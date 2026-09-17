@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Bell,
   Bot,
+  Check,
   ChevronLeft,
   ChevronRight,
   CircleAlert,
@@ -14,9 +15,9 @@ import {
   MessageCircle,
   Navigation,
   Phone,
-  Search,
   Send,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   UserRoundCheck,
   WalletCards,
@@ -57,9 +58,6 @@ function loadKakaoMaps() {
   if (window.__helperKakaoMapsPromise) return window.__helperKakaoMapsPromise
 
   window.__helperKakaoMapsPromise = new Promise((resolve, reject) => {
-    const existingScript = document.querySelector('script[data-helper-kakao-map]')
-    const script = existingScript || document.createElement('script')
-
     const finishLoading = () => {
       if (!window.kakao?.maps) {
         reject(new Error('sdk-unavailable'))
@@ -68,6 +66,13 @@ function loadKakaoMaps() {
       window.kakao.maps.load(() => resolve(window.kakao.maps))
     }
 
+    const existingScript = document.querySelector('script[data-helper-kakao-map]')
+    if (existingScript && window.kakao?.maps?.load) {
+      finishLoading()
+      return
+    }
+
+    const script = existingScript || document.createElement('script')
     script.addEventListener('load', finishLoading, { once: true })
     script.addEventListener('error', () => reject(new Error('sdk-load-failed')), { once: true })
 
@@ -378,6 +383,14 @@ function ShelterCard({ shelter, onClick }) {
 
 function ShelterView({ shelters: nearby, position, locationMessage, locateMe, locating, setSelectedShelter }) {
   const [viewMode, setViewMode] = useState('map')
+  const [filterOpen, setFilterOpen] = useState(false)
+  const [filter, setFilter] = useState('전체')
+
+  const visibleShelters = useMemo(() => {
+    if (filter === '전체') return nearby
+    if (filter === '이동쉼터') return nearby.filter((shelter) => shelter.type === '이동쉼터')
+    return nearby.filter((shelter) => shelter.gender === filter || shelter.gender === '누구나')
+  }, [filter, nearby])
 
   return (
     <div className="view shelter-view">
@@ -397,26 +410,55 @@ function ShelterView({ shelters: nearby, position, locationMessage, locateMe, lo
           <button className={viewMode === 'map' ? 'active' : ''} onClick={() => setViewMode('map')}>지도</button>
           <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}>목록</button>
         </div>
-        <button className="filter-button"><Search size={17} /> 조건 찾기</button>
+        <button
+          className={filterOpen ? 'filter-button active' : 'filter-button'}
+          onClick={() => setFilterOpen((open) => !open)}
+          aria-expanded={filterOpen}
+        >
+          <SlidersHorizontal size={17} /> 조건
+        </button>
       </div>
 
+      {filterOpen && (
+        <div className="filter-row" aria-label="대피처 이용 조건">
+          {['전체', '누구나', '여성', '남성', '이동쉼터'].map((item) => (
+            <button
+              key={item}
+              className={filter === item ? 'active' : ''}
+              onClick={() => setFilter(item)}
+            >
+              {filter === item && <Check size={14} />}
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
+
       {viewMode === 'map' ? (
-        <KakaoMap position={position} shelters={nearby} onSelectShelter={setSelectedShelter} />
+        <KakaoMap position={position} shelters={visibleShelters} onSelectShelter={setSelectedShelter} />
       ) : (
         <div className="shelter-list">
-          {nearby.map((shelter) => (
+          {visibleShelters.map((shelter) => (
             <ShelterCard key={shelter.id} shelter={shelter} onClick={() => setSelectedShelter(shelter)} />
           ))}
         </div>
       )}
 
-      {viewMode === 'map' && (
+      {visibleShelters.length === 0 && (
+        <div className="empty-state">
+          <MapPin size={25} />
+          <strong>조건에 맞는 대피처가 없어요</strong>
+          <p>다른 조건을 선택해 주세요.</p>
+        </div>
+      )}
+
+      {viewMode === 'map' && visibleShelters.length > 0 && (
         <section className="map-results">
           <div className="results-heading">
             <strong>가까운 순</strong>
-            <span>{nearby.length}곳</span>
+            <span>{visibleShelters.length}곳</span>
           </div>
-          {nearby.slice(0, 2).map((shelter) => (
+          {visibleShelters.slice(0, 3).map((shelter) => (
             <button className="result-row" key={shelter.id} onClick={() => setSelectedShelter(shelter)}>
               <span className="result-icon"><MapPin size={20} /></span>
               <span className="result-copy">
