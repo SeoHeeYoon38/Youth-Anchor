@@ -8,7 +8,6 @@ import {
   Clock3,
   Compass,
   ExternalLink,
-  HandHeart,
   Home,
   LocateFixed,
   MapPin,
@@ -216,7 +215,10 @@ function App() {
       <header className="topbar">
         <button className="brand" onClick={() => navigate('home')} aria-label="HELPER 홈">
           <span className="brand-mark">H</span>
-          <span>HELPER</span>
+          <span className="brand-copy">
+            <strong>HELPER</strong>
+            <small>청소년 안전지원</small>
+          </span>
         </button>
         <div className="topbar-actions">
           <button className="icon-button" onClick={() => setNoticeOpen(true)} aria-label="알림 안내">
@@ -280,24 +282,18 @@ function HomeView({ shelters: nearby, locationMessage, locateMe, locating, navig
   return (
     <div className="view home-view">
       <section className="welcome-band">
-        <div className="welcome-copy">
-          <span className="eyebrow"><ShieldCheck size={15} /> 로그인 없이 바로 이용해요</span>
-          <h1>지금 필요한 도움부터<br />함께 찾을게요.</h1>
-          <p>이름이나 연락처를 묻지 않아요. 대화 내용도 이 기기에 저장하지 않습니다.</p>
-        </div>
-        <div className="safety-badge" aria-hidden="true">
-          <HandHeart size={34} />
-          <span>안전이<br />먼저예요</span>
-        </div>
+        <span className="eyebrow"><ShieldCheck size={16} /> 로그인 없이 바로 이용해요</span>
+        <h1>지금, 어떤 도움이<br />가장 필요한가요?</h1>
+        <p>이름이나 연락처를 묻지 않아요. 필요한 도움부터 바로 선택하세요.</p>
       </section>
 
       <section className="urgent-actions" aria-labelledby="urgent-heading">
-        <div className="section-heading">
-          <div>
-            <span className="section-kicker">긴급 도움</span>
-            <h2 id="urgent-heading">지금 가장 필요한 건 무엇인가요?</h2>
-          </div>
-        </div>
+        <h2 className="sr-only" id="urgent-heading">긴급 도움</h2>
+        <a href="tel:112" className="danger-call">
+          <span className="danger-call-icon"><Phone size={23} /></span>
+          <span><small>지금 다칠 위험이 있어요</small><strong>112 바로 전화</strong></span>
+          <ChevronRight size={20} />
+        </a>
         <div className="action-grid">
           <button className="action-tile shelter-action" onClick={() => navigate('shelters')}>
             <span className="action-icon"><MapPin /></span>
@@ -312,16 +308,10 @@ function HomeView({ shelters: nearby, locationMessage, locateMe, locating, navig
             <ChevronRight size={18} />
           </button>
         </div>
-        <div className="emergency-row">
-          <a href="tel:112" className="emergency-link danger">
-            <Phone size={19} />
-            <span><strong>112</strong> 즉시 위험할 때</span>
-          </a>
-          <a href="tel:1388" className="emergency-link counsel">
-            <Phone size={19} />
-            <span><strong>1388</strong> 청소년 상담</span>
-          </a>
-        </div>
+        <a href="tel:1388" className="counsel-call">
+          <span><Phone size={18} /> 청소년전화 <strong>1388</strong></span>
+          <span>24시간 무료 상담 <ChevronRight size={17} /></span>
+        </a>
       </section>
 
       <section className="nearby-section">
