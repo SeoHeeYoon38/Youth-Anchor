@@ -20,14 +20,15 @@
 
 * { box-sizing: border-box; }
 html { background: #dce5e2; }
-body { margin: 0; min-width: 320px; min-height: 100vh; background: #dce5e2; }
+body { margin: 0; min-width: 320px; min-height: 100vh; overflow-x: hidden; background: #dce5e2; }
 button, input { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button { color: inherit; }
 a { color: inherit; text-decoration: none; }
 
 .app-shell {
-  width: min(100%, 520px);
+  width: 100%;
+  max-width: 520px;
   min-height: 100vh;
   margin: 0 auto;
   background: var(--canvas);
@@ -119,7 +120,7 @@ a { color: inherit; text-decoration: none; }
 .support-preview button { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 7px; background: rgba(255,255,255,.12); color: #fff; cursor: pointer; }
 .data-note { padding: 0 20px; margin: 14px 0 0; display: flex; align-items: center; gap: 5px; color: #7a8783; font-size: 10px; line-height: 1.5; }
 
-.bottom-nav { position: fixed; z-index: 900; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%, 520px); height: calc(70px + env(safe-area-inset-bottom)); padding: 8px 12px env(safe-area-inset-bottom); display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); background: rgba(255,255,255,.97); box-shadow: 0 -7px 18px rgba(25, 57, 50, .07); }
+.bottom-nav { position: fixed; z-index: 900; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 520px; height: calc(70px + env(safe-area-inset-bottom)); padding: 8px 12px env(safe-area-inset-bottom); display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); background: rgba(255,255,255,.97); box-shadow: 0 -7px 18px rgba(25, 57, 50, .07); }
 .nav-item { display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: center; border: 0; background: transparent; color: #78827f; font-size: 10px; cursor: pointer; }
 .nav-item.active { color: var(--teal); font-weight: 800; }
 
@@ -245,6 +246,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 390px) {
+  .topbar { padding-left: 14px; padding-right: 14px; }
+  .exit-button { padding: 0 9px; }
   .welcome-band { padding-left: 20px; }
   .welcome-band h1 { font-size: 27px; }
   .safety-badge { width: 78px; height: 78px; right: 14px; }
