@@ -23,7 +23,8 @@ import {
   WalletCards,
   X
 } from 'lucide-react'
-import { quickReplies, shelters, supports } from './data.js'
+import { fetchShelters, fetchSupports, requestChatReply } from './api.js'
+import { quickReplies, shelters as fallbackShelters, supports as fallbackSupports } from './data.js'
 
 const NAV_ITEMS = [
   { id: 'home', label: '홈', icon: Home },
@@ -163,10 +164,34 @@ function KakaoMap({ position, shelters: nearby, onSelectShelter }) {
 function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [position, setPosition] = useState(null)
+  const [shelterItems, setShelterItems] = useState(fallbackShelters)
+  const [supportItems, setSupportItems] = useState(fallbackSupports)
   const [locating, setLocating] = useState(false)
   const [locationMessage, setLocationMessage] = useState('서울시청 기준으로 보고 있어요')
   const [selectedShelter, setSelectedShelter] = useState(null)
   const [noticeOpen, setNoticeOpen] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    fetchShelters(position)
+      .then((items) => {
+        if (active && Array.isArray(items) && items.length > 0) setShelterItems(items)
+      })
+      .catch(() => {})
+
+    return () => { active = false }
+  }, [position])
+
+  useEffect(() => {
+    let active = true
+    fetchSupports()
+      .then((items) => {
+        if (active && Array.isArray(items) && items.length > 0) setSupportItems(items)
+      })
+      .catch(() => {})
+
+    return () => { active = false }
+  }, [])
 
   const locateMe = () => {
     if (!navigator.geolocation) {
@@ -191,10 +216,10 @@ function App() {
 
   const sortedShelters = useMemo(() => {
     const origin = position || { lat: DEFAULT_CENTER[0], lng: DEFAULT_CENTER[1] }
-    return shelters
+    return shelterItems
       .map((shelter) => ({ ...shelter, distance: distanceKm(origin, shelter) }))
       .sort((a, b) => a.distance - b.distance)
-  }, [position])
+  }, [position, shelterItems])
 
   const quickExit = async () => {
     document.title = '새 탭'
@@ -258,7 +283,7 @@ function App() {
           />
         )}
         {activeTab === 'chat' && <ChatView navigate={navigate} />}
-        {activeTab === 'support' && <SupportView />}
+        {activeTab === 'support' && <SupportView supports={supportItems} />}
       </main>
 
       <nav className="bottom-nav" aria-label="주요 메뉴">
@@ -478,6 +503,7 @@ function ShelterView({ shelters: nearby, position, locationMessage, locateMe, lo
 function ChatView({ navigate }) {
   const [started, setStarted] = useState(false)
   const [input, setInput] = useState('')
+  const [replying, setReplying] = useState(false)
   const [messages, setMessages] = useState([
     { id: 1, role: 'helper', text: '안녕하세요. 이름을 말하지 않아도 괜찮아요. 지금 어떤 도움이 가장 필요한가요?' }
   ])
@@ -494,15 +520,22 @@ function ChatView({ navigate }) {
     return '말해줘서 고마워요. 지금 느끼는 감정과 상황 중에서 가장 힘든 부분을 천천히 적어도 괜찮아요. 이 대화는 새로고침하면 사라집니다.'
   }
 
-  const sendMessage = (text) => {
+  const sendMessage = async (text) => {
     const clean = text.trim()
-    if (!clean) return
+    if (!clean || replying) return
     setStarted(true)
     setMessages((current) => [...current, { id: Date.now(), role: 'user', text: clean }])
     setInput('')
-    window.setTimeout(() => {
+    setReplying(true)
+
+    try {
+      const response = await requestChatReply(clean)
+      setMessages((current) => [...current, { id: Date.now() + 1, role: 'helper', text: response.reply }])
+    } catch {
       setMessages((current) => [...current, { id: Date.now() + 1, role: 'helper', text: replyFor(clean) }])
-    }, 550)
+    } finally {
+      setReplying(false)
+    }
   }
 
   return (
@@ -526,6 +559,12 @@ function ChatView({ navigate }) {
             <p>{message.text}</p>
           </div>
         ))}
+        {replying && (
+          <div className="message helper">
+            <span className="mini-avatar">H</span>
+            <p className="typing" aria-label="답변 작성 중"><i></i><i></i><i></i></p>
+          </div>
+        )}
         {!started && (
           <div className="quick-replies">
             {quickReplies.map((reply) => (
@@ -544,14 +583,14 @@ function ChatView({ navigate }) {
       <form className="chat-composer" onSubmit={(event) => { event.preventDefault(); sendMessage(input) }}>
         <label className="sr-only" htmlFor="chat-input">상담 내용 입력</label>
         <input id="chat-input" value={input} onChange={(event) => setInput(event.target.value)} placeholder="편하게 적어주세요" autoComplete="off" />
-        <button type="submit" disabled={!input.trim()} aria-label="보내기"><Send size={19} /></button>
+        <button type="submit" disabled={!input.trim() || replying} aria-label="보내기"><Send size={19} /></button>
       </form>
       <p className="chat-demo-note">현재는 응답 흐름 확인용 데모 상담입니다. 실제 운영 전 전문상담 연동이 필요합니다.</p>
     </div>
   )
 }
 
-function SupportView() {
+function SupportView({ supports }) {
   const categories = ['전체', '주거', '생활', '일자리', '식사']
   const [category, setCategory] = useState('전체')
   const filtered = category === '전체' ? supports : supports.filter((item) => item.category === category)
