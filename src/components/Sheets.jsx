@@ -31,13 +31,12 @@ export function ShelterSheet({ shelter, onClose }) {
     <SheetFrame onClose={onClose} labelledBy="shelter-sheet-title">
       <div className="sheet-title-row">
         <span className="sheet-place-icon"><House size={26} /></span>
-        <div><span className="live-status"><i /> {shelter.status}</span><h2 id="shelter-sheet-title">{shelter.name}</h2><p>{shelter.address}</p></div>
+        <div><span className="section-kicker">안전 공간 정보</span><h2 id="shelter-sheet-title">{shelter.name}</h2><p>{shelter.address}</p></div>
         <button className="icon-button" onClick={onClose} aria-label="닫기"><X size={20} /></button>
       </div>
-      <div className="sheet-facts">
+      <div className="sheet-facts two-columns">
         <div><span>이용 대상</span><strong>{shelter.gender}<br />{shelter.ages}</strong></div>
         <div><span>운영 시간</span><strong>{shelter.open}</strong></div>
-        <div><span>현재 정보</span><strong>{shelter.beds > 0 ? `${shelter.beds}자리 남음` : shelter.status}</strong></div>
       </div>
       <div className="tag-row large">{shelter.features.map((feature) => <span key={feature}>{feature}</span>)}</div>
       <p className="sheet-warning"><CircleAlert size={17} /> 출발 전 1388을 통해 입소 가능 여부를 다시 확인해 주세요.</p>

@@ -74,7 +74,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
         <button className="section-link group" onClick={() => navigate('/shelters')}>지도에서 모두 보기 <ChevronRight className="transition group-hover:translate-x-1" size={18} /></button>
       </section>
 
-      <p className="data-note"><CircleAlert size={14} /> 대피처 잔여석은 현재 기능 확인용 예시 정보입니다.</p>
+      <p className="data-note"><CircleAlert size={14} /> 방문 전 운영 시간과 이용 방법을 1388에서 확인해 주세요.</p>
       {chatFabVisible && (
         <div className="home-chat-fab">
           <button className="home-chat-fab-open" onClick={() => navigate('/chat')} aria-label="가온과 익명 상담 시작"><MessageCircle size={22} /><span>가온에게 말하기</span></button>

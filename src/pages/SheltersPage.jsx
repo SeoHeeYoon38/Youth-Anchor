@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react'
-import { Check, ChevronLeft, House, LocateFixed, MapPin, Search, ShieldCheck, SlidersHorizontal } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, House, LocateFixed, MapPin, Search, ShieldCheck, SlidersHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import KakaoMap from '../components/KakaoMap.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
+import ShelterOnboarding from '../components/ShelterOnboarding.jsx'
 import { formatDistance } from '../utils.js'
 
 export default function SheltersPage({ shelters, position, locationMessage, locateMe, locating, onSelectShelter }) {
@@ -48,6 +49,8 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
         </div>
       )}
 
+      <ShelterOnboarding onOpenChat={() => navigate('/chat')} />
+
       {viewMode === 'map' ? (
         <KakaoMap position={position} shelters={visibleShelters} onSelectShelter={onSelectShelter} onOpenChat={() => navigate('/chat')} />
       ) : (
@@ -65,7 +68,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
             <button className="result-row group" key={shelter.id} onClick={() => onSelectShelter(shelter)}>
               <span className="result-icon transition group-hover:scale-110"><House size={21} /></span>
               <span className="result-copy"><strong>{shelter.name}</strong><small>{formatDistance(shelter.distance)} · {shelter.open}</small></span>
-              <span className={`result-status ${shelter.status === '마감 임박' ? 'warning' : ''}`}>{shelter.status}</span>
+              <span className="result-arrow"><ChevronRight size={16} /></span>
             </button>
           ))}
         </section>
