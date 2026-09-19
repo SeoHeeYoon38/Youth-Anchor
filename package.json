@@ -1,19 +1,25 @@
 {
-  "name": "helper-youth-safety",
+  "name": "haven-youth-safety",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node server/dev.js",
+    "dev:web": "vite",
+    "api": "node server/index.js",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "node --test server/*.test.js"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-router-dom": "^7.18.4",
+    "tailwindcss": "^4.3.3",
     "vite": "latest",
     "vite-plugin-pwa": "latest"
   },

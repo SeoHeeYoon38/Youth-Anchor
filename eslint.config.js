@@ -19,5 +19,14 @@ export default [
       ...reactRefresh.configs.vite.rules,
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }]
     }
+  },
+  {
+    files: ['server/**/*.js'],
+    languageOptions: {
+      globals: globals.node
+    },
+    rules: {
+      'react-refresh/only-export-components': 'off'
+    }
   }
 ]
