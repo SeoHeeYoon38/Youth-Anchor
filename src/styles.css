@@ -312,9 +312,10 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .notification-preview p, .notification-preview strong, .notification-preview span { display: block; margin: 0; }
 .notification-preview strong { color: var(--ink); font-size: 12px; }
 .notification-preview span { margin-top: 4px; font-size: 10px; line-height: 1.5; }
-.home-chat-fab { height: 0; position: sticky; z-index: 20; bottom: 88px; display: flex; justify-content: flex-end; pointer-events: none; }
-.home-chat-fab-open { min-height: 46px; padding: 0 14px; display: flex; align-items: center; gap: 7px; position: relative; transform: translateY(-14px); border: 1px solid rgba(255,255,255,.7); border-radius: 23px; background: #7598cf; color: #fff; box-shadow: 0 10px 24px rgba(70,91,129,.25); font-size: 12px; font-weight: 800; pointer-events: auto; animation: fab-breathe 3.6s ease-in-out infinite; }
-.home-chat-fab-close { top: -23px; right: 0; pointer-events: auto; }
+/* 대피처 화면의 가온 헬퍼와 동일하게 화면 오른쪽에 고정해 스크롤을 따라오게 한다. */
+.home-chat-fab { position: fixed; z-index: 30; right: max(12px, calc((100vw - 560px) / 2 + 12px)); bottom: calc(86px + env(safe-area-inset-bottom)); display: flex; }
+.home-chat-fab-open { min-height: 46px; padding: 0 14px; display: flex; align-items: center; gap: 7px; position: relative; border: 1px solid rgba(255,255,255,.7); border-radius: 23px; background: #7598cf; color: #fff; box-shadow: 0 10px 24px rgba(70,91,129,.25); font-size: 12px; font-weight: 800; cursor: pointer; animation: fab-breathe 3.6s ease-in-out infinite; }
+.home-chat-fab-close { top: -9px; right: -9px; }
 .page-enter { animation: page-in .48s cubic-bezier(.2,.8,.2,1) both; }
 .reveal-card { animation: card-in .58s cubic-bezier(.2,.8,.2,1) both; }
 .reveal-stack > * { animation: text-in .55s cubic-bezier(.2,.8,.2,1) both; }
@@ -364,8 +365,11 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .sheet-place-icon { width: 46px; height: 46px; }
 }
 
+/* 화면이 낮으면 버튼을 숨기지 않고 라벨만 줄여 계속 닿을 수 있게 둔다. */
 @media (max-height: 650px) {
-  .home-chat-fab { display: none; }
+  .home-chat-fab { bottom: calc(78px + env(safe-area-inset-bottom)); }
+  .home-chat-fab-open { min-height: 40px; padding: 0 11px; font-size: 11px; }
+  .shelter-chat-fab { top: auto; bottom: calc(78px + env(safe-area-inset-bottom)); transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

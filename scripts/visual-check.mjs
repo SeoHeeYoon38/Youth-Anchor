@@ -8,9 +8,12 @@ const { chromium } = require('playwright')
 const outputDir = new URL('../docs/screenshots/', import.meta.url)
 await mkdir(outputDir, { recursive: true })
 
+// 실행 환경마다 크롬 위치가 달라 경로를 하드코딩하지 않는다.
+// CHROME_PATH가 있으면 그 브라우저를, 없으면 Playwright가 내려받은 브라우저를 쓴다.
 const browser = await chromium.launch({
-  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  headless: true
+  executablePath: process.env.CHROME_PATH || undefined,
+  headless: true,
+  args: ['--no-sandbox']
 })
 
 const cases = [
