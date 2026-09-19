@@ -1,7 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
-import { DEFAULT_CENTER, MASCOTS } from '../constants.js'
+import { DEFAULT_CENTER } from '../constants.js'
+import Mascot from './Mascot.jsx'
 
 const KAKAO_MAP_APP_KEY = import.meta.env.VITE_KAKAO_MAP_APP_KEY
+const MARKER_TONES = [
+  { tone: 'green', symbol: '집', label: 'Open' },
+  { tone: 'yellow', symbol: '손', label: 'Open' },
+  { tone: 'coral', symbol: 'SOS', label: '긴급 대피처' },
+  { tone: 'purple', symbol: '쉼', label: 'Open' }
+]
+
+function markerStyle(shelter, index) {
+  if (shelter.status === '마감 임박') return MARKER_TONES[2]
+  return MARKER_TONES[index % MARKER_TONES.length]
+}
 
 function loadKakaoMaps() {
   if (!KAKAO_MAP_APP_KEY) return Promise.reject(new Error('missing-key'))
@@ -57,13 +69,27 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
           level: 5
         })
 
-        shelters.forEach((shelter) => {
-          const marker = new maps.Marker({
+        shelters.forEach((shelter, index) => {
+          const style = markerStyle(shelter, index)
+          const content = document.createElement('button')
+          const pin = document.createElement('span')
+          const label = document.createElement('span')
+          content.type = 'button'
+          content.className = `haven-map-marker marker-${style.tone}`
+          content.setAttribute('aria-label', `${shelter.name} ${shelter.status}`)
+          pin.className = 'marker-pin'
+          pin.dataset.symbol = style.symbol
+          label.className = 'marker-label'
+          label.textContent = style.label
+          content.append(pin, label)
+          content.addEventListener('click', () => onSelectShelter(shelter))
+
+          const marker = new maps.CustomOverlay({
             map,
             position: new maps.LatLng(shelter.lat, shelter.lng),
-            title: shelter.name
+            content,
+            yAnchor: 1.12
           })
-          maps.event.addListener(marker, 'click', () => onSelectShelter(shelter))
           markers.push(marker)
         })
 
@@ -104,15 +130,27 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
       <div ref={mapElement} className="kakao-map" aria-label="카카오맵 대피처 지도" />
       {status !== 'ready' && (
         <div className="map-fallback" role="status">
-          <img className="mascot-float" src={MASCOTS.guide} alt="길을 안내하는 가온" />
-          <strong>{title}</strong>
-          <p>아래 목록에서는 가까운 대피처를 바로 확인할 수 있어요.</p>
+          <div className="fallback-markers" aria-label="대피처 위치 미리보기">
+            {shelters.slice(0, 4).map((shelter, index) => {
+              const style = markerStyle(shelter, index)
+              return (
+                <button className={`haven-map-marker marker-${style.tone} fallback-marker-${index + 1}`} key={shelter.id} onClick={() => onSelectShelter(shelter)} aria-label={`${shelter.name} 상세 보기`}>
+                  <span className="marker-pin" data-symbol={style.symbol} />
+                  <span className="marker-label">{style.label}</span>
+                </button>
+              )
+            })}
+          </div>
+          <div className="map-fallback-message">
+            <strong>{title}</strong>
+            <p>아래 목록에서는 가까운 대피처를 바로 확인할 수 있어요.</p>
+          </div>
         </div>
       )}
       {status === 'ready' && <div className="map-legend"><span /> 이용 가능한 대피처</div>}
       <div className="map-companion" aria-hidden="true">
-        <img src={MASCOTS.guide} alt="" />
-        <span>가온 헬퍼</span>
+        <Mascot pose="guide" />
+        <span className="map-companion-label">가온 헬퍼</span>
       </div>
     </div>
   )

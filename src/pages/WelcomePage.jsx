@@ -1,6 +1,6 @@
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { MASCOTS } from '../constants.js'
+import Mascot from '../components/Mascot.jsx'
 
 export default function WelcomePage({ onQuickExit }) {
   const navigate = useNavigate()
@@ -24,8 +24,8 @@ export default function WelcomePage({ onQuickExit }) {
       </div>
       <div className="welcome-mascot">
         <span className="mascot-halo" aria-hidden="true" />
-        <img src={MASCOTS.welcome} alt="두 팔을 벌려 반기는 Haven 안내 캐릭터 가온" />
-        <span>언제든 네 편이 되어줄게</span>
+        <Mascot pose="welcome" alt="두 팔을 벌려 반기는 Haven 안내 캐릭터 가온" />
+        <span className="welcome-promise">언제든 네 편이 되어줄게</span>
       </div>
       <button className="welcome-start group transition duration-300 hover:-translate-y-1 active:scale-[0.98]" onClick={startHaven}>
         Haven 시작하기 <ChevronRight className="transition group-hover:translate-x-1" size={20} />

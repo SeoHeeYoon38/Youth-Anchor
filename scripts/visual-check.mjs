@@ -60,6 +60,8 @@ const interactionPage = await browser.newPage({ viewport: { width: 390, height: 
 await interactionPage.goto('http://127.0.0.1:5173/home', { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: /SOS 대피처/ }).click()
 await interactionPage.waitForURL('**/shelters')
+await interactionPage.locator('.haven-map-marker').first().click()
+await interactionPage.getByRole('dialog').waitFor()
 await interactionPage.goto('http://127.0.0.1:5173/home', { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: /안전 가이드/ }).click()
 await interactionPage.getByRole('dialog', { name: /가온의 안전 가이드/ }).waitFor()

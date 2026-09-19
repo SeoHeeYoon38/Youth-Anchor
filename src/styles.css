@@ -45,7 +45,13 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
 .topbar { min-height: 70px; padding: max(10px, env(safe-area-inset-top)) 18px 10px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; background: #dd8b80; border-bottom: 1px solid rgba(255,255,255,.28); }
 .brand { padding: 0; display: inline-flex; align-items: center; gap: 9px; border: 0; background: transparent; color: #fff; font-size: 17px; font-weight: 800; cursor: pointer; }
-.brand img { width: 38px; height: 38px; border: 2px solid rgba(255,255,255,.75); border-radius: 50%; object-fit: cover; }
+.gaon-mascot { display: block; flex: 0 0 auto; background-image: url('/gaon-2-5d-sprite.png'); background-repeat: no-repeat; background-size: 300% 200%; }
+.gaon-basic { background-position: 0 0; }
+.gaon-guide { background-position: 50% 0; }
+.gaon-welcome { background-position: 100% 0; }
+.gaon-secure { background-position: 0 100%; }
+.gaon-chat { background-position: 50% 100%; }
+.brand .gaon-mascot { width: 44px; height: 44px; filter: drop-shadow(0 3px 5px rgba(72,55,69,.18)); }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
 .icon-button { width: 40px; height: 40px; padding: 0; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer; }
 .topbar .icon-button { border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.22); color: #fff; }
@@ -64,16 +70,16 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .welcome-copy h1 em { color: #c19531; font-style: normal; }
 .welcome-copy p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
 .welcome-mascot { flex: 1; min-height: 270px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 1; }
-.welcome-mascot img { width: 196px; height: 196px; border: 8px solid rgba(255,255,255,.82); border-radius: 50%; object-fit: cover; box-shadow: var(--shadow); animation: mascot-float 4.8s ease-in-out infinite; }
+.welcome-mascot .gaon-mascot { width: 220px; height: 220px; filter: drop-shadow(0 14px 18px rgba(67,73,100,.15)); animation: mascot-float 4.8s ease-in-out infinite; }
 .mascot-halo { width: 238px; height: 220px; position: absolute; z-index: 0; margin-top: -30px; border: 1px solid rgba(120,153,204,.24); border-radius: 54px; animation: halo-breathe 3.6s ease-in-out infinite; }
-.welcome-mascot img { position: relative; z-index: 1; }
-.welcome-mascot > span:not(.mascot-halo) { margin-top: 13px; padding: 8px 13px; position: relative; z-index: 2; border-radius: 16px; background: rgba(255,255,255,.88); color: var(--blue-dark); box-shadow: var(--soft-shadow); font-size: 13px; font-weight: 700; }
+.welcome-mascot .gaon-mascot { position: relative; z-index: 1; }
+.welcome-mascot > .welcome-promise { margin-top: 13px; padding: 8px 13px; position: relative; z-index: 2; border-radius: 16px; background: rgba(255,255,255,.88); color: var(--blue-dark); box-shadow: var(--soft-shadow); font-size: 13px; font-weight: 700; }
 .welcome-start { width: 100%; min-height: 54px; padding: 0 18px; display: flex; align-items: center; justify-content: center; gap: 7px; position: relative; z-index: 1; border: 0; border-radius: 16px; background: var(--blue); color: #fff; box-shadow: 0 8px 18px rgba(82,111,158,.23); font-size: 16px; font-weight: 800; cursor: pointer; }
 .welcome-screen > small { margin-top: 11px; position: relative; z-index: 1; color: #8c92a2; font-size: 12px; text-align: center; }
 
 .home-view { padding: 18px 16px 24px; }
 .guest-card { min-height: 132px; padding: 16px; display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center; border: 1px solid rgba(255,255,255,.9); border-radius: 20px; background: #fff; box-shadow: var(--shadow); }
-.guest-card > img { width: 96px; height: 96px; border: 6px solid #edf1f8; border-radius: 50%; object-fit: cover; }
+.guest-card > .gaon-mascot { width: 104px; height: 104px; margin: -4px; filter: drop-shadow(0 7px 9px rgba(74,82,111,.16)); }
 .guest-label { display: flex; align-items: center; gap: 5px; color: var(--blue-dark); font-size: 12px; font-weight: 800; }
 .guest-card h1 { margin: 7px 0 5px; font-size: 20px; line-height: 1.35; }
 .guest-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
@@ -90,12 +96,13 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .feature-tile:nth-child(3)::before { animation-delay: 2.4s; }
 .feature-tile:nth-child(4)::before { animation-delay: 3.6s; }
 .feature-tile > svg { position: absolute; right: 15px; bottom: 16px; opacity: .85; }
-.design-icon { width: 78px; height: 66px; display: block; position: relative; z-index: 1; overflow: hidden; border-radius: 16px; background-image: url('/haven-design-source.png'); background-repeat: no-repeat; background-size: 1440px 822px; background-color: rgba(255,255,255,.2); box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 5px 12px rgba(55,61,85,.12); }
-.design-icon-map { background-position: -572px -278px; }
-.design-icon-robot { width: 64px; background-position: -427px -375px; }
-.design-icon-support { width: 64px; background-position: -425px -594px; }
-.design-icon-guide { width: 104px; background-position: -534px -498px; }
-.feature-tile strong { margin-top: 20px; font-size: 17px; }
+.design-icon { width: 78px; height: 78px; display: block; position: relative; z-index: 1; background-image: url('/haven-2-5d-icons.png'); background-repeat: no-repeat; background-size: 400% 200%; filter: drop-shadow(0 8px 8px rgba(55,61,85,.2)); transition: transform .28s cubic-bezier(.2,.8,.2,1), filter .28s ease; }
+.feature-tile:hover .design-icon { transform: translateY(-3px) scale(1.06) rotate(-2deg); filter: drop-shadow(0 11px 11px rgba(55,61,85,.26)); }
+.design-icon-map { background-position: 0 0; }
+.design-icon-robot { background-position: 33.333% 0; }
+.design-icon-support { background-position: 66.666% 0; }
+.design-icon-guide { background-position: 100% 0; }
+.feature-tile strong { margin-top: 10px; font-size: 17px; }
 .feature-tile small { margin-top: 4px; max-width: calc(100% - 18px); font-size: 12px; line-height: 1.45; opacity: .78; }
 .tile-coral { background: #ce7c70; color: #fff; }
 .tile-blue { background: #7c9bcb; color: #fff; }
@@ -161,15 +168,29 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .filter-row button.active { border-color: var(--blue); background: var(--blue); color: #fff; font-weight: 800; }
 .map-wrap { height: 405px; margin: 0 16px; position: relative; overflow: hidden; border: 1px solid #d8deea; border-radius: 18px; background: #e7ecf5; box-shadow: var(--soft-shadow); }
 .kakao-map { width: 100%; height: 100%; }
-.map-fallback { position: absolute; z-index: 5; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px; background-color: #eef2f8; background-image: linear-gradient(#dfe6f0 1px, transparent 1px), linear-gradient(90deg, #dfe6f0 1px, transparent 1px); background-size: 54px 54px; text-align: center; }
-.map-fallback img { width: 82px; height: 82px; border: 5px solid #fff; border-radius: 50%; object-fit: cover; box-shadow: var(--soft-shadow); }
-.map-fallback strong { margin-top: 14px; font-size: 14px; }
-.map-fallback p { max-width: 230px; margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.map-fallback { position: absolute; z-index: 5; inset: 0; overflow: hidden; background-color: #eef2f8; background-image: linear-gradient(#dfe6f0 1px, transparent 1px), linear-gradient(90deg, #dfe6f0 1px, transparent 1px); background-size: 54px 54px; text-align: center; }
+.fallback-markers { position: absolute; inset: 0; }
+.map-fallback-message { min-width: 236px; padding: 12px 16px; position: absolute; z-index: 4; left: 50%; top: 48%; transform: translate(-50%, -50%); border: 1px solid rgba(255,255,255,.9); border-radius: 14px; background: rgba(255,255,255,.94); box-shadow: var(--soft-shadow); }
+.map-fallback-message strong { display: block; font-size: 13px; }
+.map-fallback-message p { max-width: 230px; margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.haven-map-marker { width: 88px; min-height: 88px; padding: 0; display: flex; flex-direction: column; align-items: center; position: relative; border: 0; background: transparent; cursor: pointer; filter: drop-shadow(0 6px 7px rgba(48,55,78,.2)); }
+.marker-pin { width: 72px; height: 72px; display: block; background-image: url('/haven-2-5d-icons.png'); background-repeat: no-repeat; background-size: 400% 200%; transition: transform .24s cubic-bezier(.2,.8,.2,1); }
+.haven-map-marker:hover .marker-pin, .haven-map-marker:focus-visible .marker-pin { transform: translateY(-4px) scale(1.08); }
+.marker-green .marker-pin { background-position: 0 100%; }
+.marker-yellow .marker-pin { background-position: 33.333% 100%; }
+.marker-coral .marker-pin { background-position: 66.666% 100%; }
+.marker-purple .marker-pin { background-position: 100% 100%; }
+.marker-label { margin-top: -11px; padding: 4px 9px; border: 1px solid rgba(255,255,255,.92); border-radius: 11px; background: rgba(255,255,255,.95); color: #3c4253; box-shadow: 0 4px 9px rgba(48,55,78,.13); font-size: 9px; font-weight: 800; white-space: nowrap; }
+.fallback-markers .haven-map-marker { position: absolute; }
+.fallback-marker-1 { left: 15px; top: 22px; }
+.fallback-marker-2 { right: 15px; top: 48px; }
+.fallback-marker-3 { left: 37px; bottom: 36px; }
+.fallback-marker-4 { right: 37px; bottom: 25px; }
 .map-legend { position: absolute; z-index: 5; left: 10px; top: 10px; padding: 7px 9px; display: flex; align-items: center; gap: 5px; border-radius: 9px; background: rgba(255,255,255,.94); box-shadow: var(--soft-shadow); font-size: 10px; font-weight: 700; }
 .map-legend span { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
 .map-companion { position: absolute; z-index: 6; right: 10px; bottom: 10px; display: flex; flex-direction: column; align-items: center; }
-.map-companion img { width: 58px; height: 58px; border: 4px solid #fff; border-radius: 50%; object-fit: cover; box-shadow: var(--soft-shadow); animation: mascot-breathe 3s ease-in-out infinite; }
-.map-companion span { margin-top: -3px; padding: 4px 7px; border-radius: 7px; background: #fff; box-shadow: var(--soft-shadow); color: var(--blue-dark); font-size: 9px; font-weight: 800; }
+.map-companion .gaon-mascot { width: 74px; height: 74px; filter: drop-shadow(0 7px 8px rgba(48,55,78,.2)); animation: mascot-breathe 3s ease-in-out infinite; }
+.map-companion .map-companion-label { margin-top: -8px; padding: 4px 7px; border-radius: 7px; background: #fff; box-shadow: var(--soft-shadow); color: var(--blue-dark); font-size: 9px; font-weight: 800; }
 .map-results { margin: 13px 16px 0; padding: 15px; border-radius: 18px; background: #fff; box-shadow: var(--soft-shadow); }
 .results-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; font-size: 13px; }
 .results-heading span { color: var(--muted); font-size: 11px; }
@@ -188,19 +209,19 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .empty-state p { margin: 4px 0 0; font-size: 11px; }
 
 .chat-view { min-height: calc(100vh - 72px); display: flex; flex-direction: column; background: #f2f4f9; }
-.chat-header { min-height: 76px; padding: max(12px, env(safe-area-inset-top)) 14px 11px; display: grid; grid-template-columns: 40px 48px 1fr 40px; gap: 9px; align-items: center; border-bottom: 1px solid var(--line); background: #fff; }
+.chat-header { min-height: 76px; padding: max(12px, env(safe-area-inset-top)) 14px 11px; display: grid; grid-template-columns: 40px 54px 1fr 40px; gap: 7px; align-items: center; border-bottom: 1px solid var(--line); background: #fff; }
 .chat-header .round-button { width: 40px; height: 40px; box-shadow: none; }
-.chat-header > img { width: 48px; height: 48px; border: 3px solid var(--blue-soft); border-radius: 50%; object-fit: cover; }
+.chat-header > .gaon-mascot { width: 54px; height: 54px; margin-left: -3px; filter: drop-shadow(0 4px 5px rgba(58,66,92,.18)); }
 .chat-header h1 { margin: 0; font-size: 15px; }
-.chat-header span { margin-top: 3px; display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; }
-.chat-header span i { width: 7px; height: 7px; border-radius: 50%; background: #73bd7e; }
+.chat-header > div > span { margin-top: 3px; display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; }
+.chat-header > div > span i { width: 7px; height: 7px; border-radius: 50%; background: #73bd7e; }
 .exit-compact { width: 40px; height: 40px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 12px; background: var(--coral-soft); color: var(--coral-dark); cursor: pointer; }
 .privacy-strip { padding: 10px 16px; display: flex; align-items: center; justify-content: center; gap: 6px; background: #e6e8ed; color: #676d7d; font-size: 10px; text-align: center; }
 .messages { flex: 1; min-height: 460px; padding: 16px 16px 24px; overflow-y: auto; }
 .time-marker { margin: 2px 0 19px; color: #969baa; font-size: 10px; text-align: center; }
 .message { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 13px; animation: message-in .34s cubic-bezier(.2,.8,.2,1) both; }
 .message.user { justify-content: flex-end; }
-.message > img { width: 34px; height: 34px; flex: 0 0 34px; border: 2px solid #fff; border-radius: 50%; object-fit: cover; box-shadow: 0 2px 7px rgba(67,73,100,.1); }
+.message > .gaon-mascot { width: 42px; height: 42px; flex: 0 0 42px; margin: -4px; filter: drop-shadow(0 3px 4px rgba(67,73,100,.17)); }
 .message p { max-width: 78%; margin: 0; padding: 12px 14px; border-radius: 8px 17px 17px 17px; background: #f5e8b5; color: #38311b; box-shadow: 0 3px 8px rgba(67,73,100,.07); font-size: 13px; line-height: 1.65; }
 .message.user p { border-radius: 17px 8px 17px 17px; background: #82a4d5; color: #fff; }
 .typing { min-height: 42px; display: flex; align-items: center; gap: 4px; }
@@ -219,11 +240,11 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .chat-demo-note { margin: 0; padding: 5px 16px 10px; background: #fff; color: #8b91a0; font-size: 9px; line-height: 1.5; text-align: center; }
 
 .support-view { padding: 0 16px 24px; }
-.support-hero { min-height: 212px; margin: 0 -16px; padding: 28px 20px 24px; display: grid; grid-template-columns: minmax(0, 1fr) 132px; gap: 12px; align-items: center; overflow: hidden; background: #eee6bd; }
+.support-hero { min-height: 212px; margin: 0 -16px; padding: 28px 20px 24px; display: grid; grid-template-columns: minmax(0, 1fr) 142px; gap: 10px; align-items: center; overflow: hidden; background: #eee6bd; }
 .support-hero > div > span { display: flex; align-items: center; gap: 6px; color: var(--yellow-dark); font-size: 12px; font-weight: 800; }
 .support-hero h1 { margin: 10px 0 8px; font-size: 26px; line-height: 1.35; }
 .support-hero p { max-width: 390px; margin: 0; color: #6e6549; font-size: 13px; line-height: 1.65; }
-.support-hero > img { width: 146px; height: 146px; object-fit: cover; border: 6px solid rgba(255,255,255,.72); border-radius: 38px; box-shadow: var(--soft-shadow); }
+.support-hero > .gaon-mascot { width: 150px; height: 150px; margin-left: -6px; filter: drop-shadow(0 12px 13px rgba(89,78,43,.18)); }
 .support-callout { min-height: 88px; margin-top: 16px; padding: 14px; display: grid; grid-template-columns: 44px 1fr 20px; gap: 11px; align-items: center; border-radius: 16px; background: #fff; box-shadow: var(--soft-shadow); }
 .support-callout > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: var(--yellow-soft); color: var(--yellow-dark); }
 .support-callout strong { font-size: 13px; }
@@ -251,7 +272,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 @keyframes rise { from { transform: translateY(30px); opacity: .5; } }
 .sheet-handle { width: 38px; height: 4px; margin: 0 auto 18px; border-radius: 2px; background: #cbd0d9; }
 .sheet-title-row { display: grid; grid-template-columns: 52px 1fr 40px; gap: 10px; align-items: flex-start; }
-.sheet-title-with-mascot > img { width: 52px; height: 52px; border: 3px solid var(--purple-soft); border-radius: 15px; object-fit: cover; }
+.sheet-title-with-mascot > .gaon-mascot { width: 64px; height: 64px; margin: -6px; filter: drop-shadow(0 4px 5px rgba(67,73,100,.16)); }
 .sheet-title-row h2 { margin: 7px 0 3px; font-size: 18px; line-height: 1.4; }
 .sheet-title-row p { margin: 0; color: var(--muted); font-size: 11px; }
 .sheet-place-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 15px; background: var(--blue-soft); color: var(--blue-dark); }
@@ -328,7 +349,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .topbar .icon-button { display: none; }
   .home-view { padding-left: 13px; padding-right: 13px; }
   .guest-card { grid-template-columns: 82px 1fr; gap: 12px; }
-  .guest-card > img { width: 82px; height: 82px; }
+  .guest-card > .gaon-mascot { width: 92px; height: 92px; }
   .guest-card h1 { font-size: 18px; }
   .feature-tile { min-height: 172px; padding: 14px; }
   .feature-icon { width: 58px; height: 58px; }

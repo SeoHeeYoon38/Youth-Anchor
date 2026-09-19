@@ -1,8 +1,8 @@
 import { ChevronRight, CircleAlert, LocateFixed, MessageCircle, Phone, ShieldCheck } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import DesignIcon from '../components/DesignIcon.jsx'
+import Mascot from '../components/Mascot.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
-import { MASCOTS } from '../constants.js'
 
 export default function HomePage({ shelters, locationMessage, locateMe, locating, onSelectShelter, onOpenGuide }) {
   const navigate = useNavigate()
@@ -10,7 +10,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
   return (
     <div className="view home-view page-enter">
       <section className="guest-card reveal-card">
-        <img src={MASCOTS.basic} alt="태블릿을 든 가온" />
+        <Mascot pose="basic" alt="태블릿을 든 가온" />
         <div>
           <span className="guest-label"><ShieldCheck size={15} /> 익명 게스트 모드</span>
           <h1>안녕하세요, 게스트님!</h1>
