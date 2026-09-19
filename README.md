@@ -55,6 +55,23 @@ npx web-push generate-vapid-keys                                            # �
 
 `DATA_GO_KR_SERVICE_KEY`와 카카오 키는 본인 계정으로만 발급되므로 아래 절차가 필요합니다.
 
+환경변수와 포트 상태는 다음 명령으로 확인할 수 있습니다. 값 자체는 출력하지 않고 일부만 마스킹합니다.
+
+```bash
+npm run check:env
+```
+
+Windows에서 `port: 8787`이 나오면 기존 프로세스를 종료한 뒤 다시 실행합니다.
+
+```powershell
+netstat -ano | findstr :8787
+# 마지막 숫자가 PID인 줄을 확인한 뒤
+ taskkill /PID <PID> /F
+npm run dev
+```
+
+`.env`는 반드시 `Youth-Anchor` 프로젝트 루트에 있어야 합니다. `server/.env`나 다른 폴더의 `.env`는 서버가 읽지 않습니다.
+
 ## 공공데이터 연동 준비
 
 1. [공공데이터포털](https://www.data.go.kr)에 로그인합니다.

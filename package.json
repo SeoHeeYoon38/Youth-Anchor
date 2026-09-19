@@ -13,6 +13,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
+    "check:env": "node --env-file-if-exists=.env scripts/check-env.mjs",
     "test": "node --test server/*.test.js",
     "sync": "node --env-file-if-exists=.env server/sync.js",
     "sync:shelters": "node --env-file-if-exists=.env server/sync.js shelters",
