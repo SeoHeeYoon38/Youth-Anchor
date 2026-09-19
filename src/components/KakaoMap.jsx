@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { X } from 'lucide-react'
 import { DEFAULT_CENTER } from '../constants.js'
 import Mascot from './Mascot.jsx'
 
@@ -50,9 +51,10 @@ function loadKakaoMaps() {
   return window.__havenKakaoMapsPromise
 }
 
-export default function KakaoMap({ position, shelters, onSelectShelter }) {
+export default function KakaoMap({ position, shelters, onSelectShelter, onOpenChat }) {
   const mapElement = useRef(null)
   const [status, setStatus] = useState(KAKAO_MAP_APP_KEY ? 'loading' : 'missing-key')
+  const [companionVisible, setCompanionVisible] = useState(true)
 
   useEffect(() => {
     let cancelled = false
@@ -148,10 +150,17 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
         </div>
       )}
       {status === 'ready' && <div className="map-legend"><span /> 이용 가능한 대피처</div>}
-      <div className="map-companion" aria-hidden="true">
-        <Mascot pose="guide" />
-        <span className="map-companion-label">가온 헬퍼</span>
-      </div>
+      {companionVisible && (
+        <div className="map-companion">
+          <button className="map-companion-button" type="button" onClick={onOpenChat} aria-label="가온 헬퍼 채팅 열기">
+            <Mascot pose="guide" />
+            <span className="map-companion-label">가온 헬퍼</span>
+          </button>
+          <button className="map-companion-close" type="button" onClick={() => setCompanionVisible(false)} aria-label="가온 헬퍼 플로팅 버튼 닫기">
+            <X size={13} />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -49,7 +49,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
       )}
 
       {viewMode === 'map' ? (
-        <KakaoMap position={position} shelters={visibleShelters} onSelectShelter={onSelectShelter} />
+        <KakaoMap position={position} shelters={visibleShelters} onSelectShelter={onSelectShelter} onOpenChat={() => navigate('/chat')} />
       ) : (
         <div className="shelter-list page-enter">
           {visibleShelters.map((shelter) => <ShelterCard key={shelter.id} shelter={shelter} onClick={() => onSelectShelter(shelter)} />)}
