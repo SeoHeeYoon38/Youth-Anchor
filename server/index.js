@@ -6,6 +6,7 @@ import { bearerToken, createGuestToken, verifyGuestToken } from './auth.js'
 import { createDatabase } from './database.js'
 import { syncNoticeFeeds } from './notice-sync.js'
 import { createPushService } from './push.js'
+import { ensureBaselineData, resolveOpenDataConfig, startSyncScheduler, syncAll } from './sync.js'
 
 const DEFAULT_PORT = 8787
 
@@ -82,6 +83,7 @@ export function createApiServer(options = {}) {
   const jwtSecret = configuredJwtSecret || randomBytes(32).toString('hex')
   const adminKey = options.adminKey || process.env.HAVEN_ADMIN_KEY || (process.env.NODE_ENV === 'production' ? '' : 'local-development-admin-key')
   const pushService = options.pushService || createPushService(repository, options.pushConfig)
+  const openDataConfig = options.openDataConfig || resolveOpenDataConfig()
   const socketsByRoom = new Map()
 
   function authenticate(request, response) {
@@ -115,6 +117,13 @@ export function createApiServer(options = {}) {
           service: 'haven-api',
           database: 'sqlite',
           pushConfigured: Boolean(pushService.publicKey),
+          openData: {
+            shelters: openDataConfig.shelter.enabled,
+            welfare: openDataConfig.welfare.enabled,
+            youthPolicy: openDataConfig.youthPolicy.enabled
+          },
+          counts: { shelters: repository.countShelters(), notices: repository.countNotices() },
+          lastSync: repository.latestSyncRuns(),
           time: new Date().toISOString()
         })
         return
@@ -143,6 +152,33 @@ export function createApiServer(options = {}) {
 
         if (request.method === 'POST' && url.pathname === '/api/v1/admin/notices/sync') {
           sendJson(response, 200, await syncNoticeFeeds(repository, options.noticeFeedUrls))
+          return
+        }
+
+        // 공공데이터포털 전체 동기화를 수동으로 돌린다. ?target=shelters|notices 로 범위를 좁힐 수 있다.
+        if (request.method === 'POST' && url.pathname === '/api/v1/admin/sync') {
+          const requested = url.searchParams.getAll('target').flatMap((value) => value.split(','))
+          const allowed = ['shelters', 'notices']
+          const targets = requested.filter((target) => allowed.includes(target))
+          sendJson(response, 200, await syncAll({
+            repository,
+            config: openDataConfig,
+            targets: targets.length > 0 ? targets : allowed
+          }))
+          return
+        }
+
+        if (request.method === 'GET' && url.pathname === '/api/v1/admin/sync/status') {
+          sendJson(response, 200, {
+            openData: {
+              shelters: { enabled: openDataConfig.shelter.enabled, endpoint: openDataConfig.shelter.endpoint },
+              welfare: { enabled: openDataConfig.welfare.enabled, endpoint: openDataConfig.welfare.listEndpoint },
+              youthPolicy: { enabled: openDataConfig.youthPolicy.enabled, endpoint: openDataConfig.youthPolicy.endpoint || null }
+            },
+            schedule: { hourKst: openDataConfig.scheduleHourKst, minuteKst: openDataConfig.scheduleMinuteKst },
+            counts: { shelters: repository.countShelters(), notices: repository.countNotices() },
+            runs: repository.latestSyncRuns()
+          })
           return
         }
 
@@ -352,11 +388,14 @@ export function createApiServer(options = {}) {
   const cleanupTimer = options.disableJobs ? null : setInterval(() => repository.purgeExpired(), 60 * 60 * 1000)
   cleanupTimer?.unref()
 
-  if (!options.disableJobs && (options.noticeFeedUrls || process.env.HAVEN_NOTICE_FEED_URLS)) {
-    syncNoticeFeeds(repository, options.noticeFeedUrls).catch(() => {})
-    const noticeTimer = setInterval(() => syncNoticeFeeds(repository, options.noticeFeedUrls).catch(() => {}), 6 * 60 * 60 * 1000)
-    noticeTimer.unref()
-    server.on('close', () => clearInterval(noticeTimer))
+  if (!options.disableJobs) {
+    // 키가 없으면 화면이 비지 않도록 샘플 쉼터를 넣고, 있으면 곧바로 실데이터를 당겨온다.
+    ensureBaselineData({ repository, config: openDataConfig }).catch(() => {})
+    const scheduler = startSyncScheduler({
+      repository,
+      config: { ...openDataConfig, noticeFeedUrls: options.noticeFeedUrls || openDataConfig.noticeFeedUrls }
+    })
+    server.on('close', () => scheduler.stop())
   }
 
   server.on('close', () => {

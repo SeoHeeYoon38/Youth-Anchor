@@ -4,7 +4,8 @@ import { fileURLToPath } from 'node:url'
 const viteBin = fileURLToPath(new URL('../node_modules/vite/bin/vite.js', import.meta.url))
 const forwardedArgs = process.argv.slice(2)
 
-const api = spawn(process.execPath, ['--watch', 'server/index.js'], { stdio: 'inherit' })
+// .env는 서버 프로세스에서만 필요하다. Vite는 자체적으로 .env를 읽는다.
+const api = spawn(process.execPath, ['--env-file-if-exists=.env', '--watch', 'server/index.js'], { stdio: 'inherit' })
 const web = spawn(process.execPath, [viteBin, ...forwardedArgs], { stdio: 'inherit' })
 
 let stopping = false

@@ -27,6 +27,9 @@ function SheetFrame({ children, onClose, labelledBy, className = '' }) {
 
 export function ShelterSheet({ shelter, onClose }) {
   const mapUrl = `https://map.kakao.com/link/to/${encodeURIComponent(shelter.name)},${shelter.lat},${shelter.lng}`
+  // 공공데이터에서 대표전화를 받아오면 그 번호로 걸고, 없으면 청소년전화 1388로 안내한다.
+  const phone = shelter.phone || '1388'
+  const dialNumber = phone.replace(/[^0-9+]/g, '') || '1388'
   return (
     <SheetFrame onClose={onClose} labelledBy="shelter-sheet-title">
       <div className="sheet-title-row">
@@ -37,12 +40,12 @@ export function ShelterSheet({ shelter, onClose }) {
       <div className="sheet-facts">
         <div><span>이용 대상</span><strong>{shelter.gender}<br />{shelter.ages}</strong></div>
         <div><span>운영 시간</span><strong>{shelter.open}</strong></div>
-        <div><span>입소 문의</span><strong>1388 전화 확인</strong></div>
+        <div><span>입소 문의</span><strong>{phone}</strong></div>
       </div>
       <div className="tag-row large">{shelter.features.map((feature) => <span key={feature}>{feature}</span>)}</div>
-      <p className="sheet-warning"><CircleAlert size={17} /> 출발 전 1388을 통해 입소 가능 여부를 다시 확인해 주세요.</p>
+      <p className="sheet-warning"><CircleAlert size={17} /> 출발 전 전화로 입소 가능 여부를 다시 확인해 주세요. 연결이 어렵다면 청소년전화 1388을 이용하세요.</p>
       <div className="sheet-actions">
-        <a className="secondary-action" href="tel:1388"><Phone size={18} /> 전화 확인</a>
+        <a className="secondary-action" href={`tel:${dialNumber}`}><Phone size={18} /> 전화 확인</a>
         <a className="primary-action" href={mapUrl} target="_blank" rel="noreferrer"><Navigation size={18} /> 경로 안내받기</a>
       </div>
     </SheetFrame>

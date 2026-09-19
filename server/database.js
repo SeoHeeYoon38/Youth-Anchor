@@ -26,6 +26,7 @@ function mapNotice(row) {
     tags: parseJson(row.tags),
     applicationUrl: row.application_url,
     provider: row.provider,
+    contact: row.contact || '',
     deadline: row.deadline,
     sourceUrl: row.source_url,
     publishedAt: row.published_at,
@@ -46,7 +47,50 @@ function mapShelter(row) {
     address: row.address,
     phone: row.phone,
     open: row.open_hours,
-    features: parseJson(row.features)
+    features: parseJson(row.features),
+    capacity: row.capacity ?? null,
+    region: row.region || '',
+    homepage: row.homepage || null,
+    entryTarget: row.entry_target || '',
+    entryPeriod: row.entry_period || '',
+    source: row.source || 'seed'
+  }
+}
+
+/** createShelter와 upsertShelter가 같은 컬럼 순서를 공유하도록 값 배열을 만든다. */
+function shelterValues(shelter, now) {
+  return [
+    shelter.externalId || null,
+    shelter.name,
+    shelter.type,
+    shelter.gender || '누구나',
+    shelter.ages || '',
+    shelter.lat,
+    shelter.lng,
+    shelter.address,
+    shelter.phone || '1388',
+    shelter.open || '',
+    JSON.stringify(shelter.features || []),
+    Number.isFinite(shelter.capacity) ? shelter.capacity : null,
+    shelter.region || '',
+    shelter.homepage || null,
+    shelter.entryTarget || '',
+    shelter.entryPeriod || '',
+    shelter.source || 'seed',
+    now,
+    now
+  ]
+}
+
+/**
+ * 이미 만들어진 데이터베이스 파일에도 새 컬럼을 안전하게 더한다.
+ * node:sqlite에는 마이그레이션 도구가 없어 PRAGMA로 존재 여부를 직접 확인한다.
+ */
+function ensureColumns(database, table, columns) {
+  const existing = new Set(database.prepare(`PRAGMA table_info(${table})`).all().map((row) => row.name))
+  for (const [name, definition] of Object.entries(columns)) {
+    if (existing.has(name)) continue
+    database.exec(`ALTER TABLE ${table} ADD COLUMN ${name} ${definition}`)
   }
 }
 
@@ -71,6 +115,7 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
       tags TEXT NOT NULL DEFAULT '[]',
       application_url TEXT,
       provider TEXT NOT NULL DEFAULT '',
+      contact TEXT NOT NULL DEFAULT '',
       deadline TEXT NOT NULL DEFAULT '',
       source_url TEXT,
       published_at TEXT NOT NULL,
@@ -91,8 +136,26 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
       phone TEXT NOT NULL DEFAULT '1388',
       open_hours TEXT NOT NULL DEFAULT '',
       features TEXT NOT NULL DEFAULT '[]',
+      capacity INTEGER,
+      region TEXT NOT NULL DEFAULT '',
+      homepage TEXT,
+      entry_target TEXT NOT NULL DEFAULT '',
+      entry_period TEXT NOT NULL DEFAULT '',
+      source TEXT NOT NULL DEFAULT 'seed',
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS sync_runs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      target TEXT NOT NULL,
+      status TEXT NOT NULL,
+      imported INTEGER NOT NULL DEFAULT 0,
+      skipped INTEGER NOT NULL DEFAULT 0,
+      total_count INTEGER NOT NULL DEFAULT 0,
+      message TEXT NOT NULL DEFAULT '',
+      started_at TEXT NOT NULL,
+      finished_at TEXT NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS guest_sessions (
@@ -150,7 +213,18 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     CREATE INDEX IF NOT EXISTS idx_shelters_coordinates ON shelters(lat, lng);
     CREATE INDEX IF NOT EXISTS idx_chat_rooms_guest ON chat_rooms(guest_jti);
     CREATE INDEX IF NOT EXISTS idx_push_audience ON push_subscriptions(audience);
+    CREATE INDEX IF NOT EXISTS idx_sync_runs_target ON sync_runs(target, finished_at);
   `)
+
+  ensureColumns(database, 'notices', { contact: "TEXT NOT NULL DEFAULT ''" })
+  ensureColumns(database, 'shelters', {
+    capacity: 'INTEGER',
+    region: "TEXT NOT NULL DEFAULT ''",
+    homepage: 'TEXT',
+    entry_target: "TEXT NOT NULL DEFAULT ''",
+    entry_period: "TEXT NOT NULL DEFAULT ''",
+    source: "TEXT NOT NULL DEFAULT 'seed'"
+  })
 
   const statements = {
     listNotices: database.prepare(`
@@ -164,8 +238,8 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     upsertNotice: database.prepare(`
       INSERT INTO notices (
         external_id, kind, category, title, summary, content, eligibility, benefits, tags,
-        application_url, provider, deadline, source_url, published_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        application_url, provider, contact, deadline, source_url, published_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(source_url, external_id) DO UPDATE SET
         kind = excluded.kind,
         category = excluded.category,
@@ -177,6 +251,7 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
         tags = excluded.tags,
         application_url = excluded.application_url,
         provider = excluded.provider,
+        contact = excluded.contact,
         deadline = excluded.deadline,
         published_at = excluded.published_at,
         updated_at = excluded.updated_at
@@ -186,8 +261,47 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     createShelter: database.prepare(`
       INSERT INTO shelters (
         external_id, name, type, gender, ages, lat, lng, address, phone, open_hours,
-        features, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        features, capacity, region, homepage, entry_target, entry_period, source,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `),
+    upsertShelter: database.prepare(`
+      INSERT INTO shelters (
+        external_id, name, type, gender, ages, lat, lng, address, phone, open_hours,
+        features, capacity, region, homepage, entry_target, entry_period, source,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(external_id) DO UPDATE SET
+        name = excluded.name,
+        type = excluded.type,
+        gender = excluded.gender,
+        ages = excluded.ages,
+        lat = excluded.lat,
+        lng = excluded.lng,
+        address = excluded.address,
+        phone = excluded.phone,
+        open_hours = excluded.open_hours,
+        features = excluded.features,
+        capacity = excluded.capacity,
+        region = excluded.region,
+        homepage = excluded.homepage,
+        entry_target = excluded.entry_target,
+        entry_period = excluded.entry_period,
+        source = excluded.source,
+        updated_at = excluded.updated_at
+    `),
+    getShelterByExternalId: database.prepare('SELECT * FROM shelters WHERE external_id = ?'),
+    countShelters: database.prepare('SELECT COUNT(*) AS total FROM shelters'),
+    countNotices: database.prepare('SELECT COUNT(*) AS total FROM notices'),
+    deleteSheltersBySource: database.prepare('DELETE FROM shelters WHERE source = ?'),
+    recordSyncRun: database.prepare(`
+      INSERT INTO sync_runs (target, status, imported, skipped, total_count, message, started_at, finished_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `),
+    latestSyncRuns: database.prepare(`
+      SELECT * FROM sync_runs WHERE id IN (
+        SELECT MAX(id) FROM sync_runs GROUP BY target
+      ) ORDER BY target
     `),
     createGuest: database.prepare('INSERT INTO guest_sessions (jti, created_at, expires_at) VALUES (?, ?, ?)'),
     getGuest: database.prepare('SELECT * FROM guest_sessions WHERE jti = ?'),
@@ -236,6 +350,7 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
         JSON.stringify(notice.tags || []),
         notice.applicationUrl || null,
         notice.provider || '',
+        notice.contact || '',
         notice.deadline || '',
         notice.sourceUrl || null,
         notice.publishedAt || now,
@@ -251,22 +366,48 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     },
     createShelter(shelter) {
       const now = new Date().toISOString()
-      const result = statements.createShelter.run(
-        shelter.externalId || null,
-        shelter.name,
-        shelter.type,
-        shelter.gender || '누구나',
-        shelter.ages || '',
-        shelter.lat,
-        shelter.lng,
-        shelter.address,
-        shelter.phone || '1388',
-        shelter.open || '',
-        JSON.stringify(shelter.features || []),
-        now,
-        now
-      )
+      const result = statements.createShelter.run(...shelterValues(shelter, now))
       return this.getShelter(Number(result.lastInsertRowid))
+    },
+    /** external_id 기준으로 새로 넣거나 갱신한다. 동기화 배치가 반복 실행돼도 중복되지 않는다. */
+    upsertShelter(shelter) {
+      if (!shelter.externalId) throw new Error('shelter-external-id-required')
+      const now = new Date().toISOString()
+      statements.upsertShelter.run(...shelterValues(shelter, now))
+      return mapShelter(statements.getShelterByExternalId.get(shelter.externalId))
+    },
+    countShelters() {
+      return Number(statements.countShelters.get()?.total || 0)
+    },
+    countNotices() {
+      return Number(statements.countNotices.get()?.total || 0)
+    },
+    deleteSheltersBySource(source) {
+      return statements.deleteSheltersBySource.run(source).changes
+    },
+    recordSyncRun(run) {
+      statements.recordSyncRun.run(
+        run.target,
+        run.status,
+        run.imported || 0,
+        run.skipped || 0,
+        run.totalCount || 0,
+        run.message || '',
+        run.startedAt,
+        run.finishedAt || new Date().toISOString()
+      )
+    },
+    latestSyncRuns() {
+      return statements.latestSyncRuns.all().map((row) => ({
+        target: row.target,
+        status: row.status,
+        imported: row.imported,
+        skipped: row.skipped,
+        totalCount: row.total_count,
+        message: row.message,
+        startedAt: row.started_at,
+        finishedAt: row.finished_at
+      }))
     },
     createGuest(jti, createdAt, expiresAt) {
       statements.createGuest.run(jti, createdAt, expiresAt)
