@@ -1,6 +1,8 @@
-# HELPER
+# Haven
 
 위기청소년과 자립준비청년이 로그인 없이 대피처, 익명 상담, 자립지원 정보를 확인할 수 있는 모바일 PWA입니다.
+
+화면은 React Router를 기준으로 `/home`, `/shelters`, `/chat`, `/support` 페이지로 분리되어 있으며 Tailwind CSS와 반응형 전용 스타일을 함께 사용합니다.
 
 ## 로컬 실행
 
