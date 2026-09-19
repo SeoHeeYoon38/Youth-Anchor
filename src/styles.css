@@ -188,9 +188,12 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .fallback-marker-4 { right: 37px; bottom: 25px; }
 .map-legend { position: absolute; z-index: 5; left: 10px; top: 10px; padding: 7px 9px; display: flex; align-items: center; gap: 5px; border-radius: 9px; background: rgba(255,255,255,.94); box-shadow: var(--soft-shadow); font-size: 10px; font-weight: 700; }
 .map-legend span { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-.map-companion { position: absolute; z-index: 6; right: 10px; bottom: 10px; display: flex; flex-direction: column; align-items: center; }
-.map-companion .gaon-mascot { width: 74px; height: 74px; filter: drop-shadow(0 7px 8px rgba(48,55,78,.2)); animation: mascot-breathe 3s ease-in-out infinite; }
+.map-companion { position: absolute; z-index: 7; right: 10px; bottom: 10px; display: flex; flex-direction: column; align-items: center; }
+.map-companion-button { padding: 0; display: flex; flex-direction: column; align-items: center; border: 0; background: transparent; cursor: pointer; }
+.map-companion-button .gaon-mascot { width: 74px; height: 74px; filter: drop-shadow(0 7px 8px rgba(48,55,78,.2)); animation: mascot-breathe 3s ease-in-out infinite; }
 .map-companion .map-companion-label { margin-top: -8px; padding: 4px 7px; border-radius: 7px; background: #fff; box-shadow: var(--soft-shadow); color: var(--blue-dark); font-size: 9px; font-weight: 800; }
+.map-companion-close, .home-chat-fab-close { width: 22px; height: 22px; padding: 0; display: grid; place-items: center; position: absolute; z-index: 2; border: 2px solid #fff; border-radius: 50%; background: #4d5870; color: #fff; box-shadow: 0 3px 7px rgba(48,55,78,.25); cursor: pointer; }
+.map-companion-close { top: -2px; right: -2px; }
 .map-results { margin: 13px 16px 0; padding: 15px; border-radius: 18px; background: #fff; box-shadow: var(--soft-shadow); }
 .results-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; font-size: 13px; }
 .results-heading span { color: var(--muted); font-size: 11px; }
@@ -309,7 +312,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .notification-preview strong { color: var(--ink); font-size: 12px; }
 .notification-preview span { margin-top: 4px; font-size: 10px; line-height: 1.5; }
 .home-chat-fab { height: 0; position: sticky; z-index: 20; bottom: 88px; display: flex; justify-content: flex-end; pointer-events: none; }
-.home-chat-fab button { min-height: 46px; padding: 0 14px; display: flex; align-items: center; gap: 7px; transform: translateY(-14px); border: 1px solid rgba(255,255,255,.7); border-radius: 23px; background: #7598cf; color: #fff; box-shadow: 0 10px 24px rgba(70,91,129,.25); font-size: 12px; font-weight: 800; pointer-events: auto; animation: fab-breathe 3.6s ease-in-out infinite; }
+.home-chat-fab-open { min-height: 46px; padding: 0 14px; display: flex; align-items: center; gap: 7px; position: relative; transform: translateY(-14px); border: 1px solid rgba(255,255,255,.7); border-radius: 23px; background: #7598cf; color: #fff; box-shadow: 0 10px 24px rgba(70,91,129,.25); font-size: 12px; font-weight: 800; pointer-events: auto; animation: fab-breathe 3.6s ease-in-out infinite; }
+.home-chat-fab-close { top: -23px; right: 0; pointer-events: auto; }
 .page-enter { animation: page-in .48s cubic-bezier(.2,.8,.2,1) both; }
 .reveal-card { animation: card-in .58s cubic-bezier(.2,.8,.2,1) both; }
 .reveal-stack > * { animation: text-in .55s cubic-bezier(.2,.8,.2,1) both; }
