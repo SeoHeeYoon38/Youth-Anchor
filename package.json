@@ -1,5 +1,5 @@
 {
-  "name": "helper-youth-safety",
+  "name": "haven-youth-safety",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -13,10 +13,13 @@
     "test": "node --test server/*.test.js"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-router-dom": "^7.18.4",
+    "tailwindcss": "^4.3.3",
     "vite": "latest",
     "vite-plugin-pwa": "latest"
   },

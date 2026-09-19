@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Haven">
+  <rect width="512" height="512" rx="96" fill="#7899cc"/>
+  <path d="M136 122h72v98h96v-98h72v268h-72V286h-96v104h-72z" fill="#fff"/>
+  <circle cx="374" cy="130" r="54" fill="#f0c75e"/>
+  <path d="M350 131l17 17 32-36" fill="none" stroke="#2f3d5c" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

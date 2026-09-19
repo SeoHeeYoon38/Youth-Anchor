@@ -128,6 +128,6 @@ const isMainModule = process.argv[1] && import.meta.url === pathToFileURL(proces
 if (isMainModule) {
   const port = Number(process.env.PORT) || DEFAULT_PORT
   createApiServer().listen(port, '127.0.0.1', () => {
-    console.log(`HELPER API ready at http://127.0.0.1:${port}`)
+    console.log(`Haven API ready at http://127.0.0.1:${port}`)
   })
 }
