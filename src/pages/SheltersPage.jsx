@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
-import { Check, ChevronLeft, House, LocateFixed, MapPin, Search, ShieldCheck, SlidersHorizontal } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, House, LocateFixed, MapPin, Search, ShieldCheck, SlidersHorizontal, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import KakaoMap from '../components/KakaoMap.jsx'
+import Mascot from '../components/Mascot.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
 import { formatDistance } from '../utils.js'
 
@@ -10,6 +11,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
   const [viewMode, setViewMode] = useState('map')
   const [filterOpen, setFilterOpen] = useState(false)
   const [filter, setFilter] = useState('전체')
+  const [chatFabVisible, setChatFabVisible] = useState(true)
 
   const visibleShelters = useMemo(() => {
     if (filter === '전체') return shelters
@@ -49,7 +51,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
       )}
 
       {viewMode === 'map' ? (
-        <KakaoMap position={position} shelters={visibleShelters} onSelectShelter={onSelectShelter} onOpenChat={() => navigate('/chat')} />
+        <KakaoMap position={position} shelters={visibleShelters} onSelectShelter={onSelectShelter} />
       ) : (
         <div className="shelter-list page-enter">
           {visibleShelters.map((shelter) => <ShelterCard key={shelter.id} shelter={shelter} onClick={() => onSelectShelter(shelter)} />)}
@@ -65,12 +67,21 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
             <button className="result-row group" key={shelter.id} onClick={() => onSelectShelter(shelter)}>
               <span className="result-icon transition group-hover:scale-110"><House size={21} /></span>
               <span className="result-copy"><strong>{shelter.name}</strong><small>{formatDistance(shelter.distance)} · {shelter.open}</small></span>
-              <span className={`result-status ${shelter.status === '마감 임박' ? 'warning' : ''}`}>{shelter.status}</span>
+              <ChevronRight className="result-chevron" size={18} />
             </button>
           ))}
         </section>
       )}
       <p className="data-note"><ShieldCheck size={14} /> 위치는 가까운 순서를 계산할 때만 사용해요.</p>
+      {chatFabVisible && (
+        <div className="shelter-chat-fab">
+          <button className="shelter-chat-fab-open" type="button" onClick={() => navigate('/chat')} aria-label="가온 헬퍼 채팅 열기">
+            <Mascot pose="guide" />
+            <span>가온 헬퍼</span>
+          </button>
+          <button className="shelter-chat-fab-close" type="button" onClick={() => setChatFabVisible(false)} aria-label="가온 헬퍼 플로팅 버튼 닫기"><X size={13} /></button>
+        </div>
+      )}
     </div>
   )
 }

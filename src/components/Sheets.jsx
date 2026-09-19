@@ -31,13 +31,13 @@ export function ShelterSheet({ shelter, onClose }) {
     <SheetFrame onClose={onClose} labelledBy="shelter-sheet-title">
       <div className="sheet-title-row">
         <span className="sheet-place-icon"><House size={26} /></span>
-        <div><span className="live-status"><i /> {shelter.status}</span><h2 id="shelter-sheet-title">{shelter.name}</h2><p>{shelter.address}</p></div>
+        <div><span className="section-kicker">안전 공간 정보</span><h2 id="shelter-sheet-title">{shelter.name}</h2><p>{shelter.address}</p></div>
         <button className="icon-button" onClick={onClose} aria-label="닫기"><X size={20} /></button>
       </div>
       <div className="sheet-facts">
         <div><span>이용 대상</span><strong>{shelter.gender}<br />{shelter.ages}</strong></div>
         <div><span>운영 시간</span><strong>{shelter.open}</strong></div>
-        <div><span>현재 정보</span><strong>{shelter.beds > 0 ? `${shelter.beds}자리 남음` : shelter.status}</strong></div>
+        <div><span>입소 문의</span><strong>1388 전화 확인</strong></div>
       </div>
       <div className="tag-row large">{shelter.features.map((feature) => <span key={feature}>{feature}</span>)}</div>
       <p className="sheet-warning"><CircleAlert size={17} /> 출발 전 1388을 통해 입소 가능 여부를 다시 확인해 주세요.</p>
@@ -88,7 +88,7 @@ export function GuideSheet({ onClose }) {
   )
 }
 
-export function NoticeSheet({ onClose }) {
+export function NoticeSheet({ notices = [], status, onSubscribe, onClose }) {
   return (
     <SheetFrame onClose={onClose} labelledBy="notice-title" className="notice-sheet">
       <div className="sheet-title-row">
@@ -96,8 +96,15 @@ export function NoticeSheet({ onClose }) {
         <div><span className="section-kicker">알림 설정</span><h2 id="notice-title">필요한 소식만 받을게요</h2></div>
         <button className="icon-button" onClick={onClose} aria-label="닫기"><X size={20} /></button>
       </div>
-      <div className="notification-preview"><ShieldCheck size={20} /><p><strong>대피처·지원 정보 알림</strong><span>직접 동의하기 전에는 어떤 알림도 보내지 않아요.</span></p></div>
-      <button className="primary-action full" onClick={onClose}>확인했어요</button>
+      {notices.length > 0 ? (
+        <div className="notice-list">
+          {notices.slice(0, 5).map((notice) => <div className="notification-preview" key={notice.id}><ShieldCheck size={20} /><p><strong>{notice.title}</strong><span>{notice.summary || notice.content}</span></p></div>)}
+        </div>
+      ) : (
+        <div className="notification-preview"><ShieldCheck size={20} /><p><strong>새 공지사항이 없어요</strong><span>관리자 공지나 긴급 지원 소식이 등록되면 이곳에 표시돼요.</span></p></div>
+      )}
+      {status && <p className="sheet-warning" role="status">{status}</p>}
+      <button className="primary-action full" onClick={onSubscribe}>새 소식 알림 켜기</button>
     </SheetFrame>
   )
 }

@@ -6,7 +6,10 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   server: {
     proxy: {
-      '/api': 'http://127.0.0.1:8787'
+      '/api': {
+        target: 'http://127.0.0.1:8787',
+        ws: true
+      }
     }
   },
   plugins: [
@@ -36,6 +39,7 @@ export default defineConfig({
       workbox: {
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,
+        importScripts: ['/push-sw.js'],
         globPatterns: ['**/*.{js,css,html,svg,woff2}']
       }
     })

@@ -70,11 +70,12 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
           {shelters.slice(0, 3).map((shelter) => (
             <ShelterCard key={shelter.id} shelter={shelter} onClick={() => onSelectShelter(shelter)} />
           ))}
+          {shelters.length === 0 && <div className="empty-state compact"><strong>등록된 대피처가 없어요</strong><p>관리자가 정보를 등록하면 가까운 순서로 표시돼요.</p></div>}
         </div>
         <button className="section-link group" onClick={() => navigate('/shelters')}>지도에서 모두 보기 <ChevronRight className="transition group-hover:translate-x-1" size={18} /></button>
       </section>
 
-      <p className="data-note"><CircleAlert size={14} /> 대피처 잔여석은 현재 기능 확인용 예시 정보입니다.</p>
+      <p className="data-note"><CircleAlert size={14} /> 방문 전 1388을 통해 운영 여부와 입소 방법을 확인해 주세요.</p>
       {chatFabVisible && (
         <div className="home-chat-fab">
           <button className="home-chat-fab-open" onClick={() => navigate('/chat')} aria-label="가온과 익명 상담 시작"><MessageCircle size={22} /><span>가온에게 말하기</span></button>
