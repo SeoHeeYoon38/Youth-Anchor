@@ -389,8 +389,8 @@ export function createApiServer(options = {}) {
   cleanupTimer?.unref()
 
   if (!options.disableJobs) {
-    // 키가 없으면 화면이 비지 않도록 샘플 쉼터를 넣고, 있으면 곧바로 실데이터를 당겨온다.
-    ensureBaselineData({ repository, config: openDataConfig }).catch(() => {})
+    // 첫 실행부터 전국 쉼터가 보이도록 동봉 데이터를 넣고, 키가 있으면 오픈API로 갱신한다.
+    ensureBaselineData({ repository }).catch(() => {})
     const scheduler = startSyncScheduler({
       repository,
       config: { ...openDataConfig, noticeFeedUrls: options.noticeFeedUrls || openDataConfig.noticeFeedUrls }

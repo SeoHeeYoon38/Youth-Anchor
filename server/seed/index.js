@@ -1,14 +1,28 @@
 import { readFile } from 'node:fs/promises'
 
+export const SEED_SOURCE = 'mogef-file'
+
 /**
- * 공공데이터포털 서비스키가 없을 때만 쓰는 샘플 쉼터 목록.
+ * 전국 청소년쉼터 137곳의 실제 목록.
  *
- * 실제 쉼터 정보로 오해하면 위험하므로 이름과 태그에 '샘플'을 명시해 두었고,
- * 실데이터 동기화가 한 번이라도 성공하면 source='seed' 행은 모두 삭제된다.
+ * 출처: 공공데이터포털 '성평등가족부_청소년쉼터 현황' 파일데이터(2025년 3월 기준).
+ * https://www.data.go.kr/data/3084536/fileData.do
+ *
+ * 이 파일데이터는 인증키 없이 내려받을 수 있어 서비스키 발급 전에도 실데이터로 동작한다.
+ * 원본에 좌표가 없어 주소를 지오코딩해 넣었고, 갱신은 scripts/build-shelter-seed.mjs로 한다.
+ * 오픈API 동기화가 성공하면 더 최신인 API 데이터로 대체된다.
  */
 export async function loadSeedShelters() {
   const path = new URL('./shelters.json', import.meta.url)
   const raw = await readFile(path, 'utf8')
   const parsed = JSON.parse(raw)
-  return Array.isArray(parsed) ? parsed.map((shelter) => ({ ...shelter, source: 'seed' })) : []
+  if (!Array.isArray(parsed)) return []
+  return parsed.map(({ geocodePrecision, ...shelter }) => ({
+    ...shelter,
+    source: SEED_SOURCE,
+    // 시군구 단위로만 좌표를 찾은 곳은 거리 표시가 부정확할 수 있어 태그로 알린다.
+    features: geocodePrecision === 'region'
+      ? [...(shelter.features || []), '위치 대략 표시']
+      : shelter.features || []
+  }))
 }

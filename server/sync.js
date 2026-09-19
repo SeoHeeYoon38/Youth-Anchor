@@ -124,8 +124,8 @@ export async function syncShelters({
       imported += 1
     }
 
-    // 실데이터가 들어오면 초기 화면용 샘플 시드는 더 이상 필요 없다.
-    if (imported > 0) repository.deleteSheltersBySource('seed')
+    // 오픈API가 더 최신이므로 동봉 파일데이터로 넣어둔 행은 정리한다.
+    if (imported > 0) repository.deleteSheltersExceptSource(SHELTER_SOURCE)
 
     const message = withoutCoordinates > 0 ? `좌표 없음 ${withoutCoordinates}건 제외` : ''
     logger.log?.(`[sync] shelters imported=${imported} total=${totalCount} ${message}`)
@@ -215,16 +215,18 @@ export async function syncSupportNotices({
 }
 
 /**
- * 키가 하나도 없을 때 화면이 비어 보이지 않도록 샘플 쉼터를 넣는다.
- * source='seed'로 표시되며 실데이터가 들어오는 순간 삭제된다.
+ * DB가 비어 있으면 동봉된 전국 청소년쉼터 실데이터를 먼저 넣는다.
+ *
+ * 성평등가족부 파일데이터 기반이라 서비스키가 없어도 첫 실행부터 실제 쉼터가 보인다.
+ * 서비스키가 있는 환경에서도 오픈API 응답을 기다리는 동안 화면이 비지 않도록 항상 넣고,
+ * 이후 동기화가 성공하면 더 최신인 오픈API 데이터로 교체된다.
  */
-export async function ensureBaselineData({ repository, config = resolveOpenDataConfig(), logger = console } = {}) {
+export async function ensureBaselineData({ repository, logger = console } = {}) {
   if (repository.countShelters() > 0) return { inserted: 0, reason: 'already-populated' }
-  if (config.shelter.enabled) return { inserted: 0, reason: 'live-sync-available' }
 
   const seeds = await loadSeedShelters()
-  for (const shelter of seeds) repository.upsertShelter({ ...shelter, source: 'seed' })
-  logger.log?.(`[sync] seeded ${seeds.length} sample shelters (공공데이터 키 미설정)`)
+  for (const shelter of seeds) repository.upsertShelter(shelter)
+  logger.log?.(`[sync] 전국 청소년쉼터 ${seeds.length}곳을 동봉 데이터로 채웠습니다 (성평등가족부 2025-03 기준)`)
   return { inserted: seeds.length, reason: 'seeded' }
 }
 

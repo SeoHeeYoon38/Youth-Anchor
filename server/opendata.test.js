@@ -10,7 +10,14 @@ import {
   normalizeWelfareService,
   fetchWelfareServices
 } from './opendata/notices.js'
-import { millisecondsUntilNextRun, resolveOpenDataConfig, syncShelters, syncSupportNotices } from './sync.js'
+import { SEED_SOURCE, loadSeedShelters } from './seed/index.js'
+import {
+  ensureBaselineData,
+  millisecondsUntilNextRun,
+  resolveOpenDataConfig,
+  syncShelters,
+  syncSupportNotices
+} from './sync.js'
 
 const SHELTER_RECORD = {
   fcltNm: '서울시립 강북여자단기청소년쉼터',
@@ -304,9 +311,9 @@ test('쉼터 동기화를 다시 돌려도 행이 늘지 않는다', async () =>
   repository.close()
 })
 
-test('실데이터가 들어오면 샘플 시드를 지운다', async () => {
+test('오픈API 동기화가 성공하면 동봉 파일데이터 행을 대체한다', async () => {
   const repository = createDatabase(':memory:')
-  repository.upsertShelter({ externalId: 'seed:sample', name: '샘플 쉼터', type: '일시쉼터', lat: 37.5, lng: 127, address: '샘플', source: 'seed' })
+  repository.upsertShelter({ externalId: 'mogef-file:1:파일쉼터', name: '파일쉼터', type: '일시쉼터', lat: 37.5, lng: 127, address: '서울', source: 'mogef-file' })
   assert.equal(repository.countShelters(), 1)
 
   await syncShelters({
@@ -355,6 +362,50 @@ test('동기화 스케줄은 한국시간 새벽 시각을 가리킨다', () => 
 
   const nextDay = millisecondsUntilNextRun(4, 10, new Date('2026-09-19T19:20:00Z'))
   assert.equal(nextDay, 24 * 60 * 60 * 1000 - 10 * 60 * 1000)
+})
+
+test('동봉된 전국 쉼터 데이터가 유효하다', async () => {
+  const seeds = await loadSeedShelters()
+  assert.ok(seeds.length >= 130, `쉼터 수가 너무 적습니다: ${seeds.length}`)
+
+  for (const shelter of seeds) {
+    assert.ok(shelter.name, '시설명이 비었습니다')
+    assert.ok(shelter.address, `${shelter.name}: 주소가 비었습니다`)
+    assert.ok(shelter.phone, `${shelter.name}: 전화번호가 비었습니다`)
+    assert.equal(shelter.source, SEED_SOURCE)
+    // 대한민국 영역(제주~강원) 안에 있어야 지도에 정상 표시된다.
+    assert.ok(shelter.lat >= 33 && shelter.lat <= 38.7, `${shelter.name}: 위도 이상 ${shelter.lat}`)
+    assert.ok(shelter.lng >= 124.5 && shelter.lng <= 132, `${shelter.name}: 경도 이상 ${shelter.lng}`)
+    assert.ok(['일시쉼터', '단기쉼터', '중장기쉼터', '이동쉼터'].includes(shelter.type), `${shelter.name}: 유형 ${shelter.type}`)
+    assert.ok(['누구나', '남성', '여성'].includes(shelter.gender), `${shelter.name}: 성별 ${shelter.gender}`)
+    assert.equal(shelter.geocodePrecision, undefined, '내부 필드가 그대로 노출되면 안 됩니다')
+  }
+
+  const ids = new Set(seeds.map((shelter) => shelter.externalId))
+  assert.equal(ids.size, seeds.length, 'externalId가 중복됩니다')
+})
+
+test('동봉 데이터를 넣으면 주변 쉼터 조회가 실제 결과를 낸다', async () => {
+  const repository = createDatabase(':memory:')
+  await ensureBaselineData({ repository, logger: {} })
+
+  const shelters = repository.listShelters()
+  assert.ok(shelters.length >= 130)
+
+  // 서울시청 반경 15km 안에 서울 쉼터가 잡혀야 한다.
+  const origin = { lat: 37.5665, lng: 126.978 }
+  const near = shelters.filter((shelter) => {
+    const dLat = ((shelter.lat - origin.lat) * Math.PI) / 180
+    const dLng = ((shelter.lng - origin.lng) * Math.PI) / 180
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos((origin.lat * Math.PI) / 180) * Math.cos((shelter.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
+    return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) <= 15
+  })
+  assert.ok(near.length >= 5, `서울 인근 쉼터가 ${near.length}곳뿐입니다`)
+
+  // 두 번 실행해도 늘지 않는다.
+  await ensureBaselineData({ repository, logger: {} })
+  assert.equal(repository.countShelters(), shelters.length)
+  repository.close()
 })
 
 test('설정 해석이 공유 키와 개별 키를 모두 받는다', () => {
