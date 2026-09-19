@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "dev": "node server/dev.js",
     "dev:web": "vite",
@@ -21,7 +24,9 @@
     "react-router-dom": "^7.18.4",
     "tailwindcss": "^4.3.3",
     "vite": "latest",
-    "vite-plugin-pwa": "latest"
+    "vite-plugin-pwa": "latest",
+    "web-push": "^3.6.7",
+    "ws": "^8.21.3"
   },
   "devDependencies": {
     "@eslint/js": "latest",
