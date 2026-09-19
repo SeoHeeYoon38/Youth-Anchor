@@ -20,7 +20,8 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
   }, [filter, shelters])
 
   return (
-    <div className="view shelter-view page-enter">
+    <>
+      <div className="view shelter-view page-enter">
       <header className="map-header">
         <button className="round-button transition hover:-translate-x-0.5" onClick={() => navigate('/home')} aria-label="홈으로 돌아가기"><ChevronLeft size={24} /></button>
         <div><span>HAVEN</span><h1>SOS 대피처</h1></div>
@@ -73,15 +74,16 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
         </section>
       )}
       <p className="data-note"><ShieldCheck size={14} /> 위치는 가까운 순서를 계산할 때만 사용해요.</p>
+      </div>
       {chatFabVisible && (
         <div className="shelter-chat-fab">
           <button className="shelter-chat-fab-open" type="button" onClick={() => navigate('/chat')} aria-label="가온 헬퍼 채팅 열기">
             <Mascot pose="guide" />
-            <span>가온 헬퍼</span>
+            <span className="shelter-chat-fab-label">가온 헬퍼</span>
           </button>
           <button className="shelter-chat-fab-close" type="button" onClick={() => setChatFabVisible(false)} aria-label="가온 헬퍼 플로팅 버튼 닫기"><X size={13} /></button>
         </div>
       )}
-    </div>
+    </>
   )
 }
