@@ -1,6 +1,6 @@
 import { Bell, ExternalLink, Home, Map, MessageCircle, WalletCards } from 'lucide-react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { MASCOTS } from '../constants.js'
+import Mascot from '../components/Mascot.jsx'
 
 const NAV_ITEMS = [
   { to: '/home', label: '홈', icon: Home },
@@ -19,7 +19,7 @@ export default function HavenLayout({ onQuickExit, onNotice }) {
       {!hasOwnHeader && (
         <header className="topbar">
           <button className="brand group" onClick={() => navigate('/home')} aria-label="Haven 홈">
-            <img className="transition duration-300 group-hover:scale-110" src={MASCOTS.basic} alt="" />
+            <Mascot pose="basic" className="transition duration-300 group-hover:scale-110" />
             <span>HAVEN</span>
           </button>
           <div className="topbar-actions">

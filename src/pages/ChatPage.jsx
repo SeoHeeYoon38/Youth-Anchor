@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight, ExternalLink, LockKeyhole, MapPin, Send } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { requestChatReply } from '../api.js'
-import { MASCOTS } from '../constants.js'
+import Mascot from '../components/Mascot.jsx'
 import { quickReplies } from '../data.js'
 
 export default function ChatPage({ onQuickExit }) {
@@ -43,7 +43,7 @@ export default function ChatPage({ onQuickExit }) {
     <div className="view chat-view page-enter">
       <header className="chat-header">
         <button className="round-button transition hover:-translate-x-0.5" onClick={() => navigate('/home')} aria-label="홈으로 돌아가기"><ChevronLeft size={24} /></button>
-        <img className="mascot-breathe" src={MASCOTS.chat} alt="태블릿으로 상담하는 가온" />
+        <Mascot pose="chat" className="mascot-breathe" alt="태블릿으로 상담하는 가온" />
         <div><h1>상담사 가온</h1><span><i /> 온라인</span></div>
         <button className="exit-compact transition active:scale-95" onClick={onQuickExit} aria-label="긴급 종료"><ExternalLink size={18} /></button>
       </header>
@@ -52,11 +52,11 @@ export default function ChatPage({ onQuickExit }) {
         <div className="time-marker">오늘 · 익명 대화</div>
         {messages.map((message) => (
           <div className={`message ${message.role}`} key={message.id}>
-            {message.role === 'helper' && <img src={MASCOTS.chat} alt="" />}
+            {message.role === 'helper' && <Mascot pose="chat" />}
             <p>{message.text}</p>
           </div>
         ))}
-        {replying && <div className="message helper"><img src={MASCOTS.chat} alt="" /><p className="typing" aria-label="답변 작성 중"><i /><i /><i /></p></div>}
+        {replying && <div className="message helper"><Mascot pose="chat" /><p className="typing" aria-label="답변 작성 중"><i /><i /><i /></p></div>}
         {!started && <div className="quick-replies stagger-grid">{quickReplies.map((reply) => <button className="group transition hover:-translate-y-0.5" key={reply} onClick={() => sendMessage(reply)}>{reply}<ChevronRight className="transition group-hover:translate-x-1" size={17} /></button>)}</div>}
         {started && <button className="inline-shelter-button page-enter" onClick={() => navigate('/shelters')}><MapPin size={17} /> 가까운 대피처 함께 보기</button>}
         <div ref={messagesEnd} />

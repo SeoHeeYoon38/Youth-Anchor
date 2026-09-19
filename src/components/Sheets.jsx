@@ -12,7 +12,7 @@ import {
   Trash2,
   X
 } from 'lucide-react'
-import { MASCOTS } from '../constants.js'
+import Mascot from './Mascot.jsx'
 
 function SheetFrame({ children, onClose, labelledBy, className = '' }) {
   return (
@@ -76,7 +76,7 @@ export function GuideSheet({ onClose }) {
   return (
     <SheetFrame onClose={onClose} labelledBy="guide-title">
       <div className="sheet-title-row sheet-title-with-mascot">
-        <img src={MASCOTS.secure} alt="안전을 안내하는 가온" />
+        <Mascot pose="secure" alt="안전을 안내하는 가온" />
         <div><span className="section-kicker">흔적 없는 이용</span><h2 id="guide-title">가온의 안전 가이드</h2><p>지금 바로 기억할 세 가지예요.</p></div>
         <button className="icon-button" onClick={onClose} aria-label="닫기"><X size={20} /></button>
       </div>

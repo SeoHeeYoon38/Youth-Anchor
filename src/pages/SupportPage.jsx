@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronRight, CircleAlert, Clock3, Phone, Sparkles, UserRoundCheck } from 'lucide-react'
-import { MASCOTS } from '../constants.js'
+import Mascot from '../components/Mascot.jsx'
 
 export default function SupportPage({ supports, onSelect }) {
   const categories = ['전체', '주거', '생활', '일자리', '식사']
@@ -11,7 +11,7 @@ export default function SupportPage({ supports, onSelect }) {
     <div className="view support-view page-enter">
       <section className="support-hero">
         <div><span><Sparkles size={20} /> 맞춤 자립 지원</span><h1>혼자 준비하지<br />않아도 돼요</h1><p>주거, 생활비, 일자리, 식사 지원을 한곳에서 확인하세요.</p></div>
-        <img className="mascot-float" src={MASCOTS.guide} alt="지원을 안내하는 가온" />
+        <Mascot pose="guide" className="mascot-float" alt="지원을 안내하는 가온" />
       </section>
       <a className="support-callout group transition duration-300 hover:-translate-y-1" href="tel:1388">
         <span><Phone size={22} /></span><div><strong>무엇부터 볼지 막막한가요?</strong><p>1388에서 필요한 지원을 함께 찾을 수 있어요.</p></div><ChevronRight className="transition group-hover:translate-x-1" size={20} />
