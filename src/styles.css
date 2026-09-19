@@ -188,7 +188,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .fallback-marker-4 { right: 37px; bottom: 25px; }
 .map-legend { position: absolute; z-index: 5; left: 10px; top: 10px; padding: 7px 9px; display: flex; align-items: center; gap: 5px; border-radius: 9px; background: rgba(255,255,255,.94); box-shadow: var(--soft-shadow); font-size: 10px; font-weight: 700; }
 .map-legend span { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-.map-companion { position: absolute; z-index: 7; right: 10px; bottom: 10px; display: flex; flex-direction: column; align-items: center; }
+.map-companion { position: absolute; z-index: 7; top: 12px; left: 50%; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); }
 .map-companion-button { padding: 0; display: flex; flex-direction: column; align-items: center; border: 0; background: transparent; cursor: pointer; }
 .map-companion-button .gaon-mascot { width: 74px; height: 74px; filter: drop-shadow(0 7px 8px rgba(48,55,78,.2)); animation: mascot-breathe 3s ease-in-out infinite; }
 .map-companion .map-companion-label { margin-top: -8px; padding: 4px 7px; border-radius: 7px; background: #fff; box-shadow: var(--soft-shadow); color: var(--blue-dark); font-size: 9px; font-weight: 800; }
