@@ -208,7 +208,6 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .chat-fab { position: fixed; z-index: 950; top: 54%; right: max(12px, calc((100vw - 560px) / 2 + 12px)); transform: translateY(-50%); }
 .chat-fab-open { padding: 0; display: flex; flex-direction: column; align-items: center; border: 0; background: transparent; cursor: pointer; }
 .chat-fab-open .gaon-mascot { width: 76px; height: 76px; filter: drop-shadow(0 8px 10px rgba(48,55,78,.22)); animation: mascot-breathe 3s ease-in-out infinite; }
-.chat-fab-label { margin-top: -8px; padding: 5px 8px; border-radius: 8px; background: #fff; box-shadow: var(--soft-shadow); color: var(--blue-dark); font-size: 9px; font-weight: 800; white-space: nowrap; }
 .chat-fab-close { width: 22px; height: 22px; padding: 0; display: grid; place-items: center; position: absolute; z-index: 2; top: -1px; right: -1px; border: 2px solid #fff; border-radius: 50%; background: #4d5870; color: #fff; box-shadow: 0 3px 7px rgba(48,55,78,.25); cursor: pointer; }
 .map-results { margin: 13px 16px 0; padding: 15px; border-radius: 18px; background: #fff; box-shadow: var(--soft-shadow); }
 .results-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; font-size: 13px; }

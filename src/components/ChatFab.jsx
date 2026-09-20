@@ -9,7 +9,7 @@ import Mascot from './Mascot.jsx'
  * 홈·대피처·지원 화면이 같은 위치와 같은 아이콘을 쓰도록 한 곳에서 관리한다.
  * 화면마다 따로 만들면 위치와 모양이 어긋나므로 컴포넌트로 공유한다.
  */
-export default function ChatFab({ label = '가온 헬퍼' }) {
+export default function ChatFab() {
   const navigate = useNavigate()
   const [visible, setVisible] = useState(true)
 
@@ -24,7 +24,6 @@ export default function ChatFab({ label = '가온 헬퍼' }) {
         aria-label="가온 헬퍼 채팅 열기"
       >
         <Mascot pose="guide" />
-        <span className="chat-fab-label">{label}</span>
       </button>
       <button
         className="chat-fab-close"
