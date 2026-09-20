@@ -189,3 +189,31 @@ test('push subscription is validated and stored', async () => {
   })
   assert.equal(response.status, 201)
 })
+
+test('admin push subscription requires the admin key', async () => {
+  const denied = await fetch(`${baseUrl}/api/v1/notifications/subscribe`, {
+    method: 'POST',
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({
+      audience: 'admin',
+      subscription: {
+        endpoint: 'https://push.example.test/admin-denied',
+        keys: { p256dh: 'test-p256dh', auth: 'test-auth' }
+      }
+    })
+  })
+  assert.equal(denied.status, 403)
+
+  const accepted = await fetch(`${baseUrl}/api/v1/notifications/subscribe`, {
+    method: 'POST',
+    headers: authHeaders({ 'Content-Type': 'application/json', 'x-admin-key': 'test-admin-key' }),
+    body: JSON.stringify({
+      audience: 'admin',
+      subscription: {
+        endpoint: 'https://push.example.test/admin-accepted',
+        keys: { p256dh: 'test-p256dh', auth: 'test-auth' }
+      }
+    })
+  })
+  assert.equal(accepted.status, 201)
+})

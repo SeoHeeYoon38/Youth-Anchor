@@ -5,6 +5,7 @@ import { GuideSheet, NoticeSheet, ShelterSheet, SupportSheet } from './component
 import { DEFAULT_CENTER } from './constants.js'
 import HavenLayout from './layouts/HavenLayout.jsx'
 import ChatPage from './pages/ChatPage.jsx'
+import AdminNotificationsPage from './pages/AdminNotificationsPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import SheltersPage from './pages/SheltersPage.jsx'
 import SupportPage from './pages/SupportPage.jsx'
@@ -115,6 +116,7 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={<WelcomePage onQuickExit={quickExit} />} />
+        <Route path="/__internal/admin-notifications" element={<AdminNotificationsPage />} />
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
           <Route path="/home" element={<HomePage shelters={sortedShelters} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} onOpenGuide={() => setGuideOpen(true)} />} />
           <Route path="/shelters" element={<SheltersPage shelters={sortedShelters} position={position} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} />} />

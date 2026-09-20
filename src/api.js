@@ -132,9 +132,11 @@ export async function createSosAlert({ position, roomId, message }) {
   })
 }
 
-export async function subscribeToPush(subscription, audience = 'guest') {
+export async function subscribeToPush(subscription, audience = 'guest', adminKey = '') {
+  const headers = adminKey ? { 'x-admin-key': adminKey } : undefined
   return requestJson('/api/v1/notifications/subscribe', {
     method: 'POST',
+    headers,
     body: JSON.stringify({ subscription: subscription.toJSON?.() || subscription, audience })
   })
 }
@@ -160,4 +162,20 @@ export async function enablePushNotifications() {
   })
   await subscribeToPush(subscription)
   return true
+}
+
+export async function enableAdminPushNotifications(adminKey) {
+  if (!adminKey?.trim()) throw new Error('admin-key-empty')
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) throw new Error('push-not-supported')
+  const config = await requestJson('/api/v1/notifications/config')
+  if (!config.configured || !config.vapidPublicKey) throw new Error('push-not-configured')
+  const permission = await Notification.requestPermission()
+  if (permission !== 'granted') throw new Error('push-permission-denied')
+  const registration = await navigator.serviceWorker.ready
+  const existing = await registration.pushManager.getSubscription()
+  const subscription = existing || await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(config.vapidPublicKey)
+  })
+  return subscribeToPush(subscription, 'admin', adminKey.trim())
 }
