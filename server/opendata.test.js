@@ -188,7 +188,7 @@ test('청소년쉼터 레코드를 UI 스키마로 정규화한다', () => {
   assert.equal(shelter.capacity, 12)
   assert.equal(shelter.region, '서울특별시 강북구')
   assert.equal(shelter.source, 'mogef-teen-shelter')
-  assert.ok(shelter.features.includes('정원 12명'))
+  assert.ok(!shelter.features.some((feature) => feature.includes('정원')))
   assert.ok(shelter.features.includes('미아사거리역 인근'))
 })
 
@@ -420,5 +420,4 @@ test('설정 해석이 공유 키와 개별 키를 모두 받는다', () => {
 
   const none = resolveOpenDataConfig({})
   assert.equal(none.shelter.enabled, false)
-  assert.equal(none.youthPolicy.enabled, false)
 })

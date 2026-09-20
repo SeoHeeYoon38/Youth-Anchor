@@ -5,8 +5,7 @@ import {
   WELFARE_DETAIL_ENDPOINT,
   WELFARE_LIST_ENDPOINT,
   YOUTH_LIFE_CODES,
-  fetchWelfareServices,
-  fetchYouthPolicies
+  fetchWelfareServices
 } from './opendata/notices.js'
 import { SHELTER_ENDPOINT, fetchYouthShelters } from './opendata/shelters.js'
 import { syncNoticeFeeds } from './notice-sync.js'
@@ -49,13 +48,6 @@ export function resolveOpenDataConfig(env = process.env) {
       maxPages: Number(env.HAVEN_WELFARE_MAX_PAGES || 10),
       detailLimit: Number(env.HAVEN_WELFARE_DETAIL_LIMIT || 60),
       enabled: Boolean(welfareKey)
-    },
-    youthPolicy: {
-      // 온통청년 청년정책 API는 공공데이터포털에서 LINK 유형이라 별도 수동 승인이 필요하다.
-      key: (env.HAVEN_YOUTH_POLICY_KEY || '').trim(),
-      endpoint: (env.HAVEN_YOUTH_POLICY_ENDPOINT || '').trim(),
-      keyParam: env.HAVEN_YOUTH_POLICY_KEY_PARAM || 'apiKeyNm',
-      enabled: Boolean((env.HAVEN_YOUTH_POLICY_KEY || '').trim() && (env.HAVEN_YOUTH_POLICY_ENDPOINT || '').trim())
     },
     noticeFeedUrls: env.HAVEN_NOTICE_FEED_URLS || '',
     scheduleHourKst: Number(env.HAVEN_SYNC_HOUR_KST ?? 4),
@@ -142,7 +134,7 @@ export async function syncShelters({
 }
 
 /**
- * 중앙부처 복지서비스와(설정된 경우) 청년정책, 추가 JSON 피드를 공지/지원 목록으로 모은다.
+ * 중앙부처 복지서비스와 추가 JSON 피드를 공지/지원 목록으로 모은다.
  */
 export async function syncSupportNotices({
   repository,
@@ -182,25 +174,6 @@ export async function syncSupportNotices({
   } else {
     messages.push('DATA_GO_KR_SERVICE_KEY가 없어 복지서비스 동기화를 건너뜁니다.')
     status = 'skipped'
-  }
-
-  if (config.youthPolicy.enabled) {
-    try {
-      const result = await fetchYouthPolicies({
-        serviceKey: config.youthPolicy.key,
-        endpoint: config.youthPolicy.endpoint,
-        keyParam: config.youthPolicy.keyParam,
-        fetchImpl
-      })
-      for (const notice of result.items) {
-        repository.upsertNotice(notice)
-        imported += 1
-      }
-      totalCount += result.totalCount
-    } catch (error) {
-      messages.push(`청년정책: ${error.message}`)
-      logger.error?.(`[sync] youth policy failed: ${error.message}`)
-    }
   }
 
   if (config.noticeFeedUrls) {

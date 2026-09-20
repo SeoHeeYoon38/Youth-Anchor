@@ -48,6 +48,8 @@ test('health endpoint reports persistent service dependencies', async () => {
   assert.equal(response.status, 200)
   assert.equal(body.status, 'ok')
   assert.equal(body.database, 'sqlite')
+  assert.equal(body.ai.provider, 'openai')
+  assert.equal(body.ai.configured, false)
 })
 
 test('guest token is required for v1 data endpoints', async () => {
@@ -82,6 +84,7 @@ test('admin can register a shelter and nearby search returns location details', 
   assert.equal(nearbyResponse.status, 200)
   assert.equal(nearby.items.length, 1)
   assert.equal(typeof nearby.items[0].distance, 'number')
+  assert.equal('capacity' in nearby.items[0], false)
 
   const detailResponse = await fetch(`${baseUrl}/api/v1/shelters/${created.id}`, { headers: authHeaders() })
   assert.equal(detailResponse.status, 200)

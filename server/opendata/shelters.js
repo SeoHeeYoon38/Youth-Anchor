@@ -67,8 +67,6 @@ function buildFeatures(record, type) {
   if (type === '중장기쉼터' || type === '단기쉼터') features.push('숙박 가능')
   if (type === '일시쉼터') features.push('단기 보호')
   if (type === '이동쉼터') features.push('현장 찾아오기')
-  const capacity = numeric(record.cpctCnt)
-  if (capacity && capacity > 0) features.push(`정원 ${capacity}명`)
   if (text(record.nrbSbwNm)) features.push(`${text(record.nrbSbwNm)} 인근`)
   else if (text(record.nrbBusStnNm)) features.push(`${text(record.nrbBusStnNm)} 인근`)
   if (text(record.hmpgAddr)) features.push('홈페이지 안내')
