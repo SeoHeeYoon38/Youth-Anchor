@@ -1,16 +1,7 @@
 import { useState } from 'react'
 import { BellRing, CheckCircle2, KeyRound, ShieldCheck } from 'lucide-react'
-import { enableAdminPushNotifications } from '../api.js'
+import { enablePushNotifications } from '../api.js'
 import Mascot from '../components/Mascot.jsx'
-
-function messageFor(error) {
-  if (error.message === 'admin-key-empty') return '관리자 키를 입력해 주세요.'
-  if (error.message === 'push-not-configured') return '서버 웹푸시 키 설정이 필요해요.'
-  if (error.message === 'push-permission-denied') return '브라우저 알림 권한을 허용해야 해요.'
-  if (error.message === 'push-not-supported') return '이 브라우저에서는 웹푸시를 지원하지 않아요.'
-  if (error.message === 'admin-key-required' || error.message === 'request-failed-403') return '관리자 키가 맞지 않아요.'
-  return '관리자 알림 등록에 실패했어요.'
-}
 
 export default function AdminNotificationsPage() {
   const [adminKey, setAdminKey] = useState('')
@@ -20,15 +11,34 @@ export default function AdminNotificationsPage() {
 
   const submit = async (event) => {
     event.preventDefault()
+    const key = adminKey.trim()
+    
+    if (!key) {
+      setStatus('관리자 키를 입력해 주세요.')
+      return
+    }
+
     setBusy(true)
     setDone(false)
-    setStatus('관리자 기기를 등록하고 있어요.')
+    setStatus('이 브라우저를 관리자 알림 기기로 등록하고 있어요.')
+    
     try {
-      await enableAdminPushNotifications(adminKey)
+      // 원격 저장소의 최신 API 규격 반영
+      await enablePushNotifications({ audience: 'admin', adminKey: key })
       setDone(true)
       setStatus('이 컴퓨터가 관리자 알림 수신 기기로 등록됐어요.')
+      setAdminKey('')
     } catch (error) {
-      setStatus(messageFor(error))
+      const message = error.message === 'admin-key-required' || error.message === 'request-failed-403'
+        ? '관리자 키가 올바르지 않아요.'
+        : error.message === 'push-permission-denied'
+          ? '브라우저 알림 권한을 허용해야 해요.'
+          : error.message === 'push-not-configured'
+            ? '서버의 VAPID 푸시 키 설정이 필요해요.'
+            : error.message === 'push-not-supported'
+              ? '이 브라우저는 웹 푸시를 지원하지 않아요.'
+              : '관리자 기기 등록에 실패했어요.'
+      setStatus(message)
     } finally {
       setBusy(false)
     }
@@ -54,15 +64,16 @@ export default function AdminNotificationsPage() {
             value={adminKey}
             onChange={(event) => setAdminKey(event.target.value)}
             placeholder="관리자 키 입력"
-            autoComplete="one-time-code"
+            autoComplete="off"
+            disabled={busy}
           />
           <button type="submit" disabled={busy}>
             {done ? <CheckCircle2 size={18} /> : <BellRing size={18} />}
-            {busy ? '등록 중' : done ? '등록 완료' : '관리자 알림 켜기'}
+            {busy ? '등록 중...' : done ? '등록 완료' : '관리자 알림 켜기'}
           </button>
         </form>
 
-        {status && <p className={`admin-notification-status ${done ? 'success' : ''}`}>{status}</p>}
+        {status && <p className={`admin-notification-status ${done ? 'success' : 'error'}`}>{status}</p>}
       </section>
     </main>
   )

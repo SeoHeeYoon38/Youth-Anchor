@@ -176,18 +176,24 @@ test('SOS accepts coordinates and reports push delivery state', async () => {
   assert.equal(body.delivery.configured, false)
 })
 
-test('push subscription is validated and stored', async () => {
-  const response = await fetch(`${baseUrl}/api/v1/notifications/subscribe`, {
+test('admin push subscription requires the admin key', async () => {
+  const subscription = {
+    endpoint: 'https://push.example.test/admin-subscription',
+    keys: { p256dh: 'admin-p256dh', auth: 'admin-auth' }
+  }
+  const unauthorized = await fetch(`${baseUrl}/api/v1/notifications/subscribe`, {
     method: 'POST',
     headers: authHeaders({ 'Content-Type': 'application/json' }),
-    body: JSON.stringify({
-      subscription: {
-        endpoint: 'https://push.example.test/subscription',
-        keys: { p256dh: 'test-p256dh', auth: 'test-auth' }
-      }
-    })
+    body: JSON.stringify({ subscription, audience: 'admin' })
   })
-  assert.equal(response.status, 201)
+  assert.equal(unauthorized.status, 403)
+
+  const registered = await fetch(`${baseUrl}/api/v1/notifications/subscribe`, {
+    method: 'POST',
+    headers: authHeaders({ 'Content-Type': 'application/json', 'x-admin-key': 'test-admin-key' }),
+    body: JSON.stringify({ subscription, audience: 'admin' })
+  })
+  assert.equal(registered.status, 201)
 })
 
 test('admin push subscription requires the admin key', async () => {

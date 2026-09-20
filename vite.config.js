@@ -17,6 +17,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      devOptions: { enabled: true },
       includeAssets: ['haven-mark.svg', 'gaon-*.png', 'haven-2-5d-icons.png'],
       manifest: {
         name: 'Haven - 청소년 안전 지원',
