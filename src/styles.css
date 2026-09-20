@@ -203,8 +203,9 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .legend-green { background: var(--green); }
 .legend-purple { background: var(--purple); }
 
-/* 가온 헬퍼 플로팅 버튼: 홈·대피처·지원 화면이 같은 위치와 같은 아이콘을 쓴다. */
-.chat-fab { position: fixed; z-index: 30; top: 54%; right: max(12px, calc((100vw - 560px) / 2 + 12px)); transform: translateY(-50%); }
+/* 한 가지 viewport 기준을 모든 화면에 공유한다. 부모 page-enter transform을 피하기 위해
+   FAB는 HavenLayout에서 Outlet 바깥에 렌더링한다. 따라서 문서 스크롤과 무관하게 고정된다. */
+.chat-fab { position: fixed; z-index: 950; top: 54%; right: max(12px, calc((100vw - 560px) / 2 + 12px)); transform: translateY(-50%); }
 .chat-fab-open { padding: 0; display: flex; flex-direction: column; align-items: center; border: 0; background: transparent; cursor: pointer; }
 .chat-fab-open .gaon-mascot { width: 76px; height: 76px; filter: drop-shadow(0 8px 10px rgba(48,55,78,.22)); animation: mascot-breathe 3s ease-in-out infinite; }
 .chat-fab-label { margin-top: -8px; padding: 5px 8px; border-radius: 8px; background: #fff; box-shadow: var(--soft-shadow); color: var(--blue-dark); font-size: 9px; font-weight: 800; white-space: nowrap; }
@@ -379,12 +380,6 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .nearby-section { margin-left: -13px; margin-right: -13px; padding-left: 13px; padding-right: 13px; }
   .sheet-title-row { grid-template-columns: 46px 1fr 38px; }
   .sheet-place-icon { width: 46px; height: 46px; }
-}
-
-/* 화면이 낮으면 버튼을 숨기지 않고 라벨만 줄여 계속 닿을 수 있게 둔다. */
-@media (max-height: 650px) {
-  .chat-fab { top: auto; bottom: calc(78px + env(safe-area-inset-bottom)); transform: none; }
-  .chat-fab-open .gaon-mascot { width: 62px; height: 62px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

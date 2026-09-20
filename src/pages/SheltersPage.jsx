@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Check, ChevronLeft, ChevronRight, House, LocateFixed, MapPin, RotateCcw, Search, ShieldCheck, SlidersHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import ChatFab from '../components/ChatFab.jsx'
 import KakaoMap from '../components/KakaoMap.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
 import {
@@ -123,7 +122,6 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
         )}
         <p className="data-note"><ShieldCheck size={14} /> 위치는 가까운 순서를 계산할 때만 사용해요.</p>
       </div>
-      <ChatFab />
     </>
   )
 }

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { ChevronRight, CircleAlert, Clock3, Phone, Sparkles, UserRoundCheck } from 'lucide-react'
-import ChatFab from '../components/ChatFab.jsx'
 import Mascot from '../components/Mascot.jsx'
 
 export default function SupportPage({ supports, onSelect }) {
@@ -33,7 +32,6 @@ export default function SupportPage({ supports, onSelect }) {
         {filtered.length === 0 && <div className="empty-state"><Sparkles size={25} /><strong>등록된 지원 사업이 없어요</strong><p>새 공고가 수집되면 이곳에 표시돼요.</p></div>}
       </section>
       <p className="data-note"><CircleAlert size={14} /> 신청 전 운영기관의 최신 공고를 확인해 주세요.</p>
-      <ChatFab />
     </div>
   )
 }

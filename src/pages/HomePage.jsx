@@ -1,6 +1,5 @@
 import { ChevronRight, CircleAlert, LocateFixed, Phone, ShieldCheck } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import ChatFab from '../components/ChatFab.jsx'
 import DesignIcon from '../components/DesignIcon.jsx'
 import Mascot from '../components/Mascot.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
@@ -75,7 +74,6 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
       </section>
 
       <p className="data-note"><CircleAlert size={14} /> 방문 전 1388을 통해 운영 여부와 입소 방법을 확인해 주세요.</p>
-      <ChatFab />
     </div>
   )
 }

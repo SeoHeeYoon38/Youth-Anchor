@@ -1,5 +1,6 @@
 import { Bell, ExternalLink, Home, Map, MessageCircle, WalletCards } from 'lucide-react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import ChatFab from '../components/ChatFab.jsx'
 import Mascot from '../components/Mascot.jsx'
 
 const NAV_ITEMS = [
@@ -30,6 +31,8 @@ export default function HavenLayout({ onQuickExit, onNotice }) {
       )}
 
       <main><Outlet /></main>
+
+      {pathname !== '/chat' && <ChatFab />}
 
       <nav className="bottom-nav" aria-label="주요 메뉴">
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
