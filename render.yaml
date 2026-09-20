@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: haven-youth-anchor-api
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    autoDeployTrigger: commit
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HAVEN_DB_PATH
+        value: server/data/haven.db
+      - key: HAVEN_ALLOWED_ORIGINS
+        value: '*'
+      - key: HAVEN_JWT_SECRET
+        generateValue: true
+      - key: HAVEN_ADMIN_KEY
+        generateValue: true
+      - key: DATA_GO_KR_SERVICE_KEY
+        sync: false
+      - key: KAKAO_REST_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.6-luna

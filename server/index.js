@@ -47,6 +47,25 @@ function sendJson(response, status, payload) {
   response.end(JSON.stringify(payload))
 }
 
+function resolveAllowedOrigins(value = process.env.HAVEN_ALLOWED_ORIGINS || '*') {
+  return value.split(',').map((origin) => origin.trim()).filter(Boolean)
+}
+
+function applyCors(request, response, allowedOrigins) {
+  const origin = request.headers.origin
+  if (!origin) return true
+
+  const allowAny = allowedOrigins.includes('*')
+  if (!allowAny && !allowedOrigins.includes(origin)) return false
+
+  response.setHeader('Access-Control-Allow-Origin', allowAny ? '*' : origin)
+  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+  response.setHeader('Access-Control-Allow-Headers', 'Authorization,Content-Type,X-Admin-Key')
+  response.setHeader('Access-Control-Max-Age', '86400')
+  if (!allowAny) response.setHeader('Vary', 'Origin')
+  return true
+}
+
 function sendStatic(response, filePath, status = 200, requestMethod = 'GET') {
   const extension = extname(filePath)
   response.writeHead(status, {
@@ -137,6 +156,7 @@ export function createApiServer(options = {}) {
   const openDataConfig = options.openDataConfig || resolveOpenDataConfig()
   const chatService = options.chatService || createChatService(options.openai)
   const staticDir = options.staticDir === false ? '' : options.staticDir || process.env.HAVEN_STATIC_DIR || 'dist'
+  const allowedOrigins = resolveAllowedOrigins(options.allowedOrigins)
   const socketsByRoom = new Map()
 
   function authenticate(request, response) {
@@ -165,6 +185,15 @@ export function createApiServer(options = {}) {
     const url = new URL(request.url, 'http://localhost')
 
     try {
+      if (!applyCors(request, response, allowedOrigins)) {
+        sendJson(response, 403, { error: 'origin-not-allowed' })
+        return
+      }
+      if (request.method === 'OPTIONS') {
+        response.writeHead(204).end()
+        return
+      }
+
       if (request.method === 'GET' && (url.pathname === '/api/health' || url.pathname === '/api/v1/health')) {
         sendJson(response, 200, {
           status: 'ok',

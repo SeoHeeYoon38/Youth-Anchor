@@ -115,3 +115,24 @@ npm run build
 ```
 
 테스트는 빈 인메모리 SQLite를 사용하여 인증, 공지, 쉼터, HTTP/웹소켓 상담, 퀵 엑시트 삭제, SOS, 푸시 구독을 검증합니다. 공공데이터 연동은 실제 응답 스키마를 그대로 옮긴 픽스처로 XML/JSON 파싱, 페이지 순회, 좌표 보정, 재실행 시 중복 방지, 인증 오류 처리를 검증합니다.
+
+## Vercel + Render 배포
+
+프론트는 Vercel, HTTP/WebSocket 백엔드는 Render Web Service에 배포합니다. 두 서비스 모두 GitHub 저장소의 `main` 브랜치를 연결하므로 `main`에 push될 때마다 자동 배포됩니다.
+
+### Render 백엔드
+
+Render Dashboard에서 **New > Blueprint**를 선택하고 이 저장소를 연결하면 루트의 `render.yaml`이 무료 Node.js Web Service, `/api/health` 상태 확인, HTTP/WebSocket 백엔드, `main` 커밋 자동 배포를 설정합니다.
+
+Blueprint 생성 화면에서 `DATA_GO_KR_SERVICE_KEY`, `KAKAO_REST_API_KEY`, `OPENAI_API_KEY`만 입력합니다. JWT와 관리자 키는 Render가 안전한 임의 값으로 자동 생성합니다. 무료 Render의 SQLite 파일은 재시작 시 초기화될 수 있지만, 서버 시작 시 동봉된 전국 쉼터 데이터를 다시 적재하므로 지도와 쉼터 목록은 계속 동작합니다.
+
+### Vercel 프론트
+
+Vercel Project Settings > Environment Variables에는 다음 값을 Production 환경에 등록합니다.
+
+```env
+VITE_KAKAO_MAP_APP_KEY=카카오맵_JavaScript_키
+VITE_API_BASE_URL=https://haven-youth-anchor-api.onrender.com
+```
+
+`VITE_WS_BASE_URL`은 비워도 `VITE_API_BASE_URL`을 기준으로 `wss://` 주소가 자동 생성됩니다. 환경변수를 추가하거나 변경한 뒤에는 Vercel을 다시 배포해야 반영됩니다.

@@ -52,6 +52,20 @@ test('health endpoint reports persistent service dependencies', async () => {
   assert.equal(body.ai.configured, false)
 })
 
+test('cross-origin frontend can preflight API requests', async () => {
+  const response = await fetch(`${baseUrl}/api/v1/notices`, {
+    method: 'OPTIONS',
+    headers: {
+      Origin: 'https://youth-anchor.vercel.app',
+      'Access-Control-Request-Method': 'GET',
+      'Access-Control-Request-Headers': 'authorization'
+    }
+  })
+  assert.equal(response.status, 204)
+  assert.equal(response.headers.get('access-control-allow-origin'), '*')
+  assert.match(response.headers.get('access-control-allow-headers'), /Authorization/i)
+})
+
 test('guest token is required for v1 data endpoints', async () => {
   const response = await fetch(`${baseUrl}/api/v1/notices`)
   assert.equal(response.status, 401)

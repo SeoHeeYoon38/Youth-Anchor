@@ -1,5 +1,24 @@
-const REQUEST_TIMEOUT_MS = 8000
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
+const WS_BASE_URL = (import.meta.env.VITE_WS_BASE_URL || '').replace(/\/+$/, '')
+const REQUEST_TIMEOUT_MS = API_BASE_URL ? 75_000 : 8000
 const SESSION_KEY = 'haven.guest-session'
+
+function apiUrl(path) {
+  return `${API_BASE_URL}${path}`
+}
+
+function websocketUrl(path) {
+  if (WS_BASE_URL) return `${WS_BASE_URL}${path}`
+
+  if (API_BASE_URL) {
+    const url = new URL(API_BASE_URL, window.location.origin)
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+    return `${url.origin}${path}`
+  }
+
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+  return `${protocol}//${window.location.host}${path}`
+}
 
 function readSession() {
   try {
@@ -16,7 +35,7 @@ export async function ensureGuestSession(force = false) {
     if (stored) return stored
   }
 
-  const response = await fetch('/api/v1/auth/guest', {
+  const response = await fetch(apiUrl('/api/v1/auth/guest'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: '{}'
@@ -36,7 +55,7 @@ async function requestJson(path, options = {}, retry = true) {
   if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
 
   try {
-    const response = await fetch(path, { ...options, headers, signal: controller.signal })
+    const response = await fetch(apiUrl(path), { ...options, headers, signal: controller.signal })
     if (response.status === 401 && retry) {
       localStorage.removeItem(SESSION_KEY)
       await ensureGuestSession(true)
@@ -104,9 +123,8 @@ export async function requestChatReply(roomId, message) {
 
 export async function connectChatRoom(roomId, handlers = {}) {
   const session = await ensureGuestSession()
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
   return new Promise((resolve, reject) => {
-    const socket = new WebSocket(`${protocol}//${window.location.host}/api/v1/chat/rooms/${roomId}/socket?token=${encodeURIComponent(session.token)}`)
+    const socket = new WebSocket(websocketUrl(`/api/v1/chat/rooms/${roomId}/socket?token=${encodeURIComponent(session.token)}`))
     let connected = false
     socket.addEventListener('message', (event) => {
       try {
