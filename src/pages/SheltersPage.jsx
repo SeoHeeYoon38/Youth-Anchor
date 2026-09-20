@@ -26,7 +26,8 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
     
     const query = searchQuery.toLowerCase()
     return filtered.filter((shelter) => 
-      shelter.name?.toLowerCase().includes(query)
+      shelter.name?.toLowerCase().includes(query) || 
+      shelter.address?.toLowerCase().includes(query)
     )
   }, [filter, shelters, searchQuery])
 
@@ -50,7 +51,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
           <Search size={19} />
           <input
             type="text"
-            placeholder={`${locationMessage || '대피처 이름 검색...'}`}
+            placeholder={`${locationMessage || '대피처 이름 또는 주소 검색...'}`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{
@@ -62,7 +63,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
               fontSize: '14px',
               color: 'inherit'
             }}
-            aria-label="대피처 이름 검색"
+            aria-label="대피처 이름 또는 주소 검색"
           />
           {searchQuery && (
             <button 
