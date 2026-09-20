@@ -26,3 +26,11 @@ export async function loadSeedShelters() {
       : shelter.features || []
   }))
 }
+
+/** 마지막으로 정상 수집한 공공 복지서비스 목록. 외부 API 한도 초과 시 빈 화면을 막는다. */
+export async function loadSeedNotices() {
+  const path = new URL('./notices.json', import.meta.url)
+  const raw = await readFile(path, 'utf8')
+  const parsed = JSON.parse(raw)
+  return Array.isArray(parsed) ? parsed : []
+}

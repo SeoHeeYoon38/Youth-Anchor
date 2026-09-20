@@ -391,6 +391,7 @@ test('동봉 데이터를 넣으면 주변 쉼터 조회가 실제 결과를 낸
 
   const shelters = repository.listShelters()
   assert.ok(shelters.length >= 130)
+  assert.ok(repository.countNotices() >= 200)
 
   // 서울시청 반경 15km 안에 서울 쉼터가 잡혀야 한다.
   const origin = { lat: 37.5665, lng: 126.978 }

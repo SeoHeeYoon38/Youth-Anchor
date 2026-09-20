@@ -9,7 +9,7 @@ import {
 } from './opendata/notices.js'
 import { SHELTER_ENDPOINT, fetchYouthShelters } from './opendata/shelters.js'
 import { syncNoticeFeeds } from './notice-sync.js'
-import { loadSeedShelters } from './seed/index.js'
+import { loadSeedNotices, loadSeedShelters } from './seed/index.js'
 
 export const SHELTER_SOURCE = 'mogef-teen-shelter'
 const KST_OFFSET_MINUTES = 9 * 60
@@ -195,12 +195,29 @@ export async function syncSupportNotices({
  * 이후 동기화가 성공하면 더 최신인 오픈API 데이터로 교체된다.
  */
 export async function ensureBaselineData({ repository, logger = console } = {}) {
-  if (repository.countShelters() > 0) return { inserted: 0, reason: 'already-populated' }
+  let sheltersInserted = 0
+  let noticesInserted = 0
 
-  const seeds = await loadSeedShelters()
-  for (const shelter of seeds) repository.upsertShelter(shelter)
-  logger.log?.(`[sync] 전국 청소년쉼터 ${seeds.length}곳을 동봉 데이터로 채웠습니다 (여성가족부 2025-03 기준)`)
-  return { inserted: seeds.length, reason: 'seeded' }
+  if (repository.countShelters() === 0) {
+    const shelters = await loadSeedShelters()
+    for (const shelter of shelters) repository.upsertShelter(shelter)
+    sheltersInserted = shelters.length
+    logger.log?.(`[sync] 전국 청소년쉼터 ${shelters.length}곳을 동봉 데이터로 채웠습니다 (여성가족부 2025-03 기준)`)
+  }
+
+  if (repository.countNotices() === 0) {
+    const notices = await loadSeedNotices()
+    for (const notice of notices) repository.upsertNotice(notice)
+    noticesInserted = notices.length
+    logger.log?.(`[sync] 복지서비스 ${notices.length}건을 마지막 정상 수집 데이터로 채웠습니다`)
+  }
+
+  return {
+    inserted: sheltersInserted + noticesInserted,
+    sheltersInserted,
+    noticesInserted,
+    reason: sheltersInserted || noticesInserted ? 'seeded' : 'already-populated'
+  }
 }
 
 /** 쉼터·공지 동기화를 함께 실행하고 결과를 sync_runs에 기록한다. */
