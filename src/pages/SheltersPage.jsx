@@ -9,7 +9,8 @@ import {
   SHELTER_TYPE_FILTERS,
   describeFilter,
   filterShelters,
-  isFilterActive
+  isFilterActive,
+  searchShelters
 } from '../shelterFilters.js'
 import { formatDistance } from '../utils.js'
 
@@ -22,13 +23,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
 
   const visibleShelters = useMemo(() => {
     const filtered = filterShelters(shelters, filter)
-    if (!searchQuery.trim()) return filtered
-    
-    const query = searchQuery.toLowerCase()
-    return filtered.filter((shelter) => 
-      shelter.name?.toLowerCase().includes(query) || 
-      shelter.address?.toLowerCase().includes(query)
-    )
+    return searchShelters(filtered, searchQuery)
   }, [filter, shelters, searchQuery])
 
   const filterActive = isFilterActive(filter) || searchQuery.trim() !== ''

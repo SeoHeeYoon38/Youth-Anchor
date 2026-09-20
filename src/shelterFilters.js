@@ -9,6 +9,25 @@ export const SHELTER_AUDIENCE_FILTERS = ['전체', '누구나', '여성', '남�
 
 export const DEFAULT_SHELTER_FILTER = { type: '전체', audience: '전체' }
 
+function normalizeSearchText(value) {
+  return String(value ?? '').toLocaleLowerCase('ko-KR').replace(/\s+/g, '')
+}
+
+function searchableShelterText(shelter) {
+  return [
+    shelter?.name,
+    shelter?.address,
+    shelter?.type,
+    shelter?.gender,
+    shelter?.ages,
+    shelter?.open,
+    shelter?.phone,
+    shelter?.provider,
+    shelter?.homepage,
+    ...(Array.isArray(shelter?.features) ? shelter.features : [])
+  ].map(normalizeSearchText).join(' ')
+}
+
 /**
  * @param {Array<{type?: string, gender?: string}>} shelters
  * @param {{type?: string, audience?: string}} filter
@@ -25,6 +44,19 @@ export function filterShelters(shelters, filter = DEFAULT_SHELTER_FILTER) {
     // 여성·남성을 고르면 해당 전용 쉼터와 성별 제한이 없는 곳을 함께 보여준다.
     return shelter.gender === audience || shelter.gender === '누구나'
   })
+}
+
+/**
+ * 지도 검색창에서 쉼터명뿐 아니라 주소, 유형, 대상, 운영 정보까지 함께 찾는다.
+ *
+ * @param {Array<object>} shelters
+ * @param {string} query
+ */
+export function searchShelters(shelters, query = '') {
+  if (!Array.isArray(shelters)) return []
+  const normalizedQuery = normalizeSearchText(query)
+  if (!normalizedQuery) return shelters
+  return shelters.filter((shelter) => searchableShelterText(shelter).includes(normalizedQuery))
 }
 
 /** 현재 걸린 조건을 사람이 읽는 문장으로 만든다. */

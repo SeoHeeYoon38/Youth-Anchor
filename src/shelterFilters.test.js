@@ -7,7 +7,8 @@ import {
   SHELTER_TYPE_FILTERS,
   describeFilter,
   filterShelters,
-  isFilterActive
+  isFilterActive,
+  searchShelters
 } from './shelterFilters.js'
 import { MARKER_LEGEND, markerStyleFor } from './shelterMarkers.js'
 
@@ -60,6 +61,38 @@ test('잘못된 입력에도 깨지지 않는다', () => {
   assert.deepEqual(filterShelters(null), [])
   assert.deepEqual(filterShelters(undefined, { type: '단기쉼터' }), [])
   assert.equal(filterShelters(SAMPLE, null).length, 5)
+  assert.deepEqual(searchShelters(null, '서울'), [])
+})
+
+test('지도 검색은 이름 주소 유형 대상 운영 정보와 특징을 함께 찾는다', () => {
+  const shelters = [
+    {
+      id: 1,
+      name: '서울시립용산일시청소년쉼터',
+      address: '서울 용산구 한강대로 100',
+      type: '일시쉼터',
+      gender: '누구나',
+      open: '24시간',
+      phone: '1388',
+      features: ['단기 보호', '식사']
+    },
+    {
+      id: 2,
+      name: '늘푸른 청소년쉼터',
+      address: '경기 수원시',
+      type: '중장기쉼터',
+      gender: '여성',
+      open: '평일 상담',
+      features: ['자립 지원']
+    }
+  ]
+
+  assert.deepEqual(searchShelters(shelters, '용산').map((item) => item.id), [1])
+  assert.deepEqual(searchShelters(shelters, '한강 대로').map((item) => item.id), [1])
+  assert.deepEqual(searchShelters(shelters, '24시간').map((item) => item.id), [1])
+  assert.deepEqual(searchShelters(shelters, '자립지원').map((item) => item.id), [2])
+  assert.deepEqual(searchShelters(shelters, '여성').map((item) => item.id), [2])
+  assert.equal(searchShelters(shelters, '   ').length, 2)
 })
 
 test('필터 선택지가 실제 데이터 값과 일치한다', async () => {
