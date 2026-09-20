@@ -6,7 +6,9 @@ const required = [
   ['KAKAO_REST_API_KEY', '주소→좌표 보정(선택)'],
   ['OPENAI_API_KEY', 'AI 안내 가온'],
   ['HAVEN_JWT_SECRET', '익명 토큰 서명'],
-  ['HAVEN_ADMIN_KEY', '관리자 API']
+  ['HAVEN_ADMIN_KEY', '관리자 API/관리자 기기 등록'],
+  ['VAPID_PUBLIC_KEY', '관리자 웹 푸시 공개키'],
+  ['VAPID_PRIVATE_KEY', '관리자 웹 푸시 비밀키']
 ]
 
 function mask(value) {
