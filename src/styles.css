@@ -204,11 +204,12 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .legend-purple { background: var(--purple); }
 
 /* 한 가지 viewport 기준을 모든 화면에 공유한다. 부모 page-enter transform을 피하기 위해
-   FAB는 HavenLayout에서 Outlet 바깥에 렌더링한다. 따라서 문서 스크롤과 무관하게 고정된다. */
-.chat-fab { position: fixed; z-index: 950; top: 54%; right: max(12px, calc((100vw - 560px) / 2 + 12px)); transform: translateY(-50%); }
-.chat-fab-open { padding: 0; display: flex; flex-direction: column; align-items: center; border: 0; background: transparent; cursor: pointer; }
-.chat-fab-open .gaon-mascot { width: 76px; height: 76px; filter: drop-shadow(0 8px 10px rgba(48,55,78,.22)); animation: mascot-breathe 3s ease-in-out infinite; }
-.chat-fab-close { width: 22px; height: 22px; padding: 0; display: grid; place-items: center; position: absolute; z-index: 2; top: -1px; right: -1px; border: 2px solid #fff; border-radius: 50%; background: #4d5870; color: #fff; box-shadow: 0 3px 7px rgba(48,55,78,.25); cursor: pointer; }
+   FAB는 HavenLayout에서 Outlet 바깥에 렌더링한다. 문서 스크롤과 무관하게 고정하고,
+   하단 내비게이션 바로 위에 배치해 화면 아래쪽에서 바로 누를 수 있게 한다. */
+.chat-fab { position: fixed; z-index: 950; right: max(12px, calc((100vw - 560px) / 2 + 12px)); bottom: calc(84px + env(safe-area-inset-bottom)); }
+.chat-fab-open { width: 152px; height: 152px; padding: 0; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; cursor: pointer; }
+.chat-fab-open .gaon-mascot { width: 152px; height: 152px; filter: drop-shadow(0 12px 18px rgba(48,55,78,.28)); animation: mascot-breathe 3s ease-in-out infinite; }
+.chat-fab-close { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; position: absolute; z-index: 2; top: -2px; right: -2px; border: 2px solid #fff; border-radius: 50%; background: #4d5870; color: #fff; box-shadow: 0 4px 9px rgba(48,55,78,.32); cursor: pointer; }
 .map-results { margin: 13px 16px 0; padding: 15px; border-radius: 18px; background: #fff; box-shadow: var(--soft-shadow); }
 .results-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; font-size: 13px; }
 .results-heading span { color: var(--muted); font-size: 11px; }
@@ -364,6 +365,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 @media (min-width: 700px) {
   body { padding: 22px 0; }
   .app-shell, .welcome-screen { min-height: calc(100vh - 44px); overflow: hidden; border-radius: 28px; }
+  .chat-fab { bottom: calc(106px + env(safe-area-inset-bottom)); }
   .bottom-nav { bottom: 22px; border-radius: 0 0 28px 28px; }
   .bottom-sheet { border-radius: 24px; margin-bottom: 22px; }
 }
