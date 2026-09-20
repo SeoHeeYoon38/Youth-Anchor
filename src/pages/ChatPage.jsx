@@ -11,7 +11,8 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
   const [input, setInput] = useState('')
   const [replying, setReplying] = useState(false)
   const [actions, setActions] = useState([])
-  const [sosStatus, setSosStatus] = useState('')
+  const [sosStatus, setSosStatus] = useState(null)
+  const [sosSending, setSosSending] = useState(false)
   const [messages, setMessages] = useState([{ id: 1, role: 'helper', text: '안녕! 가온이야. 지금 어떤 도움이 가장 필요한지 편하게 말해줘.' }])
   const messagesEnd = useRef(null)
   const roomRef = useRef(null)
@@ -87,14 +88,26 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
   })
 
   const sendSos = async () => {
-    setSosStatus('위치를 확인하고 있어요.')
+    if (sosSending) return
+    setSosSending(true)
+    setSosStatus({ tone: 'loading', text: '위치를 확인하고 있어요.' })
     try {
       const currentPosition = await requestPosition()
       const room = await ensureRoom()
-      await createSosAlert({ position: currentPosition, roomId: room.id, message: '채팅 화면에서 긴급 도움 요청' })
-      setSosStatus('긴급 알림이 접수됐어요. 즉시 위험하면 112에도 연락해 주세요.')
+      const result = await createSosAlert({ position: currentPosition, roomId: room.id, message: '채팅 화면에서 긴급 도움 요청' })
+      const delivery = result?.delivery
+
+      if (delivery?.delivered > 0) {
+        setSosStatus({ tone: 'success', text: `긴급 알림이 관리자 기기 ${delivery.delivered}대에 전송됐어요. 즉시 위험하면 112에도 연락해 주세요.` })
+      } else if (delivery?.configured) {
+        setSosStatus({ tone: 'warning', text: '긴급 요청은 서버에 접수됐지만 관리자 알림 기기가 연결되어 있지 않아요. 즉시 위험하면 112에 연락해 주세요.' })
+      } else {
+        setSosStatus({ tone: 'warning', text: '긴급 요청은 서버에 접수됐지만 푸시 알림이 설정되지 않았어요. 즉시 위험하면 112에 연락해 주세요.' })
+      }
     } catch {
-      setSosStatus('긴급 알림을 보내지 못했어요. 112에 바로 연락해 주세요.')
+      setSosStatus({ tone: 'error', text: '긴급 알림을 보내지 못했어요. 112에 바로 연락해 주세요.' })
+    } finally {
+      setSosSending(false)
     }
   }
 
@@ -121,12 +134,12 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
           <div className="chat-actions page-enter">
             {actions.includes('find-shelter') && <button onClick={() => navigate('/shelters')}><MapPin size={17} /> 가까운 대피처 보기</button>}
             {actions.includes('view-support') && <button onClick={() => navigate('/support')}><HandCoins size={17} /> 지원 사업 확인하기</button>}
-            {actions.includes('send-sos') && <button className="danger" onClick={sendSos}><Siren size={17} /> 긴급 알림 보내기</button>}
+            {actions.includes('send-sos') && <button className="danger" onClick={sendSos} disabled={sosSending}><Siren size={17} /> {sosSending ? '전송 중...' : '긴급 알림 보내기'}</button>}
             {actions.includes('call-112') && <a className="danger" href="tel:112"><Phone size={17} /> 112 전화하기</a>}
             {actions.includes('call-1388') && <a href="tel:1388"><Phone size={17} /> 1388 전화하기</a>}
           </div>
         )}
-        {sosStatus && <p className="sos-status" role="status">{sosStatus}</p>}
+        {sosStatus && <p className={`sos-status ${sosStatus.tone}`} role="status">{sosStatus.text}</p>}
         <div ref={messagesEnd} />
       </div>
       <form className="chat-composer" onSubmit={(event) => { event.preventDefault(); sendMessage(input) }}>
