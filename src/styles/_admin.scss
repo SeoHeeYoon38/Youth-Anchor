@@ -1,0 +1,15 @@
+.admin-notification-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: linear-gradient(180deg, #eef3fb 0%, #fff8e2 100%); }
+.admin-notification-card { width: min(100%, 440px); padding: 24px; border: 1px solid rgba(199,211,231,.9); border-radius: 24px; background: rgba(255,255,255,.92); box-shadow: 0 22px 55px rgba(50,57,82,.13); }
+.admin-notification-hero { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; }
+.admin-notification-hero .gaon-mascot { width: 96px; height: 96px; filter: drop-shadow(0 8px 10px rgba(67,73,100,.18)); }
+.admin-notification-hero span { display: inline-flex; align-items: center; gap: 6px; color: var(--purple-dark); font-size: 12px; font-weight: 900; }
+.admin-notification-hero h1 { margin: 8px 0 0; font-size: 24px; line-height: 1.25; }
+.admin-notification-hero p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.admin-notification-form { margin-top: 22px; display: grid; gap: 10px; }
+.admin-notification-form label { display: inline-flex; align-items: center; gap: 6px; color: #3c4253; font-size: 12px; font-weight: 900; }
+.admin-notification-form input { height: 48px; padding: 0 14px; border: 1px solid #cdd6e8; border-radius: 16px; background: #f8f9fc; color: var(--ink); font-size: 16px; outline: none; }
+.admin-notification-form input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(120,153,204,.16); }
+.admin-notification-form button { height: 50px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 16px; background: var(--blue); color: #fff; font-size: 14px; font-weight: 900; box-shadow: 0 11px 20px rgba(120,153,204,.28); cursor: pointer; }
+.admin-notification-form button:disabled { background: #aeb8c9; cursor: default; }
+.admin-notification-status { margin: 14px 0 0; padding: 12px 13px; border-radius: 14px; background: #fff1ef; color: #a5443c; font-size: 12px; font-weight: 800; line-height: 1.5; }
+.admin-notification-status.success { background: #eef9f0; color: #3e8a51; }

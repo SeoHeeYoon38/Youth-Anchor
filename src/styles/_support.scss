@@ -1,0 +1,32 @@
+.support-view { padding: 0 16px 28px; position: relative; z-index: 1; }
+.support-hero { min-height: 224px; margin: 0 -16px; padding: 30px 20px 26px; display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 10px; align-items: center; position: relative; overflow: hidden; background:
+  radial-gradient(circle at 78% 38%, rgba(87,236,226,.18), transparent 30%),
+  linear-gradient(145deg, rgba(255,255,255,.13), rgba(255,255,255,.04));
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.support-hero::before { content: ''; width: 170px; height: 170px; position: absolute; right: 8px; bottom: -62px; border: 15px solid rgba(255,255,255,.18); border-radius: 50%; }
+.support-hero > div > span { display: flex; align-items: center; gap: 6px; color: var(--aqua); font-size: 12px; font-weight: 800; }
+.support-hero h1 { margin: 10px 0 8px; color: #fff; font-size: 29px; line-height: 1.3; }
+.support-hero p { max-width: 390px; margin: 0; color: #d3c8e3; font-size: 13px; line-height: 1.65; }
+.support-hero > .gaon-mascot { width: 154px; height: 154px; margin-left: -6px; position: relative; z-index: 1; filter: drop-shadow(0 0 18px rgba(87,236,226,.18)) drop-shadow(0 14px 15px rgba(0,0,0,.3)); }
+.support-callout { min-height: 90px; margin-top: 16px; padding: 14px; display: grid; grid-template-columns: 46px 1fr 20px; gap: 12px; align-items: center; border: 1px solid rgba(255,255,255,.15); border-radius: 23px; background: rgba(255,255,255,.1); box-shadow: var(--soft-shadow); color: #fff; backdrop-filter: blur(14px); }
+.support-callout > span { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 15px; background: rgba(243,200,78,.18); color: #ffe58c; }
+.support-callout strong { font-size: 13px; }
+.support-callout p { margin: 4px 0 0; color: #c8bdd8; font-size: 11px; line-height: 1.5; }
+.category-scroll { margin: 18px -16px; padding: 0 16px 3px; display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; }
+.category-scroll::-webkit-scrollbar { display: none; }
+.category-scroll button { height: 39px; padding: 0 16px; flex: 0 0 auto; border: 1px solid rgba(255,255,255,.14); border-radius: 20px; background: rgba(255,255,255,.1); color: #c8bdd8; font-size: 12px; cursor: pointer; backdrop-filter: blur(12px); }
+.category-scroll button.active { border-color: rgba(87,236,226,.46); background: linear-gradient(135deg, #7c2cff, #57ece2); color: #fff; font-weight: 800; }
+.support-list { display: grid; gap: 10px; }
+.support-card { width: 100%; padding: 16px; border: 1px solid rgba(255,255,255,.14); border-radius: 21px; background: rgba(255,255,255,.1); box-shadow: 0 12px 26px rgba(7,0,28,.24); color: #fff; text-align: left; cursor: pointer; backdrop-filter: blur(14px); }
+.support-card-head { display: flex; align-items: center; justify-content: space-between; }
+.category-badge { padding: 5px 8px; display: inline-block; border-radius: 7px; font-size: 10px; font-weight: 800; }
+.category-주거 { background: var(--blue-soft); color: var(--blue-dark); }
+.category-생활 { background: var(--yellow-soft); color: var(--yellow-dark); }
+.category-일자리 { background: var(--purple-soft); color: var(--purple-dark); }
+.category-식사 { background: var(--coral-soft); color: var(--coral-dark); }
+.deadline { display: flex; align-items: center; gap: 4px; color: #c8bdd8; font-size: 10px; }
+.support-card h2 { margin: 12px 0 6px; font-size: 15px; line-height: 1.5; }
+.support-card > p { margin: 0; color: #c8bdd8; font-size: 11px; line-height: 1.6; }
+.support-card-foot { margin-top: 12px; padding-top: 10px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,.12); color: #c8bdd8; font-size: 10px; }
+.support-card-foot span { display: flex; align-items: center; gap: 5px; }

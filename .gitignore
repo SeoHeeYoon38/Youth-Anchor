@@ -2,5 +2,16 @@ node_modules
 dist
 .env
 .env.local
+.env.*
+!.env.example
+.gemini/
+.gemini.json
+gemini*.key
+gemini*.env
 *.log
 .DS_Store
+docs/screenshots/visual-check-*/
+server/data/*.db
+server/data/*.db-shm
+server/data/*.db-wal
+.aider*
