@@ -24,9 +24,10 @@
 
 @media (min-width: 700px) {
   body { padding: 22px 0; }
-  .app-shell, .welcome-screen { min-height: calc(100vh - 44px); overflow: hidden; border-radius: 28px; }
-  .chat-fab { bottom: calc(106px + env(safe-area-inset-bottom)); }
-  .bottom-nav { bottom: 22px; border-radius: 0 0 28px 28px; }
+  .app-shell, .welcome-screen { height: calc(100vh - 44px); min-height: 0; overflow: hidden; border-radius: 28px; }
+  .chat-fab { bottom: calc(146px + env(safe-area-inset-bottom)); }
+  .chat-composer { border-radius: 0; }
+  .bottom-nav { border-radius: 0 0 28px 28px; }
   .bottom-sheet { border-radius: 24px; margin-bottom: 22px; }
 }
 
@@ -41,7 +42,7 @@
   .guest-card > .gaon-mascot { width: 92px; height: 92px; }
   .guest-card h1 { font-size: 18px; }
   .feature-tile { min-height: 172px; padding: 14px; }
-  .feature-icon { width: 58px; height: 58px; }
+  .design-icon { width: 66px; height: 66px; }
   .feature-tile strong { font-size: 15px; }
   .nearby-section { margin-left: -13px; margin-right: -13px; padding-left: 13px; padding-right: 13px; }
   .sheet-title-row { grid-template-columns: 46px 1fr 38px; }
