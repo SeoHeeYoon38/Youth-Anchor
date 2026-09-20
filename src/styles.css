@@ -159,10 +159,17 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .filter-button { height: 39px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--line); border-radius: 11px; background: #fff; color: #606778; font-size: 11px; font-weight: 700; cursor: pointer; }
 .filter-button.active { border-color: #9bb3da; background: var(--blue-soft); color: var(--blue-dark); }
 .filter-button:disabled { opacity: .6; }
-.filter-row { display: flex; gap: 6px; padding: 0 16px 10px; overflow-x: auto; scrollbar-width: none; }
+/* 유형과 이용 대상을 따로 고를 수 있어야 '여성 + 단기쉼터'처럼 조합할 수 있다. */
+.filter-panel { margin: 0 16px 10px; padding: 12px; border: 1px solid var(--line); border-radius: 15px; background: #fff; box-shadow: var(--soft-shadow); }
+.filter-group + .filter-group { margin-top: 10px; }
+.filter-group-label { display: block; margin-bottom: 6px; color: #5d6473; font-size: 10px; font-weight: 800; }
+.filter-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .filter-row::-webkit-scrollbar { display: none; }
 .filter-row button { min-height: 34px; padding: 0 11px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 17px; background: #fff; color: var(--muted); font-size: 11px; cursor: pointer; }
 .filter-row button.active { border-color: var(--blue); background: var(--blue); color: #fff; font-weight: 800; }
+.filter-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+.filter-reset { min-height: 30px; padding: 0 10px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); border-radius: 15px; background: #fff; color: var(--blue-dark); font-size: 10px; font-weight: 700; cursor: pointer; }
+.empty-state .filter-reset { margin-top: 12px; }
 .map-wrap { height: 405px; margin: 0 16px; position: relative; overflow: hidden; border: 1px solid #d8deea; border-radius: 18px; background: #e7ecf5; box-shadow: var(--soft-shadow); }
 .kakao-map { width: 100%; height: 100%; }
 .map-fallback { position: absolute; z-index: 5; inset: 0; overflow: hidden; background-color: #eef2f8; background-image: linear-gradient(#dfe6f0 1px, transparent 1px), linear-gradient(90deg, #dfe6f0 1px, transparent 1px); background-size: 54px 54px; text-align: center; }
@@ -183,14 +190,25 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .fallback-marker-2 { right: 15px; top: 48px; }
 .fallback-marker-3 { left: 37px; bottom: 36px; }
 .fallback-marker-4 { right: 37px; bottom: 25px; }
-.map-legend { position: absolute; z-index: 5; left: 10px; top: 10px; padding: 7px 9px; display: flex; align-items: center; gap: 5px; border-radius: 9px; background: rgba(255,255,255,.94); box-shadow: var(--soft-shadow); font-size: 10px; font-weight: 700; }
-.map-legend span { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-.shelter-chat-fab { position: fixed; z-index: 30; top: 54%; right: max(12px, calc((100vw - 560px) / 2 + 12px)); transform: translateY(-50%); }
-.shelter-chat-fab-open { padding: 0; display: flex; flex-direction: column; align-items: center; border: 0; background: transparent; cursor: pointer; }
-.shelter-chat-fab-open .gaon-mascot { width: 76px; height: 76px; filter: drop-shadow(0 8px 10px rgba(48,55,78,.22)); animation: mascot-breathe 3s ease-in-out infinite; }
-.shelter-chat-fab-open > .shelter-chat-fab-label { margin-top: -8px; padding: 5px 8px; border-radius: 8px; background: #fff; box-shadow: var(--soft-shadow); color: var(--blue-dark); font-size: 9px; font-weight: 800; }
-.shelter-chat-fab-close, .home-chat-fab-close { width: 22px; height: 22px; padding: 0; display: grid; place-items: center; position: absolute; z-index: 2; border: 2px solid #fff; border-radius: 50%; background: #4d5870; color: #fff; box-shadow: 0 3px 7px rgba(48,55,78,.25); cursor: pointer; }
-.shelter-chat-fab-close { top: -1px; right: -1px; }
+/* 마커 색상 기준을 지도 위에서 바로 읽을 수 있게 범례로 보여준다. */
+.map-legend { position: absolute; z-index: 5; left: 10px; top: 10px; max-width: 168px; padding: 8px 10px; border-radius: 11px; background: rgba(255,255,255,.95); box-shadow: var(--soft-shadow); }
+.map-legend > strong { display: block; margin-bottom: 6px; color: #3c4253; font-size: 9px; font-weight: 800; }
+.map-legend ul { margin: 0; padding: 0; display: grid; gap: 4px; list-style: none; }
+.map-legend li { display: grid; grid-template-columns: 9px auto; gap: 5px; align-items: baseline; }
+.map-legend b { color: #3c4253; font-size: 9px; font-weight: 800; }
+.map-legend small { grid-column: 2; color: var(--muted); font-size: 8px; line-height: 1.35; }
+.legend-dot { width: 9px; height: 9px; margin-top: 2px; border-radius: 50%; }
+.legend-coral { background: var(--coral); }
+.legend-yellow { background: var(--yellow); }
+.legend-green { background: var(--green); }
+.legend-purple { background: var(--purple); }
+
+/* 가온 헬퍼 플로팅 버튼: 홈·대피처·지원 화면이 같은 위치와 같은 아이콘을 쓴다. */
+.chat-fab { position: fixed; z-index: 30; top: 54%; right: max(12px, calc((100vw - 560px) / 2 + 12px)); transform: translateY(-50%); }
+.chat-fab-open { padding: 0; display: flex; flex-direction: column; align-items: center; border: 0; background: transparent; cursor: pointer; }
+.chat-fab-open .gaon-mascot { width: 76px; height: 76px; filter: drop-shadow(0 8px 10px rgba(48,55,78,.22)); animation: mascot-breathe 3s ease-in-out infinite; }
+.chat-fab-label { margin-top: -8px; padding: 5px 8px; border-radius: 8px; background: #fff; box-shadow: var(--soft-shadow); color: var(--blue-dark); font-size: 9px; font-weight: 800; white-space: nowrap; }
+.chat-fab-close { width: 22px; height: 22px; padding: 0; display: grid; place-items: center; position: absolute; z-index: 2; top: -1px; right: -1px; border: 2px solid #fff; border-radius: 50%; background: #4d5870; color: #fff; box-shadow: 0 3px 7px rgba(48,55,78,.25); cursor: pointer; }
 .map-results { margin: 13px 16px 0; padding: 15px; border-radius: 18px; background: #fff; box-shadow: var(--soft-shadow); }
 .results-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; font-size: 13px; }
 .results-heading span { color: var(--muted); font-size: 11px; }
@@ -313,9 +331,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .notification-preview strong { color: var(--ink); font-size: 12px; }
 .notification-preview span { margin-top: 4px; font-size: 10px; line-height: 1.5; }
 /* 대피처 화면의 가온 헬퍼와 동일하게 화면 오른쪽에 고정해 스크롤을 따라오게 한다. */
-.home-chat-fab { position: fixed; z-index: 30; right: max(12px, calc((100vw - 560px) / 2 + 12px)); bottom: calc(86px + env(safe-area-inset-bottom)); display: flex; }
-.home-chat-fab-open { min-height: 46px; padding: 0 14px; display: flex; align-items: center; gap: 7px; position: relative; border: 1px solid rgba(255,255,255,.7); border-radius: 23px; background: #7598cf; color: #fff; box-shadow: 0 10px 24px rgba(70,91,129,.25); font-size: 12px; font-weight: 800; cursor: pointer; animation: fab-breathe 3.6s ease-in-out infinite; }
-.home-chat-fab-close { top: -9px; right: -9px; }
+
 .page-enter { animation: page-in .48s cubic-bezier(.2,.8,.2,1) both; }
 .reveal-card { animation: card-in .58s cubic-bezier(.2,.8,.2,1) both; }
 .reveal-stack > * { animation: text-in .55s cubic-bezier(.2,.8,.2,1) both; }
@@ -367,9 +383,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
 /* 화면이 낮으면 버튼을 숨기지 않고 라벨만 줄여 계속 닿을 수 있게 둔다. */
 @media (max-height: 650px) {
-  .home-chat-fab { bottom: calc(78px + env(safe-area-inset-bottom)); }
-  .home-chat-fab-open { min-height: 40px; padding: 0 11px; font-size: 11px; }
-  .shelter-chat-fab { top: auto; bottom: calc(78px + env(safe-area-inset-bottom)); transform: none; }
+  .chat-fab { top: auto; bottom: calc(78px + env(safe-area-inset-bottom)); transform: none; }
+  .chat-fab-open .gaon-mascot { width: 62px; height: 62px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

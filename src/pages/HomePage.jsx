@@ -1,13 +1,12 @@
-import { ChevronRight, CircleAlert, LocateFixed, MessageCircle, Phone, ShieldCheck, X } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronRight, CircleAlert, LocateFixed, Phone, ShieldCheck } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import ChatFab from '../components/ChatFab.jsx'
 import DesignIcon from '../components/DesignIcon.jsx'
 import Mascot from '../components/Mascot.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
 
 export default function HomePage({ shelters, locationMessage, locateMe, locating, onSelectShelter, onOpenGuide }) {
   const navigate = useNavigate()
-  const [chatFabVisible, setChatFabVisible] = useState(true)
 
   return (
     <div className="view home-view page-enter">
@@ -76,12 +75,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
       </section>
 
       <p className="data-note"><CircleAlert size={14} /> 방문 전 1388을 통해 운영 여부와 입소 방법을 확인해 주세요.</p>
-      {chatFabVisible && (
-        <div className="home-chat-fab">
-          <button className="home-chat-fab-open" onClick={() => navigate('/chat')} aria-label="가온과 익명 상담 시작"><MessageCircle size={22} /><span>가온에게 말하기</span></button>
-          <button className="home-chat-fab-close" onClick={() => setChatFabVisible(false)} aria-label="채팅 플로팅 버튼 닫기"><X size={13} /></button>
-        </div>
-      )}
+      <ChatFab />
     </div>
   )
 }
