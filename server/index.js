@@ -3,6 +3,7 @@ import { randomBytes, randomUUID } from 'node:crypto'
 import { pathToFileURL } from 'node:url'
 import { WebSocketServer } from 'ws'
 import { bearerToken, createGuestToken, verifyGuestToken } from './auth.js'
+import { createChatService } from './ai-chat.js'
 import { createDatabase } from './database.js'
 import { syncNoticeFeeds } from './notice-sync.js'
 import { createPushService } from './push.js'
@@ -46,28 +47,6 @@ async function readJson(request) {
   }
 }
 
-function chatReply(message) {
-  if (message.includes('위험')) {
-    return {
-      reply: '지금 당장 다칠 위험이 있다면 112에 전화해 주세요. 위치를 허용하면 긴급 알림 접수도 도와드릴게요.',
-      actions: ['call-112', 'send-sos', 'find-shelter']
-    }
-  }
-  if (message.includes('잘 곳') || message.includes('쉼터')) {
-    return {
-      reply: '오늘 머물 곳이 필요하군요. 현재 위치에서 가까운 대피처를 확인해 볼게요. 출발 전에는 1388로 입소 가능 여부를 확인해 주세요.',
-      actions: ['find-shelter', 'call-1388']
-    }
-  }
-  if (message.includes('돈') || message.includes('식사')) {
-    return {
-      reply: '지금 신청할 수 있는 식사와 생활비 지원 공지를 확인해 볼게요.',
-      actions: ['view-support']
-    }
-  }
-  return { reply: '말해줘서 고마워요. 지금 가장 힘든 일부터 천천히 적어도 괜찮아요.', actions: [] }
-}
-
 function validSubscription(body) {
   return Boolean(body?.subscription?.endpoint && body.subscription?.keys?.p256dh && body.subscription?.keys?.auth)
 }
@@ -84,6 +63,7 @@ export function createApiServer(options = {}) {
   const adminKey = options.adminKey || process.env.HAVEN_ADMIN_KEY || (process.env.NODE_ENV === 'production' ? '' : 'local-development-admin-key')
   const pushService = options.pushService || createPushService(repository, options.pushConfig)
   const openDataConfig = options.openDataConfig || resolveOpenDataConfig()
+  const chatService = options.chatService || createChatService(options.openai)
   const socketsByRoom = new Map()
 
   function authenticate(request, response) {
@@ -101,8 +81,9 @@ export function createApiServer(options = {}) {
     const clean = typeof message === 'string' ? message.trim().slice(0, 1000) : ''
     if (!clean) throw new Error('message-required')
     repository.activateChatRoom(room.id)
+    const history = repository.listMessages(room.id, 6)
     repository.addMessage(room.id, 'user', clean)
-    const answer = chatReply(clean)
+    const answer = await chatService.reply({ message: clean, history })
     repository.addMessage(room.id, 'helper', answer.reply)
     return answer
   }
@@ -117,10 +98,14 @@ export function createApiServer(options = {}) {
           service: 'haven-api',
           database: 'sqlite',
           pushConfigured: Boolean(pushService.publicKey),
+          ai: {
+            provider: chatService.provider,
+            configured: chatService.configured,
+            model: chatService.model
+          },
           openData: {
             shelters: openDataConfig.shelter.enabled,
-            welfare: openDataConfig.welfare.enabled,
-            youthPolicy: openDataConfig.youthPolicy.enabled
+            welfare: openDataConfig.welfare.enabled
           },
           counts: { shelters: repository.countShelters(), notices: repository.countNotices() },
           lastSync: repository.latestSyncRuns(),
@@ -172,8 +157,7 @@ export function createApiServer(options = {}) {
           sendJson(response, 200, {
             openData: {
               shelters: { enabled: openDataConfig.shelter.enabled, endpoint: openDataConfig.shelter.endpoint },
-              welfare: { enabled: openDataConfig.welfare.enabled, endpoint: openDataConfig.welfare.listEndpoint },
-              youthPolicy: { enabled: openDataConfig.youthPolicy.enabled, endpoint: openDataConfig.youthPolicy.endpoint || null }
+              welfare: { enabled: openDataConfig.welfare.enabled, endpoint: openDataConfig.welfare.listEndpoint }
             },
             schedule: { hourKst: openDataConfig.scheduleHourKst, minuteKst: openDataConfig.scheduleMinuteKst },
             counts: { shelters: repository.countShelters(), notices: repository.countNotices() },

@@ -4,6 +4,7 @@ const required = [
   ['DATA_GO_KR_SERVICE_KEY', '지원사업 API 동기화'],
   ['VITE_KAKAO_MAP_APP_KEY', '카카오 지도 표시'],
   ['KAKAO_REST_API_KEY', '주소→좌표 보정(선택)'],
+  ['OPENAI_API_KEY', 'AI 안내 가온'],
   ['HAVEN_JWT_SECRET', '익명 토큰 서명'],
   ['HAVEN_ADMIN_KEY', '관리자 API']
 ]
@@ -42,7 +43,7 @@ if (missing > 0) {
   console.log('\n.env가 없거나 필수 값이 비어 있습니다.')
   console.log('프로젝트 루트에서 다음을 실행하세요:')
   console.log('  Copy-Item .env.example .env')
-  console.log('그 다음 .env를 열어 DATA_GO_KR_SERVICE_KEY와 VITE_KAKAO_MAP_APP_KEY를 입력하세요.')
+  console.log('그 다음 .env를 열어 공공데이터, 카카오맵, OpenAI 키를 입력하세요.')
   process.exitCode = 1
 } else {
   console.log('\n필수 환경변수는 모두 설정되어 있습니다.')

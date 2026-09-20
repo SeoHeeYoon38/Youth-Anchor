@@ -48,7 +48,6 @@ function mapShelter(row) {
     phone: row.phone,
     open: row.open_hours,
     features: parseJson(row.features),
-    capacity: row.capacity ?? null,
     region: row.region || '',
     homepage: row.homepage || null,
     entryTarget: row.entry_target || '',
@@ -310,6 +309,15 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     getChatRoom: database.prepare('SELECT * FROM chat_rooms WHERE id = ? AND deleted_at IS NULL'),
     activateChatRoom: database.prepare("UPDATE chat_rooms SET status = 'active' WHERE id = ? AND deleted_at IS NULL"),
     createMessage: database.prepare('INSERT INTO chat_messages (room_id, role, content, created_at) VALUES (?, ?, ?, ?)'),
+    listMessages: database.prepare(`
+      SELECT role, content, created_at FROM (
+        SELECT id, role, content, created_at
+        FROM chat_messages
+        WHERE room_id = ?
+        ORDER BY id DESC
+        LIMIT ?
+      ) ORDER BY id ASC
+    `),
     deleteMessages: database.prepare('DELETE FROM chat_messages WHERE room_id = ?'),
     deleteSosByRoom: database.prepare('DELETE FROM sos_alerts WHERE room_id = ?'),
     deleteRoom: database.prepare('DELETE FROM chat_rooms WHERE id = ?'),
@@ -432,6 +440,9 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     },
     addMessage(roomId, role, content) {
       statements.createMessage.run(roomId, role, content, new Date().toISOString())
+    },
+    listMessages(roomId, limit = 6) {
+      return statements.listMessages.all(roomId, limit)
     },
     deleteChatRoom(id, guestJti) {
       const room = this.getChatRoom(id)

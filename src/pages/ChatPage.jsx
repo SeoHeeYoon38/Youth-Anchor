@@ -103,7 +103,7 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
       <header className="chat-header">
         <button className="round-button transition hover:-translate-x-0.5" onClick={() => navigate('/home')} aria-label="홈으로 돌아가기"><ChevronLeft size={24} /></button>
         <Mascot pose="chat" className="mascot-breathe" alt="태블릿으로 상담하는 가온" />
-        <div><h1>상담사 가온</h1><span><i /> 온라인</span></div>
+        <div><h1>AI 안내 가온</h1><span><i /> 온라인</span></div>
         <button className="exit-compact transition active:scale-95" onClick={onQuickExit} aria-label="긴급 종료"><ExternalLink size={18} /></button>
       </header>
       <div className="privacy-strip"><LockKeyhole size={17} /> 대화는 익명으로 임시 저장되며 긴급 종료 시 즉시 삭제돼요.</div>
@@ -134,7 +134,7 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
         <input id="chat-input" value={input} onChange={(event) => setInput(event.target.value)} placeholder="가온에게 편하게 말해줘" autoComplete="off" />
         <button className="transition active:scale-90" type="submit" disabled={!input.trim() || replying} aria-label="보내기"><Send size={20} /></button>
       </form>
-      <p className="chat-demo-note">익명 상담 세션은 24시간 후 자동 만료돼요.</p>
+      <p className="chat-demo-note">AI가 안내하며, 익명 상담 세션은 24시간 후 자동 만료돼요.</p>
     </div>
   )
 }
