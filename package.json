@@ -14,7 +14,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "check:env": "node --env-file-if-exists=.env scripts/check-env.mjs",
-    "test": "node --test server/*.test.js",
+    "test": "node --test server/*.test.js src/*.test.js",
     "sync": "node --env-file-if-exists=.env server/sync.js",
     "sync:shelters": "node --env-file-if-exists=.env server/sync.js shelters",
     "sync:notices": "node --env-file-if-exists=.env server/sync.js notices"

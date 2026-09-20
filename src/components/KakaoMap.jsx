@@ -1,17 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { DEFAULT_CENTER } from '../constants.js'
+import { MARKER_LEGEND, markerStyleFor } from '../shelterMarkers.js'
 
 const KAKAO_MAP_APP_KEY = import.meta.env.VITE_KAKAO_MAP_APP_KEY
-const MARKER_TONES = [
-  { tone: 'green', symbol: '집', label: '쉼터' },
-  { tone: 'yellow', symbol: '손', label: '쉼터' },
-  { tone: 'coral', symbol: 'SOS', label: '긴급 대피처' },
-  { tone: 'purple', symbol: '쉼', label: '쉼터' }
-]
-
-function markerStyle(index) {
-  return MARKER_TONES[index % MARKER_TONES.length]
-}
 
 function loadKakaoMaps() {
   if (!KAKAO_MAP_APP_KEY) return Promise.reject(new Error('missing-key'))
@@ -48,62 +39,54 @@ function loadKakaoMaps() {
   return window.__havenKakaoMapsPromise
 }
 
+/** 마커 DOM은 지도용과 미리보기용이 같은 모양이어야 해서 한 곳에서 만든다. */
+function createMarkerElement(shelter, onSelect) {
+  const style = markerStyleFor(shelter)
+  const element = document.createElement('button')
+  const pin = document.createElement('span')
+  const label = document.createElement('span')
+
+  element.type = 'button'
+  element.className = `haven-map-marker marker-${style.tone}`
+  element.setAttribute('aria-label', `${shelter.name} · ${style.title} 위치`)
+  element.title = `${style.title} — ${style.description}`
+  pin.className = 'marker-pin'
+  pin.dataset.symbol = style.symbol
+  label.className = 'marker-label'
+  label.textContent = style.label
+  element.append(pin, label)
+  element.addEventListener('click', () => onSelect(shelter))
+
+  return element
+}
+
 export default function KakaoMap({ position, shelters, onSelectShelter }) {
   const mapElement = useRef(null)
+  const mapInstance = useRef(null)
+  const mapsApi = useRef(null)
+  const overlays = useRef([])
+  const locationCircle = useRef(null)
+  const selectHandler = useRef(onSelectShelter)
   const [status, setStatus] = useState(KAKAO_MAP_APP_KEY ? 'loading' : 'missing-key')
 
+  // 마커 클릭 처리는 최신 콜백을 쓰되, 콜백 변경만으로 지도를 다시 만들지 않는다.
+  useEffect(() => {
+    selectHandler.current = onSelectShelter
+  }, [onSelectShelter])
+
+  // 지도는 한 번만 만든다. 조건을 바꿀 때마다 새로 만들면 확대 수준과 위치가 초기화된다.
   useEffect(() => {
     let cancelled = false
-    const markers = []
-    let currentLocation = null
 
     loadKakaoMaps()
       .then((maps) => {
         if (cancelled || !mapElement.current) return
-
         const center = position || DEFAULT_CENTER
-        const map = new maps.Map(mapElement.current, {
+        mapsApi.current = maps
+        mapInstance.current = new maps.Map(mapElement.current, {
           center: new maps.LatLng(center.lat, center.lng),
           level: 5
         })
-
-        shelters.forEach((shelter, index) => {
-          const style = markerStyle(index)
-          const content = document.createElement('button')
-          const pin = document.createElement('span')
-          const label = document.createElement('span')
-          content.type = 'button'
-          content.className = `haven-map-marker marker-${style.tone}`
-          content.setAttribute('aria-label', `${shelter.name} 위치`)
-          pin.className = 'marker-pin'
-          pin.dataset.symbol = style.symbol
-          label.className = 'marker-label'
-          label.textContent = style.label
-          content.append(pin, label)
-          content.addEventListener('click', () => onSelectShelter(shelter))
-
-          const marker = new maps.CustomOverlay({
-            map,
-            position: new maps.LatLng(shelter.lat, shelter.lng),
-            content,
-            yAnchor: 1.12
-          })
-          markers.push(marker)
-        })
-
-        if (position) {
-          currentLocation = new maps.Circle({
-            map,
-            center: new maps.LatLng(position.lat, position.lng),
-            radius: 34,
-            strokeWeight: 5,
-            strokeColor: '#ffffff',
-            strokeOpacity: 1,
-            fillColor: '#7398d2',
-            fillOpacity: 0.92
-          })
-        }
-
         setStatus('ready')
       })
       .catch((error) => {
@@ -112,10 +95,51 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
 
     return () => {
       cancelled = true
-      markers.forEach((marker) => marker.setMap(null))
-      currentLocation?.setMap(null)
+      overlays.current.forEach((overlay) => overlay.setMap(null))
+      overlays.current = []
+      locationCircle.current?.setMap(null)
+      locationCircle.current = null
+      mapInstance.current = null
     }
-  }, [onSelectShelter, position, shelters])
+    // 최초 1회만 실행한다. position 초기값은 아래 효과에서 다시 반영한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 필터 결과가 바뀌면 마커만 교체한다.
+  useEffect(() => {
+    const maps = mapsApi.current
+    const map = mapInstance.current
+    if (!maps || !map) return
+
+    overlays.current.forEach((overlay) => overlay.setMap(null))
+    overlays.current = shelters.map((shelter) => new maps.CustomOverlay({
+      map,
+      position: new maps.LatLng(shelter.lat, shelter.lng),
+      content: createMarkerElement(shelter, (item) => selectHandler.current?.(item)),
+      yAnchor: 1.12
+    }))
+  }, [shelters, status])
+
+  // 내 위치가 잡히면 지도 중심과 현재 위치 표시를 갱신한다.
+  useEffect(() => {
+    const maps = mapsApi.current
+    const map = mapInstance.current
+    if (!maps || !map || !position) return
+
+    const center = new maps.LatLng(position.lat, position.lng)
+    map.setCenter(center)
+    locationCircle.current?.setMap(null)
+    locationCircle.current = new maps.Circle({
+      map,
+      center,
+      radius: 34,
+      strokeWeight: 5,
+      strokeColor: '#ffffff',
+      strokeOpacity: 1,
+      fillColor: '#7398d2',
+      fillOpacity: 0.92
+    })
+  }, [position, status])
 
   const title = status === 'loading'
     ? '카카오맵을 불러오고 있어요'
@@ -130,9 +154,15 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
         <div className="map-fallback" role="status">
           <div className="fallback-markers" aria-label="대피처 위치 미리보기">
             {shelters.slice(0, 4).map((shelter, index) => {
-              const style = markerStyle(index)
+              const style = markerStyleFor(shelter)
               return (
-                <button className={`haven-map-marker marker-${style.tone} fallback-marker-${index + 1}`} key={shelter.id} onClick={() => onSelectShelter(shelter)} aria-label={`${shelter.name} 상세 보기`}>
+                <button
+                  className={`haven-map-marker marker-${style.tone} fallback-marker-${index + 1}`}
+                  key={shelter.id}
+                  onClick={() => onSelectShelter(shelter)}
+                  aria-label={`${shelter.name} 상세 보기`}
+                  title={`${style.title} — ${style.description}`}
+                >
                   <span className="marker-pin" data-symbol={style.symbol} />
                   <span className="marker-label">{style.label}</span>
                 </button>
@@ -145,7 +175,18 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
           </div>
         </div>
       )}
-      {status === 'ready' && <div className="map-legend"><span /> 이용 가능한 대피처</div>}
+      <div className="map-legend" aria-label="마커 색상 기준">
+        <strong>머물 수 있는 기간</strong>
+        <ul>
+          {MARKER_LEGEND.map((item) => (
+            <li key={item.type}>
+              <span className={`legend-dot legend-${item.tone}`} />
+              <b>{item.title}</b>
+              <small>{item.description}</small>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
