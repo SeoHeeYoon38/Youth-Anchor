@@ -53,6 +53,7 @@ export function ShelterSheet({ shelter, onClose }) {
 }
 
 export function SupportSheet({ support, onClose }) {
+  const applicationUrl = /^https?:\/\//i.test(support.applicationUrl || '') ? support.applicationUrl : null
   return (
     <SheetFrame onClose={onClose} labelledBy="support-sheet-title">
       <div className="sheet-title-row">
@@ -63,8 +64,12 @@ export function SupportSheet({ support, onClose }) {
       <p className="support-sheet-body">{support.body}</p>
       <div className="tag-row large">{support.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
       <div className="support-deadline"><Clock3 size={18} /><span>신청 기간</span><strong>{support.deadline}</strong></div>
-      <p className="sheet-warning"><CircleAlert size={17} /> 이 화면은 예시 정보입니다. 실제 조건과 기간은 운영기관 공고에서 확인해 주세요.</p>
-      <a className="primary-action full" href="tel:1388"><Phone size={18} /> 1388에 지원 문의하기</a>
+      <p className="sheet-warning"><CircleAlert size={17} /> 신청 조건과 기간은 운영기관의 최신 공고에서 한 번 더 확인해 주세요.</p>
+      {applicationUrl ? (
+        <a className="primary-action full" href={applicationUrl} target="_blank" rel="noreferrer"><ExternalLink size={18} /> 운영기관에서 신청하기</a>
+      ) : (
+        <a className="primary-action full" href="tel:1388"><Phone size={18} /> 1388에 지원 문의하기</a>
+      )}
     </SheetFrame>
   )
 }

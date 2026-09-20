@@ -69,10 +69,10 @@ export async function fetchShelter(id) {
 }
 
 export async function fetchNotices(filters = {}) {
-  const query = new URLSearchParams()
+  const query = new URLSearchParams({ limit: '100' })
   if (filters.category && filters.category !== '전체') query.set('category', filters.category)
   if (filters.kind) query.set('kind', filters.kind)
-  const response = await requestJson(`/api/v1/notices${query.size ? `?${query}` : ''}`)
+  const response = await requestJson(`/api/v1/notices?${query}`)
   return response.items.map((notice) => ({ ...notice, body: notice.summary || notice.content }))
 }
 
