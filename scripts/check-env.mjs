@@ -39,19 +39,20 @@ for (const [name, purpose] of required) {
 }
 
 const apiPort = Number(process.env.PORT || 8787)
-console.log(`\nAPI 포트 ${apiPort}: ${await checkPort(apiPort)}`)
+const portStatus = await checkPort(apiPort)
+console.log(`\nAPI 포트 ${apiPort}: ${portStatus}`)
 
 if (missing > 0) {
   console.log('\n.env가 없거나 필수 값이 비어 있습니다.')
   console.log('프로젝트 루트에서 다음을 실행하세요:')
-  console.log('  Copy-Item .env.example .env')
+  console.log('  cp .env.example .env')
   console.log('그 다음 .env를 열어 공공데이터, 카카오맵, OpenAI 키를 입력하세요.')
   process.exitCode = 1
 } else {
   console.log('\n필수 환경변수는 모두 설정되어 있습니다.')
 }
 
-if ((await checkPort(apiPort)) === '사용 중') {
+if (portStatus === '사용 중') {
   console.log('\n8787 포트가 사용 중입니다. Windows PowerShell에서 확인하세요:')
   console.log('  netstat -ano | findstr :8787')
   console.log('  taskkill /PID <PID> /F')

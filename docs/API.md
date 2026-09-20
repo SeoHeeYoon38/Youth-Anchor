@@ -59,7 +59,7 @@
 
 | 용도 | 데이터 | 엔드포인트 | 심의 |
 | --- | --- | --- | --- |
-| `GET /shelters/nearby` | [성평등가족부_청소년쉼터](https://www.data.go.kr/data/15109778/openapi.do) (15109778) | `apis.data.go.kr/1383000/gmis/teenRAreaServiceV2/getTeenRAreaListV2` | 자동승인 |
+| `GET /shelters/nearby` | [여성가족부_청소년쉼터](https://www.data.go.kr/data/15109778/openapi.do) (15109778) | `apis.data.go.kr/1383000/gmis/teenRAreaServiceV2/getTeenRAreaListV2` | 자동승인 |
 | `GET /notices` | [한국사회보장정보원_중앙부처복지서비스](https://www.data.go.kr/data/15090532/openapi.do) (15090532) | `apis.data.go.kr/B554287/NationalWelfareInformationsV001/NationalWelfarelistV001` (+ `NationalWelfaredetailedV001`) | 자동승인 |
 
 두 데이터 모두 **REST 유형**이라 공공데이터포털 계정의 일반 인증키 하나로 호출됩니다. 활용신청 후 `DATA_GO_KR_SERVICE_KEY` 한 개만 채우면 됩니다. 승인 직후에는 키가 아직 전파되지 않아 `SERVICE_KEY_IS_NOT_REGISTERED_ERROR`가 날 수 있으며 최대 1시간 정도 기다려야 합니다.
@@ -88,7 +88,7 @@ npm run sync:notices    # 지원사업/공지만
 
 같은 데이터의 **파일데이터 버전**은 인증키 없이 내려받을 수 있어, 전국 청소년쉼터 137곳을 리포지터리에 동봉해 두었습니다. 서비스키를 발급받기 전에도 첫 실행부터 실제 시설명·주소·대표전화로 동작합니다.
 
-- 출처: [성평등가족부_청소년쉼터 현황](https://www.data.go.kr/data/3084536/fileData.do) (2025년 3월 기준)
+- 출처: [여성가족부_청소년쉼터 현황](https://www.data.go.kr/data/3084536/fileData.do) (2025년 3월 기준)
 - 저장 위치: `server/seed/shelters.json` (`source: "mogef-file"`)
 - 갱신: `node scripts/build-shelter-seed.mjs` — CSV를 다시 받아 좌표까지 새로 만듭니다.
 

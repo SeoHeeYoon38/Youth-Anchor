@@ -190,7 +190,7 @@ export async function syncSupportNotices({
 /**
  * DB가 비어 있으면 동봉된 전국 청소년쉼터 실데이터를 먼저 넣는다.
  *
- * 성평등가족부 파일데이터 기반이라 서비스키가 없어도 첫 실행부터 실제 쉼터가 보인다.
+ * 여성가족부 파일데이터 기반이라 서비스키가 없어도 첫 실행부터 실제 쉼터가 보인다.
  * 서비스키가 있는 환경에서도 오픈API 응답을 기다리는 동안 화면이 비지 않도록 항상 넣고,
  * 이후 동기화가 성공하면 더 최신인 오픈API 데이터로 교체된다.
  */
@@ -199,7 +199,7 @@ export async function ensureBaselineData({ repository, logger = console } = {}) 
 
   const seeds = await loadSeedShelters()
   for (const shelter of seeds) repository.upsertShelter(shelter)
-  logger.log?.(`[sync] 전국 청소년쉼터 ${seeds.length}곳을 동봉 데이터로 채웠습니다 (성평등가족부 2025-03 기준)`)
+  logger.log?.(`[sync] 전국 청소년쉼터 ${seeds.length}곳을 동봉 데이터로 채웠습니다 (여성가족부 2025-03 기준)`)
   return { inserted: seeds.length, reason: 'seeded' }
 }
 
