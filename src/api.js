@@ -132,9 +132,12 @@ export async function createSosAlert({ position, roomId, message }) {
   })
 }
 
-export async function subscribeToPush(subscription, audience = 'guest') {
+export async function subscribeToPush(subscription, audience = 'guest', adminKey = '') {
+  const headers = {}
+  if (audience === 'admin' && adminKey) headers['X-Admin-Key'] = adminKey
   return requestJson('/api/v1/notifications/subscribe', {
     method: 'POST',
+    headers,
     body: JSON.stringify({ subscription: subscription.toJSON?.() || subscription, audience })
   })
 }
@@ -146,7 +149,7 @@ function urlBase64ToUint8Array(value) {
   return Uint8Array.from([...raw].map((character) => character.charCodeAt(0)))
 }
 
-export async function enablePushNotifications() {
+export async function enablePushNotifications({ audience = 'guest', adminKey = '' } = {}) {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) throw new Error('push-not-supported')
   const config = await requestJson('/api/v1/notifications/config')
   if (!config.configured || !config.vapidPublicKey) throw new Error('push-not-configured')
@@ -158,6 +161,6 @@ export async function enablePushNotifications() {
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(config.vapidPublicKey)
   })
-  await subscribeToPush(subscription)
+  await subscribeToPush(subscription, audience, adminKey)
   return true
 }

@@ -4,6 +4,7 @@ import { deleteChatRoom, enablePushNotifications, ensureGuestSession, fetchNotic
 import { GuideSheet, NoticeSheet, ShelterSheet, SupportSheet } from './components/Sheets.jsx'
 import { DEFAULT_CENTER } from './constants.js'
 import HavenLayout from './layouts/HavenLayout.jsx'
+import AdminNotificationsPage from './pages/AdminNotificationsPage.jsx'
 import ChatPage from './pages/ChatPage.jsx'
 import HomePage from './pages/HomePage.jsx'
 import SheltersPage from './pages/SheltersPage.jsx'
@@ -114,6 +115,7 @@ export default function App() {
   return (
     <>
       <Routes>
+        <Route path="/__internal/admin-notifications" element={<AdminNotificationsPage />} />
         <Route path="/" element={<WelcomePage onQuickExit={quickExit} />} />
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
           <Route path="/home" element={<HomePage shelters={sortedShelters} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} onOpenGuide={() => setGuideOpen(true)} />} />
