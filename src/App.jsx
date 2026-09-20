@@ -115,7 +115,6 @@ export default function App() {
   return (
     <>
       <Routes>
-        <Route path="/__internal/admin-notifications" element={<AdminNotificationsPage />} />
         <Route path="/" element={<WelcomePage onQuickExit={quickExit} />} />
         <Route path="/__internal/admin-notifications" element={<AdminNotificationsPage />} />
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
