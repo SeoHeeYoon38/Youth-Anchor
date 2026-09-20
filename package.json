@@ -3,25 +3,35 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
     "dev": "node server/dev.js",
     "dev:web": "vite",
-    "api": "node server/index.js",
+    "api": "node --env-file-if-exists=.env server/index.js",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "test": "node --test server/*.test.js"
+    "check:env": "node --env-file-if-exists=.env scripts/check-env.mjs",
+    "test": "node --test server/*.test.js",
+    "sync": "node --env-file-if-exists=.env server/sync.js",
+    "sync:shelters": "node --env-file-if-exists=.env server/sync.js shelters",
+    "sync:notices": "node --env-file-if-exists=.env server/sync.js notices"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
+    "openai": "^7.20.0",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "^7.18.4",
     "tailwindcss": "^4.3.3",
     "vite": "latest",
-    "vite-plugin-pwa": "latest"
+    "vite-plugin-pwa": "latest",
+    "web-push": "^3.6.7",
+    "ws": "^8.21.3"
   },
   "devDependencies": {
     "@eslint/js": "latest",

@@ -8,9 +8,12 @@ const { chromium } = require('playwright')
 const outputDir = new URL('../docs/screenshots/', import.meta.url)
 await mkdir(outputDir, { recursive: true })
 
+// 실행 환경마다 크롬 위치가 달라 경로를 하드코딩하지 않는다.
+// CHROME_PATH가 있으면 그 브라우저를, 없으면 Playwright가 내려받은 브라우저를 쓴다.
 const browser = await chromium.launch({
-  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-  headless: true
+  executablePath: process.env.CHROME_PATH || undefined,
+  headless: true,
+  args: ['--no-sandbox']
 })
 
 const cases = [
@@ -60,11 +63,18 @@ const interactionPage = await browser.newPage({ viewport: { width: 390, height: 
 await interactionPage.goto('http://127.0.0.1:5173/home', { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: /SOS 대피처/ }).click()
 await interactionPage.waitForURL('**/shelters')
+await interactionPage.getByRole('button', { name: '가온 헬퍼 채팅 열기' }).click()
+await interactionPage.waitForURL('**/chat')
+await interactionPage.goto('http://127.0.0.1:5173/shelters', { waitUntil: 'networkidle' })
 await interactionPage.locator('.haven-map-marker').first().click()
 await interactionPage.getByRole('dialog').waitFor()
+await interactionPage.keyboard.press('Escape')
 await interactionPage.goto('http://127.0.0.1:5173/home', { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: /안전 가이드/ }).click()
 await interactionPage.getByRole('dialog', { name: /가온의 안전 가이드/ }).waitFor()
+await interactionPage.goto('http://127.0.0.1:5173/home', { waitUntil: 'networkidle' })
+await interactionPage.getByRole('button', { name: '채팅 플로팅 버튼 닫기' }).click()
+await interactionPage.getByRole('button', { name: '채팅 플로팅 버튼 닫기' }).waitFor({ state: 'detached' })
 await interactionPage.goto('http://127.0.0.1:5173/chat', { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: '그냥 이야기하고 싶어요' }).click()
 await interactionPage.getByText('그냥 이야기하고 싶어요', { exact: true }).waitFor()

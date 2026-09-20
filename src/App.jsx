@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { fetchShelters, fetchSupports } from './api.js'
+import { deleteChatRoom, enablePushNotifications, ensureGuestSession, fetchNotices, fetchShelters } from './api.js'
 import { GuideSheet, NoticeSheet, ShelterSheet, SupportSheet } from './components/Sheets.jsx'
 import { DEFAULT_CENTER } from './constants.js'
-import { shelters as fallbackShelters, supports as fallbackSupports } from './data.js'
 import HavenLayout from './layouts/HavenLayout.jsx'
 import ChatPage from './pages/ChatPage.jsx'
 import HomePage from './pages/HomePage.jsx'
@@ -14,18 +13,25 @@ import { distanceKm } from './utils.js'
 
 export default function App() {
   const [position, setPosition] = useState(null)
-  const [shelterItems, setShelterItems] = useState(fallbackShelters)
-  const [supportItems, setSupportItems] = useState(fallbackSupports)
+  const [shelterItems, setShelterItems] = useState([])
+  const [supportItems, setSupportItems] = useState([])
+  const [noticeItems, setNoticeItems] = useState([])
+  const [activeRoomId, setActiveRoomId] = useState(null)
   const [locating, setLocating] = useState(false)
   const [locationMessage, setLocationMessage] = useState('서울시청 주변을 기준으로 보여드려요')
   const [selectedShelter, setSelectedShelter] = useState(null)
   const [selectedSupport, setSelectedSupport] = useState(null)
   const [noticeOpen, setNoticeOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
+  const [notificationStatus, setNotificationStatus] = useState('')
+
+  useEffect(() => {
+    ensureGuestSession().catch(() => {})
+  }, [])
 
   useEffect(() => {
     let active = true
-    fetchShelters(position)
+    fetchShelters(position || DEFAULT_CENTER)
       .then((items) => {
         if (active && Array.isArray(items) && items.length > 0) setShelterItems(items)
       })
@@ -35,9 +41,19 @@ export default function App() {
 
   useEffect(() => {
     let active = true
-    fetchSupports()
+    fetchNotices({ kind: 'support' })
       .then((items) => {
         if (active && Array.isArray(items) && items.length > 0) setSupportItems(items)
+      })
+      .catch(() => {})
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    fetchNotices({ kind: 'notice' })
+      .then((items) => {
+        if (active) setNoticeItems(items)
       })
       .catch(() => {})
     return () => { active = false }
@@ -73,6 +89,7 @@ export default function App() {
   const quickExit = async () => {
     document.title = '새 탭'
     try {
+      if (activeRoomId) await deleteChatRoom(activeRoomId).catch(() => {})
       localStorage.clear()
       sessionStorage.clear()
       if ('caches' in window) {
@@ -84,6 +101,16 @@ export default function App() {
     }
   }
 
+  const enableNotifications = async () => {
+    setNotificationStatus('알림을 설정하고 있어요.')
+    try {
+      await enablePushNotifications()
+      setNotificationStatus('새 공지 알림이 켜졌어요.')
+    } catch (error) {
+      setNotificationStatus(error.message === 'push-not-configured' ? '서버 푸시 키 설정이 필요해요.' : '알림을 켜지 못했어요. 브라우저 설정을 확인해 주세요.')
+    }
+  }
+
   return (
     <>
       <Routes>
@@ -91,7 +118,7 @@ export default function App() {
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
           <Route path="/home" element={<HomePage shelters={sortedShelters} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} onOpenGuide={() => setGuideOpen(true)} />} />
           <Route path="/shelters" element={<SheltersPage shelters={sortedShelters} position={position} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} />} />
-          <Route path="/chat" element={<ChatPage onQuickExit={quickExit} />} />
+          <Route path="/chat" element={<ChatPage position={position} onRoomChange={setActiveRoomId} onQuickExit={quickExit} />} />
           <Route path="/support" element={<SupportPage supports={supportItems} onSelect={setSelectedSupport} />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -99,7 +126,7 @@ export default function App() {
 
       {selectedShelter && <ShelterSheet shelter={selectedShelter} onClose={() => setSelectedShelter(null)} />}
       {selectedSupport && <SupportSheet support={selectedSupport} onClose={() => setSelectedSupport(null)} />}
-      {noticeOpen && <NoticeSheet onClose={() => setNoticeOpen(false)} />}
+      {noticeOpen && <NoticeSheet notices={noticeItems} status={notificationStatus} onSubscribe={enableNotifications} onClose={() => setNoticeOpen(false)} />}
       {guideOpen && <GuideSheet onClose={() => setGuideOpen(false)} />}
     </>
   )
