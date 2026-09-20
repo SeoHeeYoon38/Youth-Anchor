@@ -3,12 +3,6 @@ import { X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import Mascot from './Mascot.jsx'
 
-/**
- * 가온 헬퍼 플로팅 버튼.
- *
- * 홈·대피처·지원 화면이 같은 위치와 같은 아이콘을 쓰도록 한 곳에서 관리한다.
- * 화면마다 따로 만들면 위치와 모양이 어긋나므로 컴포넌트로 공유한다.
- */
 export default function ChatFab() {
   const navigate = useNavigate()
   const [visible, setVisible] = useState(true)
@@ -16,7 +10,8 @@ export default function ChatFab() {
   if (!visible) return null
 
   return (
-    <div className="chat-fab">
+    // 바로 이 줄! style 속성을 추가해 0.7배로 줄이고 우측 하단에 고정합니다.
+    <div className="chat-fab" style={{ transform: 'scale(0.7)', transformOrigin: 'bottom right' }}>
       <button
         className="chat-fab-open"
         type="button"
