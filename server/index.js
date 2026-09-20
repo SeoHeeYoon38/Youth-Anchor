@@ -1,5 +1,8 @@
 import http from 'node:http'
 import { randomBytes, randomUUID } from 'node:crypto'
+import { createReadStream } from 'node:fs'
+import { stat } from 'node:fs/promises'
+import { extname, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { WebSocketServer } from 'ws'
 import { bearerToken, createGuestToken, verifyGuestToken } from './auth.js'
@@ -10,6 +13,16 @@ import { createPushService } from './push.js'
 import { ensureBaselineData, resolveOpenDataConfig, startSyncScheduler, syncAll } from './sync.js'
 
 const DEFAULT_PORT = 8787
+const MIME_TYPES = {
+  '.css': 'text/css; charset=utf-8',
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.webmanifest': 'application/manifest+json; charset=utf-8',
+  '.woff2': 'font/woff2'
+}
 
 function distanceKm(from, to) {
   const radius = 6371
@@ -32,6 +45,65 @@ function sendJson(response, status, payload) {
     'Referrer-Policy': 'no-referrer'
   })
   response.end(JSON.stringify(payload))
+}
+
+function sendStatic(response, filePath, status = 200, requestMethod = 'GET') {
+  const extension = extname(filePath)
+  response.writeHead(status, {
+    'Content-Type': MIME_TYPES[extension] || 'application/octet-stream',
+    'Cache-Control': extension === '.html' ? 'no-cache' : 'public, max-age=31536000, immutable',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'no-referrer'
+  })
+  if (requestMethod === 'HEAD') {
+    response.end()
+    return
+  }
+  createReadStream(filePath).pipe(response)
+}
+
+async function fileExists(filePath) {
+  try {
+    const info = await stat(filePath)
+    return info.isFile()
+  } catch {
+    return false
+  }
+}
+
+async function serveStaticApp({ request, response, url, staticDir }) {
+  if (!staticDir || !['GET', 'HEAD'].includes(request.method)) return false
+
+  const root = resolve(staticDir)
+  let pathname
+  try {
+    pathname = decodeURIComponent(url.pathname)
+  } catch {
+    response.writeHead(400).end('Bad Request')
+    return true
+  }
+
+  const requestedPath = pathname === '/' ? '/index.html' : pathname
+  const filePath = resolve(root, `.${requestedPath}`)
+  const insideRoot = filePath === root || filePath.startsWith(`${root}${sep}`)
+  if (!insideRoot) {
+    response.writeHead(403).end('Forbidden')
+    return true
+  }
+
+  if (await fileExists(filePath)) {
+    sendStatic(response, filePath, 200, request.method)
+    return true
+  }
+
+  const hasExtension = Boolean(extname(requestedPath))
+  const fallbackPath = resolve(root, 'index.html')
+  if (!hasExtension && await fileExists(fallbackPath)) {
+    sendStatic(response, fallbackPath, 200, request.method)
+    return true
+  }
+
+  return false
 }
 
 async function readJson(request) {
@@ -64,6 +136,7 @@ export function createApiServer(options = {}) {
   const pushService = options.pushService || createPushService(repository, options.pushConfig)
   const openDataConfig = options.openDataConfig || resolveOpenDataConfig()
   const chatService = options.chatService || createChatService(options.openai)
+  const staticDir = options.staticDir === false ? '' : options.staticDir || process.env.HAVEN_STATIC_DIR || 'dist'
   const socketsByRoom = new Map()
 
   function authenticate(request, response) {
@@ -178,6 +251,12 @@ export function createApiServer(options = {}) {
           return
         }
 
+        sendJson(response, 404, { error: 'not-found' })
+        return
+      }
+
+      if (!url.pathname.startsWith('/api/')) {
+        if (await serveStaticApp({ request, response, url, staticDir })) return
         sendJson(response, 404, { error: 'not-found' })
         return
       }
@@ -395,7 +474,8 @@ const isMainModule = process.argv[1] && import.meta.url === pathToFileURL(proces
 
 if (isMainModule) {
   const port = Number(process.env.PORT) || DEFAULT_PORT
-  createApiServer().listen(port, '127.0.0.1', () => {
-    console.log(`Haven API ready at http://127.0.0.1:${port}`)
+  const host = process.env.HOST || '0.0.0.0'
+  createApiServer().listen(port, host, () => {
+    console.log(`Haven app ready at http://${host}:${port}`)
   })
 }
