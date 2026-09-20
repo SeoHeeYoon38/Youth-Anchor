@@ -1,0 +1,55 @@
+:root {
+  font-family: 'Noto Sans KR', system-ui, sans-serif;
+  color: #202538;
+  background: #e9edf5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --ink: #202538;
+  --muted: #73798b;
+  --line: #e0e3eb;
+  --canvas: #f7f8fc;
+  --surface: #ffffff;
+  --coral: #d97e72;
+  --coral-dark: #aa4f47;
+  --coral-soft: #f7dfdb;
+  --blue: #7899cc;
+  --blue-dark: #526f9e;
+  --blue-soft: #e4ebf7;
+  --yellow: #dfbd62;
+  --yellow-dark: #7a611c;
+  --yellow-soft: #f7edc9;
+  --purple: #8d80c6;
+  --purple-dark: #5e519d;
+  --purple-soft: #ece8f8;
+  --green: #65aa80;
+  --shadow: 0 10px 28px rgba(67, 73, 100, .12);
+  --soft-shadow: 0 6px 16px rgba(67, 73, 100, .1);
+}
+
+* { box-sizing: border-box; }
+html { background: #e9edf5; }
+body { margin: 0; min-width: 320px; min-height: 100vh; overflow-x: hidden; background: #e9edf5; }
+body, button, input { word-break: keep-all; overflow-wrap: break-word; letter-spacing: 0; }
+button, input { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { color: inherit; }
+a { color: inherit; text-decoration: none; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid rgba(86, 111, 158, .32); outline-offset: 2px; }
+
+.app-shell { width: 100%; max-width: 560px; min-height: 100vh; margin: 0 auto; padding-bottom: calc(78px + env(safe-area-inset-bottom)); position: relative; background: var(--canvas); box-shadow: 0 0 42px rgba(50, 57, 82, .15); }
+.view { min-width: 0; min-height: calc(100vh - 146px); }
+.view > *, .guest-card > *, .section-title-row > *, .support-card > *, .sheet-title-row > * { min-width: 0; }
+
+.topbar { min-height: 70px; padding: max(10px, env(safe-area-inset-top)) 18px 10px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; background: #dd8b80; border-bottom: 1px solid rgba(255,255,255,.28); }
+.brand { padding: 0; display: inline-flex; align-items: center; gap: 9px; border: 0; background: transparent; color: #fff; font-size: 17px; font-weight: 800; cursor: pointer; }
+.gaon-mascot { display: block; flex: 0 0 auto; background-image: url('/gaon-2-5d-sprite.png'); background-repeat: no-repeat; background-size: 300% 200%; }
+.gaon-basic { background-position: 0 0; }
+.gaon-guide { background-position: 50% 0; }
+.gaon-welcome { background-position: 100% 0; }
+.gaon-secure { background-position: 0 100%; }
+.gaon-chat { background-position: 50% 100%; }
+.brand .gaon-mascot { width: 44px; height: 44px; filter: drop-shadow(0 3px 5px rgba(72,55,69,.18)); }
+.topbar-actions { display: flex; align-items: center; gap: 8px; }
+.icon-button { width: 40px; height: 40px; padding: 0; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer; }
+.topbar .icon-button { border-color: rgba(255,255,255,.45); background: rgba(255,255,255,.22); color: #fff; }
+.exit-button { min-height: 40px; padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 20px; background: #fff3f0; color: #a5443c; box-shadow: 0 4px 12px rgba(131,54,47,.13); font-size: 13px; font-weight: 800; cursor: pointer; }

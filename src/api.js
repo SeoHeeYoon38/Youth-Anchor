@@ -69,11 +69,22 @@ export async function fetchShelter(id) {
 }
 
 export async function fetchNotices(filters = {}) {
-  const query = new URLSearchParams({ limit: '100' })
-  if (filters.category && filters.category !== '전체') query.set('category', filters.category)
-  if (filters.kind) query.set('kind', filters.kind)
-  const response = await requestJson(`/api/v1/notices?${query}`)
-  return response.items.map((notice) => ({ ...notice, body: notice.summary || notice.content }))
+  const limit = 100
+  const items = []
+  let offset = 0
+
+  while (true) {
+    const query = new URLSearchParams({ limit: String(limit), offset: String(offset) })
+    if (filters.category && filters.category !== '전체') query.set('category', filters.category)
+    if (filters.kind) query.set('kind', filters.kind)
+    const response = await requestJson(`/api/v1/notices?${query}`)
+    const page = response.items || []
+    items.push(...page)
+    if (page.length < limit || items.length >= 500) break
+    offset += limit
+  }
+
+  return items.map((notice) => ({ ...notice, body: notice.summary || notice.content }))
 }
 
 export async function fetchNotice(id) {

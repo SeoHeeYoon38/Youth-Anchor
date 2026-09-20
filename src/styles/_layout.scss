@@ -1,0 +1,5 @@
+.bottom-nav { width: 100%; max-width: 560px; height: calc(72px + env(safe-area-inset-bottom)); padding: 8px 10px env(safe-area-inset-bottom); display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; z-index: 900; left: 50%; bottom: 0; transform: translateX(-50%); border-top: 1px solid var(--line); background: rgba(255,255,255,.97); box-shadow: 0 -7px 18px rgba(50,57,82,.07); }
+.nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; background: transparent; color: #8c91a0; font-size: 10px; cursor: pointer; }
+.nav-item.active { color: #26304b; font-weight: 800; }
+.nav-item svg { transition: transform .25s ease, filter .25s ease; }
+.nav-item.active svg { transform: translateY(-2px) scale(1.08); filter: drop-shadow(0 4px 4px rgba(82,111,158,.2)); }

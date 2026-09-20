@@ -10,6 +10,7 @@ gemini*.key
 gemini*.env
 *.log
 .DS_Store
+docs/screenshots/visual-check-*/
 server/data/*.db
 server/data/*.db-shm
 server/data/*.db-wal

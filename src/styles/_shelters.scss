@@ -1,0 +1,82 @@
+.shelter-view { padding-bottom: 18px; background: #f3f6fb; }
+.map-header { min-height: 78px; padding: max(14px, env(safe-area-inset-top)) 16px 12px; display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; gap: 10px; background: #aec3e6; }
+.map-header > div { text-align: center; }
+.map-header span { color: #fff9d9; font-size: 11px; font-weight: 800; }
+.map-header h1 { margin: 1px 0 0; font-size: 19px; }
+.round-button { width: 42px; height: 42px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.94); box-shadow: 0 4px 10px rgba(50,57,82,.1); cursor: pointer; }
+.map-search { min-height: 46px; margin: 13px 16px 10px; padding: 0 13px; display: flex; align-items: center; gap: 8px; border: 1px solid #e1e4ec; border-radius: 14px; background: #fff; color: var(--muted); box-shadow: 0 3px 9px rgba(67,73,100,.06); font-size: 12px; }
+.map-controls { padding: 0 16px 10px; display: flex; align-items: center; gap: 7px; }
+.segmented-control { width: 130px; padding: 3px; display: grid; grid-template-columns: 1fr 1fr; border-radius: 11px; background: #e4e8f0; }
+.segmented-control button { height: 33px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 11px; cursor: pointer; }
+.segmented-control button.active { background: #fff; color: var(--ink); box-shadow: 0 2px 6px rgba(67,73,100,.09); font-weight: 800; }
+.filter-button { height: 39px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--line); border-radius: 11px; background: #fff; color: #606778; font-size: 11px; font-weight: 700; cursor: pointer; }
+.filter-button.active { border-color: #9bb3da; background: var(--blue-soft); color: var(--blue-dark); }
+.filter-button:disabled { opacity: .6; }
+/* 유형과 이용 대상을 따로 고를 수 있어야 '여성 + 단기쉼터'처럼 조합할 수 있다. */
+.filter-panel { margin: 0 16px 10px; padding: 12px; border: 1px solid var(--line); border-radius: 15px; background: #fff; box-shadow: var(--soft-shadow); }
+.filter-group + .filter-group { margin-top: 10px; }
+.filter-group-label { display: block; margin-bottom: 6px; color: #5d6473; font-size: 10px; font-weight: 800; }
+.filter-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-row button { min-height: 34px; padding: 0 11px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 17px; background: #fff; color: var(--muted); font-size: 11px; cursor: pointer; }
+.filter-row button.active { border-color: var(--blue); background: var(--blue); color: #fff; font-weight: 800; }
+.filter-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 11px; padding-top: 9px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+.filter-reset { min-height: 30px; padding: 0 10px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); border-radius: 15px; background: #fff; color: var(--blue-dark); font-size: 10px; font-weight: 700; cursor: pointer; }
+.empty-state .filter-reset { margin-top: 12px; }
+.map-wrap { height: 405px; margin: 0 16px; position: relative; overflow: hidden; border: 1px solid #d8deea; border-radius: 18px; background: #e7ecf5; box-shadow: var(--soft-shadow); }
+.kakao-map { width: 100%; height: 100%; }
+.map-fallback { position: absolute; z-index: 5; inset: 0; overflow: hidden; background-color: #eef2f8; background-image: linear-gradient(#dfe6f0 1px, transparent 1px), linear-gradient(90deg, #dfe6f0 1px, transparent 1px); background-size: 54px 54px; text-align: center; }
+.fallback-markers { position: absolute; inset: 0; }
+.map-fallback-message { min-width: 236px; padding: 12px 16px; position: absolute; z-index: 4; left: 50%; top: 48%; transform: translate(-50%, -50%); border: 1px solid rgba(255,255,255,.9); border-radius: 14px; background: rgba(255,255,255,.94); box-shadow: var(--soft-shadow); }
+.map-fallback-message strong { display: block; font-size: 13px; }
+.map-fallback-message p { max-width: 230px; margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.haven-map-marker { width: 88px; min-height: 88px; padding: 0; display: flex; flex-direction: column; align-items: center; position: relative; transform: translate(var(--marker-offset-x, 0), var(--marker-offset-y, 0)); border: 0; background: transparent; cursor: pointer; filter: drop-shadow(0 6px 7px rgba(48,55,78,.2)); }
+.haven-map-marker > * { pointer-events: none; }
+.marker-pin { width: 72px; height: 72px; display: block; background-image: url('/haven-2-5d-icons.png'); background-repeat: no-repeat; background-size: 400% 200%; transition: transform .24s cubic-bezier(.2,.8,.2,1); }
+.haven-map-marker:hover .marker-pin, .haven-map-marker:focus-visible .marker-pin { transform: translateY(-4px) scale(1.08); }
+.marker-green .marker-pin { background-position: 0 100%; }
+.marker-yellow .marker-pin { background-position: 33.333% 100%; }
+.marker-coral .marker-pin { background-position: 66.666% 100%; }
+.marker-purple .marker-pin { background-position: 100% 100%; }
+.marker-label { margin-top: -11px; padding: 4px 9px; border: 1px solid rgba(255,255,255,.92); border-radius: 11px; background: rgba(255,255,255,.95); color: #3c4253; box-shadow: 0 4px 9px rgba(48,55,78,.13); font-size: 9px; font-weight: 800; white-space: nowrap; }
+.fallback-markers .haven-map-marker { position: absolute; }
+.fallback-marker-1 { left: 15px; top: 22px; }
+.fallback-marker-2 { right: 15px; top: 48px; }
+.fallback-marker-3 { left: 37px; bottom: 36px; }
+.fallback-marker-4 { right: 37px; bottom: 25px; }
+/* 마커 색상 기준을 지도 위에서 바로 읽을 수 있게 범례로 보여준다. */
+.map-legend { position: absolute; z-index: 5; left: 10px; top: 10px; max-width: 168px; padding: 8px 10px; border-radius: 11px; background: rgba(255,255,255,.95); box-shadow: var(--soft-shadow); pointer-events: none; }
+.map-legend > strong { display: block; margin-bottom: 6px; color: #3c4253; font-size: 9px; font-weight: 800; }
+.map-legend ul { margin: 0; padding: 0; display: grid; gap: 4px; list-style: none; }
+.map-legend li { display: grid; grid-template-columns: 9px auto; gap: 5px; align-items: baseline; }
+.map-legend b { color: #3c4253; font-size: 9px; font-weight: 800; }
+.map-legend small { grid-column: 2; color: var(--muted); font-size: 8px; line-height: 1.35; }
+.legend-dot { width: 9px; height: 9px; margin-top: 2px; border-radius: 50%; }
+.legend-coral { background: var(--coral); }
+.legend-yellow { background: var(--yellow); }
+.legend-green { background: var(--green); }
+.legend-purple { background: var(--purple); }
+
+/* 한 가지 viewport 기준을 모든 화면에 공유한다. 부모 page-enter transform을 피하기 위해
+   FAB는 HavenLayout에서 Outlet 바깥에 렌더링한다. 문서 스크롤과 무관하게 고정하고,
+   하단 내비게이션 바로 위에 배치해 화면 아래쪽에서 바로 누를 수 있게 한다. */
+.chat-fab { position: fixed; z-index: 950; right: max(12px, calc((100vw - 560px) / 2 + 12px)); bottom: calc(84px + env(safe-area-inset-bottom)); }
+.chat-fab-open { width: 152px; height: 152px; padding: 0; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; cursor: pointer; }
+.chat-fab-open .gaon-mascot { width: 152px; height: 152px; filter: drop-shadow(0 12px 18px rgba(48,55,78,.28)); animation: mascot-breathe 3s ease-in-out infinite; }
+.chat-fab-close { width: 32px; height: 32px; padding: 0; display: grid; place-items: center; position: absolute; z-index: 2; top: -2px; right: -2px; border: 2px solid #fff; border-radius: 50%; background: #4d5870; color: #fff; box-shadow: 0 4px 9px rgba(48,55,78,.32); cursor: pointer; }
+.map-results { margin: 13px 16px 0; padding: 15px; border-radius: 18px; background: #fff; box-shadow: var(--soft-shadow); }
+.results-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; font-size: 13px; }
+.results-heading span { color: var(--muted); font-size: 11px; }
+.result-row { width: 100%; min-height: 66px; padding: 9px 0; display: grid; grid-template-columns: 40px 1fr auto; gap: 9px; align-items: center; border: 0; border-bottom: 1px solid #eceef3; background: transparent; text-align: left; cursor: pointer; }
+.result-row:last-child { border-bottom: 0; }
+.result-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: var(--blue-soft); color: var(--blue-dark); }
+.result-copy { min-width: 0; }
+.result-copy strong, .result-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.result-copy strong { font-size: 12px; }
+.result-copy small { margin-top: 4px; color: var(--muted); font-size: 10px; }
+.result-chevron { color: var(--blue-dark); }
+.shelter-list { padding: 0 16px; display: grid; gap: 10px; }
+.empty-state { min-height: 180px; display: grid; place-content: center; justify-items: center; color: var(--muted); text-align: center; }
+.empty-state strong { margin-top: 9px; color: var(--ink); font-size: 13px; }
+.empty-state p { margin: 4px 0 0; font-size: 11px; }
+.empty-state.compact { min-height: 120px; width: 100%; min-width: 100%; padding: 18px; border: 1px dashed #d8deea; border-radius: 15px; background: rgba(255,255,255,.7); }

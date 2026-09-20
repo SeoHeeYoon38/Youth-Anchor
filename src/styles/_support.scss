@@ -1,0 +1,27 @@
+.support-view { padding: 0 16px 24px; }
+.support-hero { min-height: 212px; margin: 0 -16px; padding: 28px 20px 24px; display: grid; grid-template-columns: minmax(0, 1fr) 142px; gap: 10px; align-items: center; overflow: hidden; background: #eee6bd; }
+.support-hero > div > span { display: flex; align-items: center; gap: 6px; color: var(--yellow-dark); font-size: 12px; font-weight: 800; }
+.support-hero h1 { margin: 10px 0 8px; font-size: 26px; line-height: 1.35; }
+.support-hero p { max-width: 390px; margin: 0; color: #6e6549; font-size: 13px; line-height: 1.65; }
+.support-hero > .gaon-mascot { width: 150px; height: 150px; margin-left: -6px; filter: drop-shadow(0 12px 13px rgba(89,78,43,.18)); }
+.support-callout { min-height: 88px; margin-top: 16px; padding: 14px; display: grid; grid-template-columns: 44px 1fr 20px; gap: 11px; align-items: center; border-radius: 16px; background: #fff; box-shadow: var(--soft-shadow); }
+.support-callout > span { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: var(--yellow-soft); color: var(--yellow-dark); }
+.support-callout strong { font-size: 13px; }
+.support-callout p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.category-scroll { margin: 18px -16px; padding: 0 16px 3px; display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; }
+.category-scroll::-webkit-scrollbar { display: none; }
+.category-scroll button { height: 37px; padding: 0 15px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 19px; background: #fff; color: var(--muted); font-size: 12px; cursor: pointer; }
+.category-scroll button.active { border-color: var(--yellow); background: var(--yellow); color: #463814; font-weight: 800; }
+.support-list { display: grid; gap: 10px; }
+.support-card { width: 100%; padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 4px 12px rgba(67,73,100,.06); text-align: left; cursor: pointer; }
+.support-card-head { display: flex; align-items: center; justify-content: space-between; }
+.category-badge { padding: 5px 8px; display: inline-block; border-radius: 7px; font-size: 10px; font-weight: 800; }
+.category-주거 { background: var(--blue-soft); color: var(--blue-dark); }
+.category-생활 { background: var(--yellow-soft); color: var(--yellow-dark); }
+.category-일자리 { background: var(--purple-soft); color: var(--purple-dark); }
+.category-식사 { background: var(--coral-soft); color: var(--coral-dark); }
+.deadline { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 10px; }
+.support-card h2 { margin: 12px 0 6px; font-size: 15px; line-height: 1.5; }
+.support-card > p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.support-card-foot { margin-top: 12px; padding-top: 10px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #eceef2; color: #697080; font-size: 10px; }
+.support-card-foot span { display: flex; align-items: center; gap: 5px; }

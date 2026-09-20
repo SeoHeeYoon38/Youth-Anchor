@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url'
 const require = createRequire(import.meta.url)
 const { chromium } = require('playwright')
 
-const outputDir = new URL('../docs/screenshots/', import.meta.url)
+const outputDir = new URL(`../docs/screenshots/visual-check-${Date.now()}/`, import.meta.url)
+const appUrl = process.env.APP_URL || 'http://localhost:5173'
 await mkdir(outputDir, { recursive: true })
 
 // 실행 환경마다 크롬 위치가 달라 경로를 하드코딩하지 않는다.
@@ -36,13 +37,14 @@ for (const item of cases) {
   })
   page.on('pageerror', (error) => errors.push(error.message))
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto(`http://127.0.0.1:5173${item.path}`, { waitUntil: 'networkidle' })
+  await page.goto(`${appUrl}${item.path}`, { waitUntil: 'networkidle' })
   await page.screenshot({ path: fileURLToPath(new URL(`${item.name}.png`, outputDir)), fullPage: false })
 
   const overflows = await page.locator('body *').evaluateAll((elements) => elements
     .filter((element) => {
       const style = getComputedStyle(element)
       if (element.classList.contains('sr-only')) return false
+      if (element.closest('.kakao-map')) return false
       if (style.overflowX === 'auto' || style.overflowX === 'scroll') return false
       return element.scrollWidth > element.clientWidth + 2 && element.clientWidth > 0
     })
@@ -60,22 +62,26 @@ for (const item of cases) {
 }
 
 const interactionPage = await browser.newPage({ viewport: { width: 390, height: 844 } })
-await interactionPage.goto('http://127.0.0.1:5173/home', { waitUntil: 'networkidle' })
+await interactionPage.goto(`${appUrl}/home`, { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: /SOS 대피처/ }).click()
 await interactionPage.waitForURL('**/shelters')
 await interactionPage.getByRole('button', { name: '가온 헬퍼 채팅 열기' }).click()
 await interactionPage.waitForURL('**/chat')
-await interactionPage.goto('http://127.0.0.1:5173/shelters', { waitUntil: 'networkidle' })
+await interactionPage.goto(`${appUrl}/shelters`, { waitUntil: 'networkidle' })
 await interactionPage.locator('.haven-map-marker').first().click()
 await interactionPage.getByRole('dialog').waitFor()
 await interactionPage.keyboard.press('Escape')
-await interactionPage.goto('http://127.0.0.1:5173/home', { waitUntil: 'networkidle' })
+await interactionPage.goto(`${appUrl}/home`, { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: /안전 가이드/ }).click()
 await interactionPage.getByRole('dialog', { name: /가온의 안전 가이드/ }).waitFor()
-await interactionPage.goto('http://127.0.0.1:5173/home', { waitUntil: 'networkidle' })
-await interactionPage.getByRole('button', { name: '채팅 플로팅 버튼 닫기' }).click()
-await interactionPage.getByRole('button', { name: '채팅 플로팅 버튼 닫기' }).waitFor({ state: 'detached' })
-await interactionPage.goto('http://127.0.0.1:5173/chat', { waitUntil: 'networkidle' })
+await interactionPage.goto(`${appUrl}/support`, { waitUntil: 'networkidle' })
+await interactionPage.getByRole('tab', { name: '식사' }).click()
+await interactionPage.getByText('식사 지원', { exact: true }).waitFor()
+await interactionPage.getByText(/학교우유급식|농식품바우처|청소년방과후아카데미운영지원/).first().waitFor()
+await interactionPage.goto(`${appUrl}/home`, { waitUntil: 'networkidle' })
+await interactionPage.getByRole('button', { name: '가온 헬퍼 플로팅 버튼 닫기' }).click()
+await interactionPage.getByRole('button', { name: '가온 헬퍼 플로팅 버튼 닫기' }).waitFor({ state: 'detached' })
+await interactionPage.goto(`${appUrl}/chat`, { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: '그냥 이야기하고 싶어요' }).click()
 await interactionPage.getByText('그냥 이야기하고 싶어요', { exact: true }).waitFor()
 results.push({ name: 'interactions', passed: true })

@@ -10,8 +10,7 @@ export default function ChatFab() {
   if (!visible) return null
 
   return (
-    // 바로 이 줄! style 속성을 추가해 0.7배로 줄이고 우측 하단에 고정합니다.
-    <div className="chat-fab" style={{ transform: 'scale(0.7)', transformOrigin: 'bottom right' }}>
+    <div className="chat-fab">
       <button
         className="chat-fab-open"
         type="button"

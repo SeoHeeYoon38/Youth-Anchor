@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { DEFAULT_CENTER } from '../constants.js'
 import { MARKER_LEGEND, markerStyleFor } from '../shelterMarkers.js'
 
@@ -40,7 +40,7 @@ function loadKakaoMaps() {
 }
 
 /** 마커 DOM은 지도용과 미리보기용이 같은 모양이어야 해서 한 곳에서 만든다. */
-function createMarkerElement(shelter, onSelect) {
+function createMarkerElement(shelter, onSelect, offset = { x: 0, y: 0 }) {
   const style = markerStyleFor(shelter)
   const element = document.createElement('button')
   const pin = document.createElement('span')
@@ -48,6 +48,8 @@ function createMarkerElement(shelter, onSelect) {
 
   element.type = 'button'
   element.className = `haven-map-marker marker-${style.tone}`
+  element.style.setProperty('--marker-offset-x', `${offset.x}px`)
+  element.style.setProperty('--marker-offset-y', `${offset.y}px`)
   element.setAttribute('aria-label', `${shelter.name} · ${style.title} 위치`)
   element.title = `${style.title} — ${style.description}`
   pin.className = 'marker-pin'
@@ -60,6 +62,26 @@ function createMarkerElement(shelter, onSelect) {
   return element
 }
 
+function markerCoordinateKey(shelter) {
+  return `${Number(shelter.lat).toFixed(3)}:${Number(shelter.lng).toFixed(3)}`
+}
+
+function spreadMarkerOffset(index, total) {
+  if (total < 2) return { x: 0, y: 0 }
+
+  const markersPerRing = 8
+  const ring = Math.floor(index / markersPerRing)
+  const ringIndex = index % markersPerRing
+  const ringTotal = Math.min(markersPerRing, total - ring * markersPerRing)
+  const angle = (Math.PI * 2 * ringIndex) / ringTotal
+  const radius = 58 * (ring + 1)
+
+  return {
+    x: Math.round(Math.cos(angle) * radius),
+    y: Math.round(Math.sin(angle) * radius)
+  }
+}
+
 export default function KakaoMap({ position, shelters, onSelectShelter }) {
   const mapElement = useRef(null)
   const mapInstance = useRef(null)
@@ -68,6 +90,25 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
   const locationCircle = useRef(null)
   const selectHandler = useRef(onSelectShelter)
   const [status, setStatus] = useState(KAKAO_MAP_APP_KEY ? 'loading' : 'missing-key')
+  const markerItems = useMemo(() => {
+    const groupCounts = new Map()
+    shelters.forEach((shelter) => {
+      const key = markerCoordinateKey(shelter)
+      groupCounts.set(key, (groupCounts.get(key) || 0) + 1)
+    })
+
+    const seenCounts = new Map()
+    return shelters.map((shelter) => {
+      const key = markerCoordinateKey(shelter)
+      const seen = seenCounts.get(key) || 0
+      seenCounts.set(key, seen + 1)
+
+      return {
+        shelter,
+        offset: spreadMarkerOffset(seen, groupCounts.get(key) || 1)
+      }
+    })
+  }, [shelters])
 
   // 마커 클릭 처리는 최신 콜백을 쓰되, 콜백 변경만으로 지도를 다시 만들지 않는다.
   useEffect(() => {
@@ -112,13 +153,13 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
     if (!maps || !map) return
 
     overlays.current.forEach((overlay) => overlay.setMap(null))
-    overlays.current = shelters.map((shelter) => new maps.CustomOverlay({
+    overlays.current = markerItems.map(({ shelter, offset }) => new maps.CustomOverlay({
       map,
       position: new maps.LatLng(shelter.lat, shelter.lng),
-      content: createMarkerElement(shelter, (item) => selectHandler.current?.(item)),
+      content: createMarkerElement(shelter, (item) => selectHandler.current?.(item), offset),
       yAnchor: 1.12
     }))
-  }, [shelters, status])
+  }, [markerItems, status])
 
   // 내 위치가 잡히면 지도 중심과 현재 위치 표시를 갱신한다.
   useEffect(() => {
