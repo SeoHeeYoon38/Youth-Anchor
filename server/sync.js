@@ -9,7 +9,7 @@ import {
 } from './opendata/notices.js'
 import { SHELTER_ENDPOINT, fetchYouthShelters } from './opendata/shelters.js'
 import { syncNoticeFeeds } from './notice-sync.js'
-import { loadSeedNotices, loadSeedShelters } from './seed/index.js'
+import { loadSeedLocalSupport, loadSeedNotices, loadSeedShelters } from './seed/index.js'
 
 export const SHELTER_SOURCE = 'mogef-teen-shelter'
 const KST_OFFSET_MINUTES = 9 * 60
@@ -212,11 +212,18 @@ export async function ensureBaselineData({ repository, logger = console } = {}) 
     logger.log?.(`[sync] 복지서비스 ${notices.length}건을 마지막 정상 수집 데이터로 채웠습니다`)
   }
 
+  // 공공데이터포털의 안양 무료급식소 정보는 전국 복지사업 피드와 별도로 보강한다.
+  // upsert라서 서버 재시작과 배포가 반복되어도 중복되지 않는다.
+  const localSupport = await loadSeedLocalSupport()
+  for (const notice of localSupport) repository.upsertNotice(notice)
+  const localSupportSynced = localSupport.length
+
   return {
-    inserted: sheltersInserted + noticesInserted,
+    inserted: sheltersInserted + noticesInserted + localSupportSynced,
     sheltersInserted,
     noticesInserted,
-    reason: sheltersInserted || noticesInserted ? 'seeded' : 'already-populated'
+    localSupportSynced,
+    reason: sheltersInserted || noticesInserted || localSupportSynced ? 'seeded' : 'already-populated'
   }
 }
 

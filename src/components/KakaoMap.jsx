@@ -126,7 +126,8 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
         mapsApi.current = maps
         mapInstance.current = new maps.Map(mapElement.current, {
           center: new maps.LatLng(center.lat, center.lng),
-          level: 5
+          // 안양 쉼터들이 한 화면에 함께 보이도록 초기 지도 범위를 넓힌다.
+          level: 7
         })
         setStatus('ready')
       })

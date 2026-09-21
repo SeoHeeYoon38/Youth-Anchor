@@ -10,7 +10,7 @@ import {
   normalizeWelfareService,
   fetchWelfareServices
 } from './opendata/notices.js'
-import { SEED_SOURCE, loadSeedShelters } from './seed/index.js'
+import { SEED_SOURCE, loadSeedLocalSupport, loadSeedShelters } from './seed/index.js'
 import {
   ensureBaselineData,
   millisecondsUntilNextRun,
@@ -406,6 +406,20 @@ test('동봉 데이터를 넣으면 주변 쉼터 조회가 실제 결과를 낸
   // 두 번 실행해도 늘지 않는다.
   await ensureBaselineData({ repository, logger: {} })
   assert.equal(repository.countShelters(), shelters.length)
+  repository.close()
+})
+
+test('안양 무료급식소 보강 데이터가 식사 지원으로 들어온다', async () => {
+  const seeds = await loadSeedLocalSupport()
+  assert.ok(seeds.length >= 8)
+  assert.ok(seeds.every((notice) => notice.kind === 'support'))
+  assert.ok(seeds.every((notice) => notice.category === '식사'))
+  assert.ok(seeds.every((notice) => notice.title.includes('안양시')))
+
+  const repository = createDatabase(':memory:')
+  await ensureBaselineData({ repository, logger: {} })
+  const meals = repository.listNotices({ kind: 'support', category: '식사', limit: 100 })
+  assert.ok(meals.some((notice) => notice.title.includes('무료급식소')))
   repository.close()
 })
 

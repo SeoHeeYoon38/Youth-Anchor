@@ -34,3 +34,11 @@ export async function loadSeedNotices() {
   const parsed = JSON.parse(raw)
   return Array.isArray(parsed) ? parsed : []
 }
+
+/** 안양시 무료급식소 표준데이터에서 확인한 식사 지원 정보. */
+export async function loadSeedLocalSupport() {
+  const path = new URL('./anyang-support.json', import.meta.url)
+  const raw = await readFile(path, 'utf8')
+  const parsed = JSON.parse(raw)
+  return Array.isArray(parsed) ? parsed : []
+}
