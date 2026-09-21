@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { deleteChatRoom, enablePushNotifications, ensureGuestSession, fetchNotices, fetchShelters } from './api.js'
 import { GuideSheet, NoticeSheet, ShelterSheet, SupportSheet } from './components/Sheets.jsx'
-import { DEFAULT_CENTER } from './constants.js'
+import { DEFAULT_CENTER, DEFAULT_LOCATION_MESSAGE } from './constants.js'
 import HavenLayout from './layouts/HavenLayout.jsx'
 import ChatPage from './pages/ChatPage.jsx'
 import AdminNotificationsPage from './pages/AdminNotificationsPage.jsx'
@@ -19,7 +19,7 @@ export default function App() {
   const [noticeItems, setNoticeItems] = useState([])
   const [activeRoomId, setActiveRoomId] = useState(null)
   const [locating, setLocating] = useState(false)
-  const [locationMessage, setLocationMessage] = useState('서울시청 주변을 기준으로 보여드려요')
+  const [locationMessage, setLocationMessage] = useState(DEFAULT_LOCATION_MESSAGE)
   const [selectedShelter, setSelectedShelter] = useState(null)
   const [selectedSupport, setSelectedSupport] = useState(null)
   const [noticeOpen, setNoticeOpen] = useState(false)
