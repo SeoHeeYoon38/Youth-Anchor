@@ -52,6 +52,12 @@ test('health endpoint reports persistent service dependencies', async () => {
   assert.equal(body.ai.configured, false)
 })
 
+test('health endpoint accepts HEAD checks used by uptime monitors', async () => {
+  const response = await fetch(`${baseUrl}/api/v1/health`, { method: 'HEAD' })
+  assert.equal(response.status, 200)
+  assert.equal(await response.text(), '')
+})
+
 test('cross-origin frontend can preflight API requests', async () => {
   const response = await fetch(`${baseUrl}/api/v1/notices`, {
     method: 'OPTIONS',

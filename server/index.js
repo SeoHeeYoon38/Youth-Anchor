@@ -37,14 +37,14 @@ function numberInRange(value, minimum, maximum) {
   return Number.isFinite(parsed) && parsed >= minimum && parsed <= maximum ? parsed : null
 }
 
-function sendJson(response, status, payload) {
+function sendJson(response, status, payload, requestMethod = 'GET') {
   response.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
     'X-Content-Type-Options': 'nosniff',
     'Referrer-Policy': 'no-referrer'
   })
-  response.end(JSON.stringify(payload))
+  response.end(requestMethod === 'HEAD' ? undefined : JSON.stringify(payload))
 }
 
 function resolveAllowedOrigins(value = process.env.HAVEN_ALLOWED_ORIGINS || '*') {
@@ -194,7 +194,7 @@ export function createApiServer(options = {}) {
         return
       }
 
-      if (request.method === 'GET' && (url.pathname === '/api/health' || url.pathname === '/api/v1/health')) {
+      if (['GET', 'HEAD'].includes(request.method) && (url.pathname === '/api/health' || url.pathname === '/api/v1/health')) {
         sendJson(response, 200, {
           status: 'ok',
           service: 'haven-api',
@@ -212,7 +212,7 @@ export function createApiServer(options = {}) {
           counts: { shelters: repository.countShelters(), notices: repository.countNotices() },
           lastSync: repository.latestSyncRuns(),
           time: new Date().toISOString()
-        })
+        }, request.method)
         return
       }
 
