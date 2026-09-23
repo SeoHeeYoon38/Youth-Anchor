@@ -86,8 +86,11 @@ export function createChatService(options = {}) {
         if (!reply) throw new Error('empty-chat-response')
         return { reply, actions, source: 'openai' }
       } catch (error) {
-        const reason = error?.status || error?.code || error?.name || 'unknown'
-        logger.warn?.(`[chat] OpenAI response unavailable (${reason}); using safety fallback`)
+        const status = error?.status || 'unknown'
+        const code = error?.code || error?.error?.code || 'none'
+        const type = error?.type || error?.error?.type || 'none'
+        const requestId = error?.request_id || error?._request_id || 'none'
+        logger.warn?.(`[chat] OpenAI response unavailable (status=${status}, code=${code}, type=${type}, request=${requestId}); using safety fallback`)
         return { ...fallbackChatReply(message), source: 'safety-fallback' }
       }
     }

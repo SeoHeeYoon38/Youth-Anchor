@@ -13,6 +13,7 @@ import {
   X
 } from 'lucide-react'
 import Mascot from './Mascot.jsx'
+import { DEFAULT_ROUTE_ORIGIN } from '../constants.js'
 
 function SheetFrame({ children, onClose, labelledBy, className = '' }) {
   return (
@@ -25,8 +26,8 @@ function SheetFrame({ children, onClose, labelledBy, className = '' }) {
   )
 }
 
-export function ShelterSheet({ shelter, onClose }) {
-  const mapUrl = `https://map.kakao.com/link/to/${encodeURIComponent(shelter.name)},${shelter.lat},${shelter.lng}`
+export function ShelterSheet({ shelter, origin = DEFAULT_ROUTE_ORIGIN, originName = '안양시청', onClose }) {
+  const mapUrl = `https://map.kakao.com/link/from/${encodeURIComponent(originName)},${origin.lat},${origin.lng}/to/${encodeURIComponent(shelter.name)},${shelter.lat},${shelter.lng}`
   // 공공데이터에서 대표전화를 받아오면 그 번호로 걸고, 없으면 청소년전화 1388로 안내한다.
   const phone = shelter.phone || '1388'
   const dialNumber = phone.replace(/[^0-9+]/g, '') || '1388'

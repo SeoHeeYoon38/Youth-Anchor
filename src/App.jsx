@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { deleteChatRoom, enablePushNotifications, ensureGuestSession, fetchNotices, fetchShelters } from './api.js'
 import { GuideSheet, NoticeSheet, ShelterSheet, SupportSheet } from './components/Sheets.jsx'
-import { DEFAULT_CENTER, DEFAULT_LOCATION_MESSAGE } from './constants.js'
+import { DEFAULT_CENTER, DEFAULT_LOCATION_MESSAGE, DEFAULT_ROUTE_ORIGIN } from './constants.js'
 import HavenLayout from './layouts/HavenLayout.jsx'
 import ChatPage from './pages/ChatPage.jsx'
 import AdminNotificationsPage from './pages/AdminNotificationsPage.jsx'
@@ -126,7 +126,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {selectedShelter && <ShelterSheet shelter={selectedShelter} onClose={() => setSelectedShelter(null)} />}
+      {selectedShelter && <ShelterSheet shelter={selectedShelter} origin={position || DEFAULT_ROUTE_ORIGIN} originName={position ? '현재 위치' : '안양시청'} onClose={() => setSelectedShelter(null)} />}
       {selectedSupport && <SupportSheet support={selectedSupport} onClose={() => setSelectedSupport(null)} />}
       {noticeOpen && <NoticeSheet notices={noticeItems} status={notificationStatus} onSubscribe={enableNotifications} onClose={() => setNoticeOpen(false)} />}
       {guideOpen && <GuideSheet onClose={() => setGuideOpen(false)} />}
