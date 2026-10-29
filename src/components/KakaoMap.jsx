@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DEFAULT_CENTER } from '../constants.js'
-import { MARKER_LEGEND, markerStyleFor } from '../shelterMarkers.js'
+import { MARKER_LEGEND, markerDescription, markerStyleFor } from '../shelterMarkers.js'
 
 const KAKAO_MAP_APP_KEY = import.meta.env.VITE_KAKAO_MAP_APP_KEY
 
@@ -10,9 +10,17 @@ function loadKakaoMaps() {
   if (window.__havenKakaoMapsPromise) return window.__havenKakaoMapsPromise
 
   window.__havenKakaoMapsPromise = new Promise((resolve, reject) => {
+    let timeoutId
+    const fail = (error) => {
+      window.clearTimeout(timeoutId)
+      window.__havenKakaoMapsPromise = null
+      document.querySelector('script[data-haven-kakao-map]')?.remove()
+      reject(error)
+    }
     const finishLoading = () => {
+      window.clearTimeout(timeoutId)
       if (!window.kakao?.maps) {
-        reject(new Error('sdk-unavailable'))
+        fail(new Error('sdk-unavailable'))
         return
       }
       window.kakao.maps.load(() => resolve(window.kakao.maps))
@@ -26,7 +34,7 @@ function loadKakaoMaps() {
 
     const script = existingScript || document.createElement('script')
     script.addEventListener('load', finishLoading, { once: true })
-    script.addEventListener('error', () => reject(new Error('sdk-load-failed')), { once: true })
+    script.addEventListener('error', () => fail(new Error('sdk-load-failed')), { once: true })
 
     if (!existingScript) {
       script.dataset.havenKakaoMap = 'true'
@@ -34,6 +42,8 @@ function loadKakaoMaps() {
       script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(KAKAO_MAP_APP_KEY)}&autoload=false`
       document.head.appendChild(script)
     }
+
+    timeoutId = window.setTimeout(() => fail(new Error('sdk-timeout')), 12000)
   })
 
   return window.__havenKakaoMapsPromise
@@ -47,11 +57,11 @@ function createMarkerElement(shelter, onSelect, offset = { x: 0, y: 0 }) {
   const label = document.createElement('span')
 
   element.type = 'button'
-  element.className = `haven-map-marker marker-${style.tone}`
+  element.className = `haven-map-marker marker-icon-${style.icon} marker-${style.tone}`
   element.style.setProperty('--marker-offset-x', `${offset.x}px`)
   element.style.setProperty('--marker-offset-y', `${offset.y}px`)
   element.setAttribute('aria-label', `${shelter.name} · ${style.title} 위치`)
-  element.title = `${style.title} — ${style.description}`
+  element.title = `${style.title} — ${markerDescription(style)}`
   pin.className = 'marker-pin'
   pin.dataset.symbol = style.symbol
   label.className = 'marker-label'
@@ -90,6 +100,7 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
   const locationCircle = useRef(null)
   const selectHandler = useRef(onSelectShelter)
   const [status, setStatus] = useState(KAKAO_MAP_APP_KEY ? 'loading' : 'missing-key')
+  const [retryToken, setRetryToken] = useState(0)
   const markerItems = useMemo(() => {
     const groupCounts = new Map()
     shelters.forEach((shelter) => {
@@ -126,7 +137,7 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
         mapsApi.current = maps
         mapInstance.current = new maps.Map(mapElement.current, {
           center: new maps.LatLng(center.lat, center.lng),
-          // 안양 쉼터들이 한 화면에 함께 보이도록 초기 지도 범위를 넓힌다.
+          // 서울시청 주변의 쉼터 분포를 한 화면에서 볼 수 있도록 초기 범위를 넓힌다.
           level: 7
         })
         setStatus('ready')
@@ -143,9 +154,9 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
       locationCircle.current = null
       mapInstance.current = null
     }
-    // 최초 1회만 실행한다. position 초기값은 아래 효과에서 다시 반영한다.
+    // 다시 불러오기를 누른 경우에만 SDK와 지도를 새로 만든다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [retryToken])
 
   // 필터 결과가 바뀌면 마커만 교체한다.
   useEffect(() => {
@@ -199,11 +210,11 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
               const style = markerStyleFor(shelter)
               return (
                 <button
-                  className={`haven-map-marker marker-${style.tone} fallback-marker-${index + 1}`}
+                  className={`haven-map-marker marker-icon-${style.icon} marker-${style.tone} fallback-marker-${index + 1}`}
                   key={shelter.id}
                   onClick={() => onSelectShelter(shelter)}
                   aria-label={`${shelter.name} 상세 보기`}
-                  title={`${style.title} — ${style.description}`}
+                  title={`${style.title} — ${markerDescription(style)}`}
                 >
                   <span className="marker-pin" data-symbol={style.symbol} />
                   <span className="marker-label">{style.label}</span>
@@ -214,6 +225,7 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
           <div className="map-fallback-message">
             <strong>{title}</strong>
             <p>아래 목록에서는 가까운 대피처를 바로 확인할 수 있어요.</p>
+            {status === 'error' && <button type="button" onClick={() => { setStatus('loading'); setRetryToken((token) => token + 1) }}>다시 불러오기</button>}
           </div>
         </div>
       )}
@@ -224,7 +236,7 @@ export default function KakaoMap({ position, shelters, onSelectShelter }) {
             <li key={item.type}>
               <span className={`legend-dot legend-${item.tone}`} />
               <b>{item.title}</b>
-              <small>{item.description}</small>
+              <small><em>{item.emphasis}</em>{' '}{item.description}</small>
             </li>
           ))}
         </ul>

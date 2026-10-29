@@ -38,9 +38,10 @@ test('여성을 고르면 여성 전용과 성별 제한 없는 곳이 함께 �
   assert.ok(!names.includes('단기-남성'))
 })
 
-test('누구나를 고르면 성별 제한 없는 곳만 나온다', () => {
-  const names = filterShelters(SAMPLE, { type: '전체', audience: '누구나' }).map((item) => item.name)
-  assert.deepEqual(names, ['일시-누구나', '이동-누구나'])
+test('남성을 고르면 남성 전용과 성별 제한 없는 곳이 함께 나온다', () => {
+  const names = filterShelters(SAMPLE, { type: '전체', audience: '남성' }).map((item) => item.name)
+  assert.deepEqual(names, ['일시-누구나', '단기-남성', '이동-누구나'])
+  assert.ok(!names.includes('단기-여성'))
 })
 
 test('유형과 이용 대상을 함께 걸 수 있다', () => {
@@ -95,16 +96,18 @@ test('지도 검색은 이름 주소 유형 대상 운영 정보와 특징을 �
   assert.equal(searchShelters(shelters, '   ').length, 2)
 })
 
-test('필터 선택지가 실제 데이터 값과 일치한다', async () => {
+test('대상과 기간 필터 모두 전체 선택지를 제공하고 공용 쉼터도 결과에 포함한다', async () => {
   const raw = await readFile(new URL('../server/seed/shelters.json', import.meta.url), 'utf8')
   const seeds = JSON.parse(raw)
 
   const types = new Set(seeds.map((shelter) => shelter.type))
   const genders = new Set(seeds.map((shelter) => shelter.gender))
 
-  // 선택지에 없는 값이 데이터에 있으면 그 쉼터는 어떤 조건으로도 찾을 수 없다.
+  assert.deepEqual(SHELTER_AUDIENCE_FILTERS, ['전체', '여성', '남성'])
+  assert.deepEqual(SHELTER_TYPE_FILTERS, ['전체', '일시쉼터', '이동쉼터', '단기쉼터', '중장기쉼터'])
+
   for (const type of types) assert.ok(SHELTER_TYPE_FILTERS.includes(type), `유형 선택지에 없음: ${type}`)
-  for (const gender of genders) assert.ok(SHELTER_AUDIENCE_FILTERS.includes(gender), `대상 선택지에 없음: ${gender}`)
+  for (const gender of genders) assert.ok(['누구나', '여성', '남성'].includes(gender), `알 수 없는 대상 값: ${gender}`)
 
   // 각 유형 조건이 최소 한 곳은 찾아야 한다.
   for (const type of SHELTER_TYPE_FILTERS.filter((item) => item !== '전체')) {
@@ -116,10 +119,10 @@ test('필터 선택지가 실제 데이터 값과 일치한다', async () => {
 })
 
 test('마커 색상이 유형마다 고정되고 서로 겹치지 않는다', () => {
-  assert.equal(markerStyleFor({ type: '일시쉼터' }).tone, 'coral')
-  assert.equal(markerStyleFor({ type: '이동쉼터' }).tone, 'yellow')
-  assert.equal(markerStyleFor({ type: '단기쉼터' }).tone, 'green')
-  assert.equal(markerStyleFor({ type: '중장기쉼터' }).tone, 'purple')
+  assert.equal(markerStyleFor({ type: '일시쉼터' }).tone, 'red')
+  assert.equal(markerStyleFor({ type: '단기쉼터' }).tone, 'yellow')
+  assert.equal(markerStyleFor({ type: '중장기쉼터' }).tone, 'green')
+  assert.equal(markerStyleFor({ type: '이동쉼터' }).tone, 'blue')
 
   // 같은 유형은 몇 번째로 그려지든 같은 색이어야 한다.
   assert.equal(markerStyleFor(SAMPLE[1]).tone, markerStyleFor(SAMPLE[2]).tone)
@@ -127,6 +130,14 @@ test('마커 색상이 유형마다 고정되고 서로 겹치지 않는다', ()
   const tones = MARKER_LEGEND.map((item) => item.tone)
   assert.equal(new Set(tones).size, tones.length, '색이 중복됩니다')
   assert.equal(MARKER_LEGEND.length, 4)
+})
+
+test('마커 그림은 원본 배포본의 유형별 디자인을 유지한다', () => {
+  assert.equal(markerStyleFor({ type: '일시쉼터' }).icon, 'temporary')
+  assert.equal(markerStyleFor({ type: '단기쉼터' }).icon, 'short-term')
+  assert.equal(markerStyleFor({ type: '중장기쉼터' }).icon, 'long-term')
+  assert.equal(markerStyleFor({ type: '이동쉼터' }).icon, 'mobile')
+  assert.deepEqual(MARKER_LEGEND.map((item) => item.type), ['일시쉼터', '단기쉼터', '중장기쉼터', '이동쉼터'])
 })
 
 test('유형을 모르는 쉼터도 지도에서 빠지지 않는다', () => {

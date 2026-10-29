@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import Mascot from './Mascot.jsx'
 
 export default function ChatFab() {
   const navigate = useNavigate()
@@ -17,7 +16,7 @@ export default function ChatFab() {
         onClick={() => navigate('/chat')}
         aria-label="가온 헬퍼 채팅 열기"
       >
-        <Mascot pose="guide" />
+        <img src="/figma/warm/welcome-mascot.png" alt="" aria-hidden="true" />
       </button>
       <button
         className="chat-fab-close"
@@ -25,7 +24,7 @@ export default function ChatFab() {
         onClick={() => setVisible(false)}
         aria-label="가온 헬퍼 플로팅 버튼 닫기"
       >
-        <X size={13} />
+        <X size={10} />
       </button>
     </div>
   )
