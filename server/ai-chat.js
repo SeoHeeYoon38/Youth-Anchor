@@ -15,16 +15,16 @@ const SAFETY_INSTRUCTIONS = `당신은 위기청소년과 자립준비청년을 
 
 export function detectChatActions(message) {
   const actions = new Set()
-  if (/위험|폭력|맞았|죽고|자해|살려|납치|협박|쫓아|무서/.test(message)) {
+  if (/위험|폭력|맞았|죽고|자해|살려|납치|협박|쫓아|무서|두려/.test(message)) {
     actions.add('call-112')
     actions.add('send-sos')
   }
-  if (/잘 곳|잠.{0,3}곳|쉼터|가출|집에.{0,4}못|머물/.test(message)) {
+  if (/잘\s*곳|잘곳|잠.{0,4}곳|쉼터|가출|집에.{0,5}못|머물|노숙|숙소/.test(message)) {
     actions.add('find-shelter')
     actions.add('call-1388')
   }
-  if (/돈|생활비|식사|밥|지원금|일자리|주거비/.test(message)) actions.add('view-support')
-  if (/상담|이야기|외로|힘들|불안|우울/.test(message)) actions.add('call-1388')
+  if (/돈|생활비|식사|밥|먹을|먹을게|배고|굶|지원금|지원\s*사업|일자리|주거비|생계/.test(message)) actions.add('view-support')
+  if (/상담|이야기|외로|힘들|불안|우울|괴로|답답/.test(message)) actions.add('call-1388')
   return [...actions]
 }
 

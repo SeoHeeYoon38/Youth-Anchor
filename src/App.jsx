@@ -126,10 +126,18 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {selectedShelter && <ShelterSheet shelter={selectedShelter} origin={position || DEFAULT_ROUTE_ORIGIN} originName={position ? '현재 위치' : '안양시청'} onClose={() => setSelectedShelter(null)} />}
+      {selectedShelter && <ShelterSheet shelter={selectedShelter} origin={position || DEFAULT_ROUTE_ORIGIN} originName={position ? '현재 위치' : '서울시청'} onClose={() => setSelectedShelter(null)} />}
       {selectedSupport && <SupportSheet support={selectedSupport} onClose={() => setSelectedSupport(null)} />}
       {noticeOpen && <NoticeSheet notices={noticeItems} status={notificationStatus} onSubscribe={enableNotifications} onClose={() => setNoticeOpen(false)} />}
-      {guideOpen && <GuideSheet onClose={() => setGuideOpen(false)} />}
+      {guideOpen && (
+        <GuideSheet
+          onClose={() => setGuideOpen(false)}
+          onOpenNotices={() => {
+            setGuideOpen(false)
+            setNoticeOpen(true)
+          }}
+        />
+      )}
     </>
   )
 }

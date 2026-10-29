@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Check, ChevronLeft, ChevronRight, House, LocateFixed, MapPin, RotateCcw, Search, ShieldCheck, SlidersHorizontal, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { ChevronRight, House, LocateFixed, MapPin, SlidersHorizontal, X } from 'lucide-react'
 import KakaoMap from '../components/KakaoMap.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
 import {
@@ -15,9 +14,10 @@ import {
 import { formatDistance } from '../utils.js'
 
 export default function SheltersPage({ shelters, position, locationMessage, locateMe, locating, onSelectShelter }) {
-  const navigate = useNavigate()
   const [viewMode, setViewMode] = useState('map')
-  const [filterOpen, setFilterOpen] = useState(false)
+  const [viewTouched, setViewTouched] = useState(false)
+  const [filterOpen, setFilterOpen] = useState(true)
+  const [filterTouched, setFilterTouched] = useState(false)
   const [filter, setFilter] = useState(DEFAULT_SHELTER_FILTER)
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -27,43 +27,36 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
   }, [filter, shelters, searchQuery])
 
   const filterActive = isFilterActive(filter) || searchQuery.trim() !== ''
-
-  const handleResetFilters = () => {
-    setFilter(DEFAULT_SHELTER_FILTER)
-    setSearchQuery('')
-  }
+  const locationCopy = locationMessage || '위치 권한 없이도 대피처를 확인할 수 있어요'
+  const highlightedLocationCopy = locationCopy.split(/(서울시청|대피처)/g).filter(Boolean)
 
   return (
     <>
       <div className="view shelter-view page-enter">
         <header className="map-header">
-          <button className="round-button transition hover:-translate-x-0.5" onClick={() => navigate('/home')} aria-label="홈으로 돌아가기"><ChevronLeft size={24} /></button>
           <div><span>HAVEN</span><h1>SOS 대피처</h1></div>
-          <button className="round-button transition hover:scale-105" onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')} aria-label="지도와 목록 전환"><Search size={22} /></button>
         </header>
 
-        <div className="map-search">
-          <Search size={19} />
+        <div className={`map-search${searchQuery ? ' has-query' : ''}`}>
+          <img src="/figma/warm/map-search.svg" alt="" aria-hidden="true" />
+          <span className="map-search-copy" aria-hidden="true">
+            {highlightedLocationCopy.map((segment, index) => (
+              segment === '서울시청' || segment === '대피처'
+                ? <strong key={`${segment}-${index}`}>{segment}</strong>
+                : <span key={`${segment}-${index}`}>{segment}</span>
+            ))}
+          </span>
           <input
             type="text"
-            placeholder={`${locationMessage || '대피처 이름 또는 주소 검색...'}`}
+            placeholder="대피처 이름 또는 주소 검색"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              width: '100%',
-              marginLeft: '8px',
-              fontSize: '14px',
-              color: 'inherit'
-            }}
             aria-label="대피처 이름 또는 주소 검색"
           />
           {searchQuery && (
-            <button 
-              onClick={() => setSearchQuery('')} 
-              style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', color: 'inherit' }}
+            <button
+              className="map-search-clear"
+              onClick={() => setSearchQuery('')}
               aria-label="검색어 지우기"
             >
               <X size={16} />
@@ -73,32 +66,19 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
 
         <div className="map-controls">
           <div className="segmented-control" aria-label="보기 방식">
-            <button className={viewMode === 'map' ? 'active' : ''} onClick={() => setViewMode('map')}>지도</button>
-            <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}>목록</button>
+            <button className={viewTouched && viewMode === 'map' ? 'active' : ''} onClick={() => { setViewMode('map'); setViewTouched(true) }}>지도</button>
+            <button className={viewTouched && viewMode === 'list' ? 'active' : ''} onClick={() => { setViewMode('list'); setViewTouched(true) }}>목록</button>
           </div>
-          <button className={filterOpen || isFilterActive(filter) ? 'filter-button active' : 'filter-button'} onClick={() => setFilterOpen((open) => !open)} aria-expanded={filterOpen}>
-            <SlidersHorizontal size={17} /> 조건{isFilterActive(filter) ? ` · ${describeFilter(filter)}` : ''}
+          <button className={(isFilterActive(filter) || (filterTouched && filterOpen)) ? 'filter-button condition-button active' : 'filter-button condition-button'} onClick={() => { setFilterOpen((open) => !open); setFilterTouched(true) }} aria-expanded={filterOpen}>
+            <SlidersHorizontal size={14} /> 조건{isFilterActive(filter) ? ` · ${describeFilter(filter)}` : ''}
           </button>
-          <button className="filter-button" onClick={locateMe} disabled={locating}><LocateFixed size={17} className={locating ? 'spin' : ''} /> 내 위치</button>
+          <button className={locating || position ? 'filter-button active' : 'filter-button'} onClick={locateMe} disabled={locating} aria-pressed={Boolean(position)}>
+            <LocateFixed size={14} className={locating ? 'spin' : ''} /> 내 위치
+          </button>
         </div>
 
         {filterOpen && (
           <div className="filter-panel page-enter">
-            <div className="filter-group">
-              <span className="filter-group-label">머물 수 있는 기간</span>
-              <div className="filter-row" role="group" aria-label="쉼터 유형">
-                {SHELTER_TYPE_FILTERS.map((item) => (
-                  <button
-                    key={item}
-                    className={filter.type === item ? 'active' : ''}
-                    aria-pressed={filter.type === item}
-                    onClick={() => setFilter((current) => ({ ...current, type: item }))}
-                  >
-                    {filter.type === item && <Check size={14} />} {item}
-                  </button>
-                ))}
-              </div>
-            </div>
             <div className="filter-group">
               <span className="filter-group-label">이용 대상</span>
               <div className="filter-row" role="group" aria-label="이용 대상">
@@ -107,23 +87,41 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
                     key={item}
                     className={filter.audience === item ? 'active' : ''}
                     aria-pressed={filter.audience === item}
-                    onClick={() => setFilter((current) => ({ ...current, audience: item }))}
+                    onClick={() => setFilter((current) => ({
+                      ...current,
+                      audience: current.audience === item ? '전체' : item
+                    }))}
                   >
-                    {filter.audience === item && <Check size={14} />} {item}
+                    {item}
                   </button>
                 ))}
               </div>
             </div>
-            <div className="filter-footer">
-              <span>{visibleShelters.length}곳 표시 중</span>
-              {filterActive && (
-                <button className="filter-reset" onClick={handleResetFilters}>
-                  <RotateCcw size={14} /> 조건 초기화
-                </button>
-              )}
+            <div className="filter-group">
+              <span className="filter-group-label">머물 수 있는 기간</span>
+              <div className="filter-row" role="group" aria-label="쉼터 유형">
+                {SHELTER_TYPE_FILTERS.map((item) => (
+                  <button
+                    key={item}
+                    className={filter.type === item ? 'active' : ''}
+                    aria-pressed={filter.type === item}
+                    onClick={() => setFilter((current) => ({
+                      ...current,
+                      type: current.type === item ? '전체' : item
+                    }))}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
+
+        <button className="map-intro-card" onClick={() => setViewMode('map')}>
+          <span className="map-intro-icon" aria-hidden="true"><img src="/figma/warm/map-intro.svg" alt="" /></span>
+          <span><strong>가까운 대피처를 찾아보세요</strong><small>방문 전 운영 여부와 이용 가능 인원을 확인한 뒤 갈 수 있는 대피처를 찾아보세요.</small></span>
+        </button>
 
         {viewMode === 'map' ? (
           <KakaoMap position={position} shelters={visibleShelters} onSelectShelter={onSelectShelter} />
@@ -138,11 +136,6 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
             <MapPin size={25} />
             <strong>조건에 맞는 대피처가 없어요</strong>
             <p>{filterActive ? '조건을 바꾸거나 검색어를 초기화해 보세요.' : '잠시 후 다시 확인해 주세요.'}</p>
-            {filterActive && (
-              <button className="filter-reset" onClick={handleResetFilters}>
-                <RotateCcw size={14} /> 조건 초기화
-              </button>
-            )}
           </div>
         )}
 
@@ -158,7 +151,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
             ))}
           </section>
         )}
-        <p className="data-note"><ShieldCheck size={14} /> 위치는 가까운 순서를 계산할 때만 사용해요.</p>
+        <p className="data-note"><span aria-hidden="true">•</span> 위치는 가까운 순서를 계산할 때만 사용해요</p>
       </div>
     </>
   )

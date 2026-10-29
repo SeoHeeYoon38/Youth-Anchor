@@ -10,6 +10,18 @@ test('chat actions map urgent and shelter requests to safe next steps', () => {
   assert.ok(actions.includes('call-1388'))
 })
 
+test('chat actions understand natural free-conversation phrases', () => {
+  const foodActions = detectChatActions('며칠째 먹을 게 없고 너무 배고파요')
+  const shelterActions = detectChatActions('오늘 편하게 머물 곳이 필요해요')
+  const urgentActions = detectChatActions('너무 두렵고 지금 위험한 것 같아요')
+
+  assert.ok(foodActions.includes('view-support'))
+  assert.ok(shelterActions.includes('find-shelter'))
+  assert.ok(shelterActions.includes('call-1388'))
+  assert.ok(urgentActions.includes('call-112'))
+  assert.ok(urgentActions.includes('send-sos'))
+})
+
 test('OpenAI chat uses the Responses API without storing the response', async () => {
   let request
   const service = createChatService({

@@ -5,7 +5,7 @@
  * "여성 + 단기쉼터"처럼 함께 거르는 조합을 만들 수 없다. 두 축을 분리해서 조합한다.
  */
 export const SHELTER_TYPE_FILTERS = ['전체', '일시쉼터', '이동쉼터', '단기쉼터', '중장기쉼터']
-export const SHELTER_AUDIENCE_FILTERS = ['전체', '누구나', '여성', '남성']
+export const SHELTER_AUDIENCE_FILTERS = ['전체', '여성', '남성']
 
 export const DEFAULT_SHELTER_FILTER = { type: '전체', audience: '전체' }
 
@@ -39,8 +39,6 @@ export function filterShelters(shelters, filter = DEFAULT_SHELTER_FILTER) {
   return shelters.filter((shelter) => {
     if (type !== '전체' && shelter.type !== type) return false
     if (audience === '전체') return true
-    // '누구나'를 고르면 성별 제한이 없는 곳만 본다.
-    if (audience === '누구나') return shelter.gender === '누구나'
     // 여성·남성을 고르면 해당 전용 쉼터와 성별 제한이 없는 곳을 함께 보여준다.
     return shelter.gender === audience || shelter.gender === '누구나'
   })
