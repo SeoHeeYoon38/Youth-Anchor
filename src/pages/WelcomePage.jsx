@@ -38,7 +38,7 @@ export default function WelcomePage({ onQuickExit }) {
       <header className="welcome-header">
         <div className="welcome-brand">
           <span className="welcome-brand-mark" aria-hidden="true">
-            <img src={`${WARM_ASSET_ROOT}/welcome-shield.svg`} alt="" />
+            <img src={`${WARM_ASSET_ROOT}/haven-house-only.png`} alt="" />
           </span>
           <strong>HAVEN</strong>
         </div>
