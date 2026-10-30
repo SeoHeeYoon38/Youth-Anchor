@@ -36,14 +36,10 @@ export function ShelterSheet({ shelter, origin = null, originName = '현재 위�
     if (routePending) return
 
     setRoutePending(true)
-    const routeWindow = window.open('about:blank', '_blank')
-    if (routeWindow) routeWindow.opener = null
-
     const navigateToKakaoMap = (routeOrigin, routeOriginName) => {
       const url = buildKakaoDirectionsUrl({ shelter, origin: routeOrigin, originName: routeOriginName })
-      if (routeWindow && !routeWindow.closed) routeWindow.location.replace(url)
-      else window.location.assign(url)
       setRoutePending(false)
+      window.location.assign(url)
     }
 
     requestCurrentPosition(navigator.geolocation)
@@ -80,7 +76,7 @@ export function ShelterSheet({ shelter, origin = null, originName = '현재 위�
       <p className="sheet-warning shelter-warning">출발 전 전화로 입소 가능 여부를 다시 확인해 주세요. 연결이 어렵다면 청소년전화 1388을 이용하세요.</p>
       <div className="sheet-actions">
         <a className="secondary-action" href={`tel:${dialNumber}`}><Phone size={18} /> 전화 확인</a>
-        <a className="primary-action" href={mapUrl} target="_blank" rel="noreferrer" onClick={openDirections} aria-busy={routePending}>
+        <a className="primary-action" href={mapUrl} onClick={openDirections} aria-busy={routePending}>
           <Navigation size={18} /> {routePending ? '현재 위치 확인 중' : '경로 안내받기'}
         </a>
       </div>
