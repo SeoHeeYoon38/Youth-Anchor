@@ -13,7 +13,7 @@ import {
   X
 } from 'lucide-react'
 import { useState } from 'react'
-import { buildKakaoDirectionsUrl, requestCurrentPosition } from '../kakaoDirections.js'
+import { buildKakaoDirectionsUrl, geolocationErrorMessage, requestCurrentPosition } from '../kakaoDirections.js'
 
 function SheetFrame({ children, onClose, labelledBy, className = '' }) {
   return (
@@ -26,25 +26,30 @@ function SheetFrame({ children, onClose, labelledBy, className = '' }) {
   )
 }
 
-export function ShelterSheet({ shelter, origin = null, originName = '현재 위치', onClose }) {
+export function ShelterSheet({ shelter, origin = null, onClose }) {
   const [addressVisible, setAddressVisible] = useState(false)
   const [routePending, setRoutePending] = useState(false)
-  const mapUrl = buildKakaoDirectionsUrl({ shelter, origin, originName })
+  const [routeError, setRouteError] = useState('')
+  const mapUrl = buildKakaoDirectionsUrl({ shelter, origin })
 
   const openDirections = (event) => {
     event.preventDefault()
     if (routePending) return
 
     setRoutePending(true)
-    const navigateToKakaoMap = (routeOrigin, routeOriginName) => {
-      const url = buildKakaoDirectionsUrl({ shelter, origin: routeOrigin, originName: routeOriginName })
+    setRouteError('')
+    const navigateToKakaoMap = (routeOrigin) => {
+      const url = buildKakaoDirectionsUrl({ shelter, origin: routeOrigin })
       setRoutePending(false)
       window.location.assign(url)
     }
 
     requestCurrentPosition(navigator.geolocation)
-      .then((currentPosition) => navigateToKakaoMap(currentPosition, '현재 위치'))
-      .catch(() => navigateToKakaoMap(origin, originName))
+      .then(navigateToKakaoMap)
+      .catch((error) => {
+        setRoutePending(false)
+        setRouteError(geolocationErrorMessage(error))
+      })
   }
   // 공공데이터에서 대표전화를 받아오면 그 번호로 걸고, 없으면 청소년전화 1388로 안내한다.
   const phone = shelter.phone || '1388'
@@ -80,6 +85,7 @@ export function ShelterSheet({ shelter, origin = null, originName = '현재 위�
           <Navigation size={18} /> {routePending ? '현재 위치 확인 중' : '경로 안내받기'}
         </a>
       </div>
+      {routeError && <p className="route-permission-message" role="alert">{routeError}</p>}
     </SheetFrame>
   )
 }

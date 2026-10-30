@@ -126,7 +126,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {selectedShelter && <ShelterSheet shelter={selectedShelter} origin={position} originName="현재 위치" onClose={() => setSelectedShelter(null)} />}
+      {selectedShelter && <ShelterSheet shelter={selectedShelter} origin={position} onClose={() => setSelectedShelter(null)} />}
       {selectedSupport && <SupportSheet support={selectedSupport} onClose={() => setSelectedSupport(null)} />}
       {noticeOpen && <NoticeSheet notices={noticeItems} status={notificationStatus} onSubscribe={enableNotifications} onClose={() => setNoticeOpen(false)} />}
       {guideOpen && (
