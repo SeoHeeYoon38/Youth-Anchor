@@ -61,8 +61,8 @@
    FAB는 HavenLayout에서 Outlet 바깥에 렌더링한다. 문서 스크롤과 무관하게 고정하고,
    하단 내비게이션 바로 위에 배치해 화면 아래쪽에서 바로 누를 수 있게 한다. */
 .chat-fab { position: fixed; z-index: 30; right: max(16px, calc((100vw - 560px) / 2 + 18px)); bottom: calc(116px + env(safe-area-inset-bottom)); }
-.chat-fab-open { width: 152px; height: 152px; padding: 0; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; cursor: pointer; animation: mascot-breathe 3s ease-in-out infinite; }
-.chat-fab-open img { width: 152px; height: 152px; display: block; position: relative; top: 10px; object-fit: contain; filter: drop-shadow(0 12px 18px rgba(116,66,42,.24)); transform: scaleX(-1); }
+.chat-fab-open { width: 106px; height: 106px; padding: 0; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; cursor: pointer; animation: mascot-breathe 3s ease-in-out infinite; }
+.chat-fab-open img { width: 106px; height: 106px; display: block; position: relative; top: 10px; object-fit: contain; filter: drop-shadow(0 12px 18px rgba(116,66,42,.24)); transform: scaleX(-1); }
 .chat-fab-close { width: 22px; height: 22px; padding: 0; display: grid; place-items: center; position: absolute; z-index: 2; top: 16px; right: 8px; border: 1.5px solid #fff; border-radius: 50%; background: #9b5037; color: #fff; box-shadow: 0 3px 7px rgba(155,80,55,.28); cursor: pointer; }
 .map-results { margin: 13px 16px 0; padding: 15px; border: 1px solid rgba(255,255,255,.14); border-radius: 23px; background: rgba(255,255,255,.1); box-shadow: var(--soft-shadow); color: #fff; backdrop-filter: blur(14px); }
 .results-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; font-size: 13px; }

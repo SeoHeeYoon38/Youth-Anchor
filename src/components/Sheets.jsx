@@ -13,7 +13,7 @@ import {
   X
 } from 'lucide-react'
 import { useState } from 'react'
-import { DEFAULT_ROUTE_ORIGIN } from '../constants.js'
+import { buildKakaoDirectionsUrl, requestCurrentPosition } from '../kakaoDirections.js'
 
 function SheetFrame({ children, onClose, labelledBy, className = '' }) {
   return (
@@ -26,9 +26,30 @@ function SheetFrame({ children, onClose, labelledBy, className = '' }) {
   )
 }
 
-export function ShelterSheet({ shelter, origin = DEFAULT_ROUTE_ORIGIN, originName = '서울시청', onClose }) {
+export function ShelterSheet({ shelter, origin = null, originName = '현재 위치', onClose }) {
   const [addressVisible, setAddressVisible] = useState(false)
-  const mapUrl = `https://map.kakao.com/link/from/${encodeURIComponent(originName)},${origin.lat},${origin.lng}/to/${encodeURIComponent(shelter.name)},${shelter.lat},${shelter.lng}`
+  const [routePending, setRoutePending] = useState(false)
+  const mapUrl = buildKakaoDirectionsUrl({ shelter, origin, originName })
+
+  const openDirections = (event) => {
+    event.preventDefault()
+    if (routePending) return
+
+    setRoutePending(true)
+    const routeWindow = window.open('about:blank', '_blank')
+    if (routeWindow) routeWindow.opener = null
+
+    const navigateToKakaoMap = (routeOrigin, routeOriginName) => {
+      const url = buildKakaoDirectionsUrl({ shelter, origin: routeOrigin, originName: routeOriginName })
+      if (routeWindow && !routeWindow.closed) routeWindow.location.replace(url)
+      else window.location.assign(url)
+      setRoutePending(false)
+    }
+
+    requestCurrentPosition(navigator.geolocation)
+      .then((currentPosition) => navigateToKakaoMap(currentPosition, '현재 위치'))
+      .catch(() => navigateToKakaoMap(origin, originName))
+  }
   // 공공데이터에서 대표전화를 받아오면 그 번호로 걸고, 없으면 청소년전화 1388로 안내한다.
   const phone = shelter.phone || '1388'
   const dialNumber = phone.replace(/[^0-9+]/g, '') || '1388'
@@ -59,7 +80,9 @@ export function ShelterSheet({ shelter, origin = DEFAULT_ROUTE_ORIGIN, originNam
       <p className="sheet-warning shelter-warning">출발 전 전화로 입소 가능 여부를 다시 확인해 주세요. 연결이 어렵다면 청소년전화 1388을 이용하세요.</p>
       <div className="sheet-actions">
         <a className="secondary-action" href={`tel:${dialNumber}`}><Phone size={18} /> 전화 확인</a>
-        <a className="primary-action" href={mapUrl} target="_blank" rel="noreferrer"><Navigation size={18} /> 경로 안내받기</a>
+        <a className="primary-action" href={mapUrl} target="_blank" rel="noreferrer" onClick={openDirections} aria-busy={routePending}>
+          <Navigation size={18} /> {routePending ? '현재 위치 확인 중' : '경로 안내받기'}
+        </a>
       </div>
     </SheetFrame>
   )
