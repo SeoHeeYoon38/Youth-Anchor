@@ -31,17 +31,17 @@
   align-items: center;
 }
 
-.welcome-brand { gap: 12px; }
-.welcome-brand strong { color: #3d2a22; font-size: 20px; line-height: 1; }
+.welcome-brand { min-height: 48px; gap: 6px; }
+.welcome-brand strong { display: block; color: #3d2a22; font-size: 20px; line-height: 1; }
 .welcome-brand-mark {
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   display: grid;
   place-items: center;
-  border-radius: 14px;
-  background: #ffe2a8;
+  border-radius: 0;
+  background: transparent;
 }
-.welcome-brand-mark img { width: 24px; height: 24px; display: block; }
+.welcome-brand-mark img { width: 100%; height: 100%; display: block; object-fit: contain; }
 .welcome-header-actions { gap: 8px; }
 .welcome-header button { cursor: pointer; }
 .welcome-bell {
@@ -160,8 +160,8 @@
 
 @media (max-width: 390px) {
   .welcome-screen { padding-left: 16px; padding-right: 16px; }
-  .welcome-brand { gap: 8px; }
-  .welcome-brand-mark { width: 42px; height: 42px; border-radius: 12px; }
+  .welcome-brand { gap: 6px; }
+  .welcome-brand-mark { width: 36px; height: 36px; }
   .welcome-brand strong { font-size: 17px; }
   .welcome-bell { width: 40px; height: 40px; }
   .welcome-exit { min-height: 40px; padding: 0 11px; gap: 6px; font-size: 12px; }
