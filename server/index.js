@@ -298,6 +298,17 @@ export function createApiServer(options = {}) {
       const guest = authenticate(request, response)
       if (!guest) return
 
+      if (request.method === 'POST' && url.pathname === '/api/v1/rights/recommend') {
+        const body = await readJson(request)
+        const title = typeof body.title === 'string' ? body.title.trim().slice(0, 80) : ''
+        if (!title) {
+          sendJson(response, 400, { error: 'title-required' })
+          return
+        }
+        sendJson(response, 200, await chatService.recommendRightsCollection({ title }))
+        return
+      }
+
       if (request.method === 'GET' && url.pathname === '/api/v1/notices') {
         const parsedLimit = Number(url.searchParams.get('limit') || 50)
         const parsedOffset = Number(url.searchParams.get('offset') || 0)

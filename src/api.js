@@ -110,6 +110,13 @@ export async function fetchNotice(id) {
   return requestJson(`/api/v1/notices/${id}`)
 }
 
+export async function recommendRightsCollection(title) {
+  return requestJson('/api/v1/rights/recommend', {
+    method: 'POST',
+    body: JSON.stringify({ title })
+  })
+}
+
 export async function createChatRoom() {
   return requestJson('/api/v1/chat/rooms', { method: 'POST', body: '{}' })
 }
