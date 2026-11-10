@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, LocateFixed } from 'lucide-react'
+import { BookOpen, CalendarDays, LocateFixed, Scale } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ShelterCard from '../components/ShelterCard.jsx'
 
@@ -61,6 +61,10 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
           <button className="new-tool-card new-tool-rights" type="button" onClick={() => navigate('/rights')}>
             <span className="new-tool-icon"><BookOpen size={24} /></span>
             <span><strong>서류 사전</strong><small>필요한 서류 찾아보기</small></span>
+          </button>
+          <button className="new-tool-card new-tool-legal" type="button" onClick={() => navigate('/legal')}>
+            <span className="new-tool-icon"><Scale size={24} /></span>
+            <span><strong>법률 상담</strong><small>부당한 일, 같이 대응하기</small></span>
           </button>
         </div>
       </section>
