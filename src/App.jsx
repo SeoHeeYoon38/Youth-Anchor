@@ -11,6 +11,7 @@ import SheltersPage from './pages/SheltersPage.jsx'
 import SupportPage from './pages/SupportPage.jsx'
 import WelcomePage from './pages/WelcomePage.jsx'
 import { RightsCatalogPage, RightsDetailPage, RightsDocumentsPage, RightsHomePage } from './pages/RightsPage.jsx'
+import { DiaryChecklistPage, DiaryEntryPage, DiaryHomePage } from './pages/DiaryPage.jsx'
 import { distanceKm } from './utils.js'
 
 export default function App() {
@@ -122,6 +123,9 @@ export default function App() {
         <Route path="/rights/catalog" element={<RightsCatalogPage onQuickExit={quickExit} />} />
         <Route path="/rights/documents" element={<RightsDocumentsPage onQuickExit={quickExit} />} />
         <Route path="/rights/document/:documentId" element={<RightsDetailPage onQuickExit={quickExit} />} />
+        <Route path="/diary" element={<DiaryHomePage onQuickExit={quickExit} />} />
+        <Route path="/diary/new" element={<DiaryEntryPage onQuickExit={quickExit} />} />
+        <Route path="/diary/checklist" element={<DiaryChecklistPage onQuickExit={quickExit} />} />
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
           <Route path="/home" element={<HomePage shelters={sortedShelters} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} onOpenGuide={() => setGuideOpen(true)} />} />
           <Route path="/shelters" element={<SheltersPage shelters={sortedShelters} position={position} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} />} />
