@@ -1,4 +1,4 @@
-import { LocateFixed } from 'lucide-react'
+import { BookOpen, LocateFixed } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ShelterCard from '../components/ShelterCard.jsx'
 
@@ -47,6 +47,17 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="new-tools-section" aria-labelledby="new-tools-title">
+        <div className="home-section-heading">
+          <div><span>생활에 필요한 정보</span><h2 id="new-tools-title">새로운 도구를 만나보세요</h2></div>
+        </div>
+        <button className="new-tool-card" type="button" onClick={() => navigate('/rights')}>
+          <span className="new-tool-icon"><BookOpen size={24} /></span>
+          <span><strong>권리 알리미</strong><small>필요한 서류와 준비 상태를 한눈에 확인해요</small></span>
+          <img src={`${WARM_ASSET_ROOT}/chevron-right.svg`} alt="" aria-hidden="true" />
+        </button>
       </section>
 
       <section className="nearby-section">

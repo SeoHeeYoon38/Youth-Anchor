@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage.jsx'
 import SheltersPage from './pages/SheltersPage.jsx'
 import SupportPage from './pages/SupportPage.jsx'
 import WelcomePage from './pages/WelcomePage.jsx'
+import { RightsCatalogPage, RightsDetailPage, RightsDocumentsPage, RightsHomePage } from './pages/RightsPage.jsx'
 import { distanceKm } from './utils.js'
 
 export default function App() {
@@ -117,6 +118,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<WelcomePage onQuickExit={quickExit} />} />
         <Route path="/__internal/admin-notifications" element={<AdminNotificationsPage />} />
+        <Route path="/rights" element={<RightsHomePage onQuickExit={quickExit} />} />
+        <Route path="/rights/catalog" element={<RightsCatalogPage onQuickExit={quickExit} />} />
+        <Route path="/rights/documents" element={<RightsDocumentsPage onQuickExit={quickExit} />} />
+        <Route path="/rights/document/:documentId" element={<RightsDetailPage onQuickExit={quickExit} />} />
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
           <Route path="/home" element={<HomePage shelters={sortedShelters} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} onOpenGuide={() => setGuideOpen(true)} />} />
           <Route path="/shelters" element={<SheltersPage shelters={sortedShelters} position={position} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} />} />
