@@ -84,37 +84,13 @@
 }
 
 .feature-icon { width: 40px; height: 40px; margin-bottom: 8px; display: grid; place-items: center; border-radius: 12px; background: #f6c57d; }
-.feature-tile-shelter .feature-icon { background: #f5dfcc; }
-.feature-tile-chat .feature-icon { background: #f2d48d; }
-.feature-tile-support .feature-icon { background: #f1edac; }
-.feature-tile-guide .feature-icon { background: #e4d7bf; }
+.feature-tile-diary .feature-icon { background: #ffe0cb; }
+.feature-tile-rights .feature-icon { background: #ffd28d; }
+.feature-tile-legal .feature-icon { background: #f5ebab; }
+.feature-tile-guide .feature-icon { background: #e9d4bd; }
+.feature-tile-legal .feature-icon img { width: 28px; height: 27px; object-fit: contain; opacity: .48; }
 .feature-tile strong { width: 100%; font-size: 15px; }
 .feature-tile small { width: 100%; color: #8b7664; font-size: 12px; line-height: 1.4; }
-
-.new-tools-section { margin-top: 18px; }
-.new-tools-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.new-tool-card {
-  min-height: 123px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  border: 1px solid #f0d7b7;
-  border-radius: 20px;
-  background: linear-gradient(110deg, #fffaf1, #ffe6bd);
-  color: #3e241a;
-  text-align: left;
-  cursor: pointer;
-}
-.new-tool-icon { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 15px; background: #f7d79b; color: #a75c25; }
-.new-tool-card strong, .new-tool-card small { display: block; }
-.new-tool-card strong { font-size: 15px; }
-.new-tool-card small { margin-top: 3px; color: #8b7664; font-size: 11px; line-height: 1.4; }
-.new-tool-card .new-tool-icon { margin-bottom: 8px; }
-.new-tool-diary .new-tool-icon { background: #f7dacb; }
-.new-tool-rights .new-tool-icon { background: #ffdda0; }
-.new-tool-legal .new-tool-icon { background: #f1edac; }
 
 .nearby-section { margin-top: 16px; padding-top: 2px; }
 .nearby-title { align-items: center; }

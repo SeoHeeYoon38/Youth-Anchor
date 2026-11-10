@@ -1,14 +1,15 @@
-import { BookOpen, CalendarDays, LocateFixed, Scale } from 'lucide-react'
+import { LocateFixed } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ShelterCard from '../components/ShelterCard.jsx'
 
 const WARM_ASSET_ROOT = '/figma/warm'
+const FEATURE_ASSET_ROOT = '/figma/features'
 
 const QUICK_ACTIONS = [
-  { label: 'SOS 대피처', description: '가까운 안전한 장소를 찾아보세요', icon: 'action-shelter.svg', tone: 'shelter', to: '/shelters' },
-  { label: '익명 톡 상담', description: '조용히 대화하기', icon: 'action-chat.svg', tone: 'chat', to: '/chat' },
-  { label: '지원 프로그램', description: '주거 생활 지원 모아보기', icon: 'action-support.svg', tone: 'support', to: '/support' },
-  { label: '안전 가이드', description: '흔적 없이 안전하게', icon: 'action-guide.svg', tone: 'guide', action: 'guide' }
+  { label: '일기장', description: '오늘의 기분을 남겨보기', icon: `${FEATURE_ASSET_ROOT}/home-action-diary.svg`, tone: 'diary', to: '/diary' },
+  { label: '서류 사전', description: '필요한 서류 찾아보기', icon: `${FEATURE_ASSET_ROOT}/home-action-rights.svg`, tone: 'rights', to: '/rights' },
+  { label: '법률 상담', description: '부당한 일, 같이 대응하기', icon: `${FEATURE_ASSET_ROOT}/home-action-legal-2.png`, tone: 'legal', to: '/legal' },
+  { label: '안전 가이드', description: '흔적 없이 안전하게', icon: `${FEATURE_ASSET_ROOT}/home-action-guide.svg`, tone: 'guide', action: 'guide' }
 ]
 
 export default function HomePage({ shelters, locationMessage, locateMe, locating, onSelectShelter, onOpenGuide }) {
@@ -41,31 +42,11 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
               className={`feature-tile feature-tile-${item.tone} group transition duration-300 hover:-translate-y-1 active:scale-[0.98]`}
               onClick={() => item.action === 'guide' ? onOpenGuide() : navigate(item.to)}
             >
-              <span className="feature-icon" aria-hidden="true"><img src={`${WARM_ASSET_ROOT}/${item.icon}`} alt="" /></span>
+              <span className="feature-icon" aria-hidden="true"><img src={item.icon} alt="" /></span>
               <strong>{item.label}</strong>
               <small>{item.description}</small>
             </button>
           ))}
-        </div>
-      </section>
-
-      <section className="new-tools-section" aria-labelledby="new-tools-title">
-        <div className="home-section-heading">
-          <div><span>생활에 필요한 정보</span><h2 id="new-tools-title">새로운 도구를 만나보세요</h2></div>
-        </div>
-        <div className="new-tools-grid">
-          <button className="new-tool-card new-tool-diary" type="button" onClick={() => navigate('/diary')}>
-            <span className="new-tool-icon"><CalendarDays size={24} /></span>
-            <span><strong>일기장</strong><small>오늘의 기분을 남겨보기</small></span>
-          </button>
-          <button className="new-tool-card new-tool-rights" type="button" onClick={() => navigate('/rights')}>
-            <span className="new-tool-icon"><BookOpen size={24} /></span>
-            <span><strong>서류 사전</strong><small>필요한 서류 찾아보기</small></span>
-          </button>
-          <button className="new-tool-card new-tool-legal" type="button" onClick={() => navigate('/legal')}>
-            <span className="new-tool-icon"><Scale size={24} /></span>
-            <span><strong>법률 상담</strong><small>부당한 일, 같이 대응하기</small></span>
-          </button>
         </div>
       </section>
 
