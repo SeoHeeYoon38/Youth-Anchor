@@ -46,3 +46,14 @@
   .legal-choices, .legal-actions { margin-left: 34px; }
   .legal-message-row.bot img { width: 36px; height: 36px; }
 }
+
+@media (min-width: 430px) {
+  .legal-main { padding-left: 32px; padding-right: 32px; }
+  .legal-hero { padding: 30px 28px; }
+  .legal-hero h1 { font-size: 27px; }
+  .legal-menu { gap: 14px; }
+  .legal-menu > button,
+  .legal-menu > a { min-height: 92px; padding: 18px; }
+  .legal-chat-log { padding-left: 8px; padding-right: 8px; }
+  .legal-bubble { font-size: 13px; }
+}
