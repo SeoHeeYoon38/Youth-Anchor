@@ -81,8 +81,9 @@ function prepMetadataFor(book) { return PREP_METADATA[book.id] || { detail: `${b
 function RightsShell({ title = '서류사전', onQuickExit, backTo = '/home', pageClass = '', showBack = false, children }) {
   const { pathname } = useLocation()
   const shellRef = useRef(null)
+  const displayBack = showBack || pageClass.includes('rights-detail-page')
   useEffect(() => { shellRef.current?.scrollTo({ top: 0 }) }, [pathname])
-  return <div className={`feature-shell rights-shell ${pageClass}`} ref={shellRef}><FeatureHeader title={title} onQuickExit={onQuickExit} backTo={backTo} showBack={showBack} /><main className="rights-main">{children}</main><ChatFab key={pathname} /><BottomNav warm /></div>
+  return <div className={`feature-shell rights-shell ${pageClass}`} ref={shellRef}><FeatureHeader title={title} onQuickExit={onQuickExit} backTo={backTo} showBack={displayBack} /><main className="rights-main">{children}</main><ChatFab key={pathname} /><BottomNav warm /></div>
 }
 
 function GovernmentBanner() {

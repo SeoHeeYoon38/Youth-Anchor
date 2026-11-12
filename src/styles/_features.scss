@@ -254,7 +254,7 @@
   overflow: hidden;
   border: 1px solid #f1cfae;
   border-radius: 36px;
-  background: linear-gradient(180deg, #fff9f1 0%, #fff3de 58%, #f6d69d 100%);
+  background: var(--haven-warm-background);
   box-shadow: 0 10px 18px rgba(140, 79, 46, .14);
 }
 .rights-shell .rights-main { min-height: 0; flex: 1; overflow-y: auto; scrollbar-width: none; }
@@ -463,14 +463,12 @@
 .rights-privacy-note { height: 72px; padding: 11px 12px; }
 .rights-privacy-note strong { font-size: 12px; }
 .rights-prep-card {
-  height: 500px;
+  height: auto;
   margin-top: 14px;
-  padding: 14px 14px 0;
-  overflow-y: auto;
-  border-radius: 18px 18px 0 0;
-  scrollbar-width: none;
+  padding: 14px 14px 16px;
+  overflow: visible;
+  border-radius: 18px;
 }
-.rights-prep-card::-webkit-scrollbar { display: none; }
 .rights-prep-card h1 { margin: 5px 0 2px; font-size: 18px; }
 .rights-prep-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .rights-prep-heading > span { min-width: 0; }
