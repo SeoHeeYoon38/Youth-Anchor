@@ -55,7 +55,8 @@
 
 :is(.route-home, .route-shelters, .route-chat, .route-support) > .bottom-nav,
 .rights-shell > .bottom-nav,
-.legal-shell > .bottom-nav {
+.legal-shell > .bottom-nav,
+.diary-shell > .bottom-nav {
   width: auto;
   height: calc(66px + env(safe-area-inset-bottom));
   margin: 0 20px 12px;
@@ -69,13 +70,16 @@
 
 :is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item,
 .rights-shell .nav-item,
-.legal-shell .nav-item { gap: 4px; color: #8b7664; font-size: 11px; font-weight: 600; }
+.legal-shell .nav-item,
+.diary-shell .nav-item { gap: 4px; color: #8b7664; font-size: 11px; font-weight: 600; }
 :is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item.active,
 .rights-shell .nav-item.active,
-.legal-shell .nav-item.active { color: #eb8f25; }
+.legal-shell .nav-item.active,
+.diary-shell .nav-item.active { color: #eb8f25; }
 :is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item.active .home-nav-icon,
 .rights-shell .nav-item.active .home-nav-icon,
-.legal-shell .nav-item.active .home-nav-icon { transform: translateY(-1px); }
+.legal-shell .nav-item.active .home-nav-icon,
+.diary-shell .nav-item.active .home-nav-icon { transform: translateY(-1px); }
 .home-nav-icon img { filter: brightness(0) saturate(100%) invert(51%) sepia(13%) saturate(638%) hue-rotate(346deg) brightness(92%) contrast(87%); transition: filter .2s ease; }
 .nav-item.active .home-nav-icon img { filter: brightness(0) saturate(100%) invert(61%) sepia(68%) saturate(1450%) hue-rotate(345deg) brightness(99%) contrast(86%); }
 .warm-bottom-nav .nav-item.active svg { transform: none; filter: none; }
@@ -85,7 +89,8 @@
   :is(.route-home, .route-support) .topbar { padding-left: 14px; padding-right: 14px; }
   :is(.route-home, .route-shelters, .route-chat, .route-support) > .bottom-nav,
   .rights-shell > .bottom-nav,
-  .legal-shell > .bottom-nav { margin-left: 14px; margin-right: 14px; padding-left: 18px; padding-right: 18px; gap: 10px; }
+  .legal-shell > .bottom-nav,
+  .diary-shell > .bottom-nav { margin-left: 14px; margin-right: 14px; padding-left: 18px; padding-right: 18px; gap: 10px; }
 }
 
 @media (max-width: 350px) {

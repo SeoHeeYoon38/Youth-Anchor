@@ -1,6 +1,8 @@
-import { CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, LockKeyhole, Pencil, Plus } from 'lucide-react'
+import { CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, LockKeyhole, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import BottomNav from '../components/BottomNav.jsx'
+import ChatFab from '../components/ChatFab.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
 
 const ASSET_ROOT = '/figma/features'
@@ -74,6 +76,7 @@ function DiaryShell({ title = '내 일기장', onQuickExit, backTo = '/home', sc
   const { pathname } = useLocation()
   const shellRef = useRef(null)
   const screenClass = pathname === '/diary/new' ? 'diary-shell-entry' : pathname === '/diary/checklist' ? 'diary-shell-checklist' : 'diary-shell-calendar'
+  const showNavigation = pathname !== '/diary/new'
 
   useEffect(() => {
     shellRef.current?.scrollTo({ top: 0 })
@@ -83,6 +86,7 @@ function DiaryShell({ title = '내 일기장', onQuickExit, backTo = '/home', sc
     <div className={`feature-shell diary-shell ${screenClass}`} ref={shellRef}>
       <FeatureHeader title={title} onQuickExit={onQuickExit} backTo={backTo} />
       <main className="diary-main">{children}</main>
+      {showNavigation && <><ChatFab key={pathname} /><BottomNav warm /></>}
     </div>
   )
 }
@@ -126,16 +130,12 @@ function formatDiaryDate(dateKey) {
 }
 
 function DiaryEntrySheet({ entry, onClose, onEdit }) {
-  const visual = entry.visual || `mood-${entry.mood || 'sun'}`
-  const mood = MOODS.find((item) => visual === `mood-${item.id}`)
-  const character = CHARACTER_OPTIONS.find((item) => item.id === visual)
   return (
     <div className="diary-entry-backdrop" role="presentation" onMouseDown={onClose}>
       <section className="diary-entry-sheet" role="dialog" aria-modal="true" aria-labelledby="diary-entry-title" onMouseDown={(event) => event.stopPropagation()}>
         <div className="diary-entry-handle"><img src={`${DIARY_ASSET_ROOT}/sheet/asset-1.svg`} alt="" /></div>
         <header>
           <h2 id="diary-entry-title">{formatDiaryDate(entry.date)}</h2>
-          <p>{mood ? `${mood.label} · ${mood.description}` : `${character?.label || '가온 표정'} · 오늘의 마음`}</p>
         </header>
         <div className="diary-entry-preview">
           {entry.photo ? <img className="diary-entry-photo" src={entry.photo} alt="첨부 사진" /> : <DiaryVisual entry={entry} />}
@@ -249,13 +249,20 @@ export function DiaryChecklistPage({ onQuickExit }) {
     setEditingId(null)
     setDraft('')
   }
+  const remove = (id) => {
+    setTasks((current) => current.filter((task) => task.id !== id))
+    if (editingId === id) {
+      setEditingId(null)
+      setDraft('')
+    }
+  }
 
   return (
     <DiaryShell title="체크리스트" onQuickExit={onQuickExit} backTo="/diary">
       <section className="diary-checklist-head"><small>HAVEN / MY CHECKLIST</small><h1>오늘 할 일을 천천히 정리해요</h1><p>작은 것부터 하나씩 체크해도 충분해요.</p></section>
       <DiaryTabs active="tasks" />
       <div className="diary-add-task"><input value={newTask} onChange={(event) => setNewTask(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') add() }} placeholder="새 할 일을 입력해 주세요." /><button type="button" onClick={add} aria-label="체크리스트 추가"><Plus size={24} /></button></div>
-      <section className="diary-task-list">{tasks.length === 0 ? <div className="diary-empty"><ClipboardCheck size={36} /><strong>등록한 할 일이 없어요</strong><p>필요할 때 부담 없이 적어보세요.</p></div> : tasks.map((task) => <div className="diary-task-row" key={task.id}><button type="button" className={`diary-task-check ${task.done ? 'done' : ''}`} onClick={() => toggle(task.id)} disabled={editingId !== null} aria-disabled={editingId !== null} aria-label={`${task.text} ${task.done ? '완료 취소' : '완료'}`}>{task.done && <Check size={22} strokeWidth={3} />}</button>{editingId === task.id ? <input className="diary-task-edit-input" value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') saveEdit(task.id); if (event.key === 'Escape') setEditingId(null) }} autoFocus /> : <strong className={task.done ? 'done' : ''}>{task.text}</strong>}<button type="button" className="diary-task-edit" onClick={() => editingId === task.id ? saveEdit(task.id) : startEdit(task)} disabled={editingId !== null && editingId !== task.id} aria-label={`${task.text} 수정`}>{editingId === task.id ? <Check size={18} /> : <img src={`${DIARY_ASSET_ROOT}/entry-pencil.svg`} alt="" />}</button></div>)}</section>
+      <section className="diary-task-list">{tasks.length === 0 ? <div className="diary-empty"><ClipboardCheck size={36} /><strong>등록한 할 일이 없어요</strong><p>필요할 때 부담 없이 적어보세요.</p></div> : tasks.map((task) => <div className="diary-task-swipe" key={task.id}><div className="diary-task-row"><button type="button" className={`diary-task-check ${task.done ? 'done' : ''}`} onClick={() => toggle(task.id)} disabled={editingId !== null} aria-disabled={editingId !== null} aria-label={`${task.text} ${task.done ? '완료 취소' : '완료'}`}>{task.done && <Check size={22} strokeWidth={3} />}</button>{editingId === task.id ? <input className="diary-task-edit-input" value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') saveEdit(task.id); if (event.key === 'Escape') setEditingId(null) }} autoFocus /> : <strong className={task.done ? 'done' : ''}>{task.text}</strong>}<button type="button" className="diary-task-edit" onClick={() => editingId === task.id ? saveEdit(task.id) : startEdit(task)} disabled={editingId !== null && editingId !== task.id} aria-label={`${task.text} 수정`}>{editingId === task.id ? <Check size={18} /> : <img src={`${DIARY_ASSET_ROOT}/entry-pencil.svg`} alt="" />}</button></div><button type="button" className="diary-task-delete" onClick={() => remove(task.id)} aria-label={`${task.text} 삭제`}><Trash2 size={20} /><span>삭제</span></button></div>)}</section>
     </DiaryShell>
   )
 }
