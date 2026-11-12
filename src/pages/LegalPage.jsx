@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
+import { fetchLegalTopic, fetchLegalTopics, fetchUserData, saveUserData } from '../api.js'
+import { addChecklistItems, mergeChecklists, readChecklist, writeChecklist } from '../checklistStore.js'
 
 const ASSET_ROOT = '/figma/features'
-const TASKS_KEY = 'haven-diary-tasks'
 
 const LEGAL_TOPICS = [
   { id: 'labor', title: '노동권 보호', description: '알바하면서 부당한 대우를 받았을 때 선택하세요', icon: `${ASSET_ROOT}/legal-briefcase.svg`, tone: 'labor' },
@@ -68,15 +69,6 @@ const LEGAL_CONVERSATIONS = {
   }
 }
 
-function readTasks() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(TASKS_KEY) || '[]')
-    return Array.isArray(saved) ? saved : []
-  } catch {
-    return []
-  }
-}
-
 function LegalShell({ title, onQuickExit, backTo, hideBack = false, children }) {
   const { pathname } = useLocation()
   const shellRef = useRef(null)
@@ -94,6 +86,15 @@ function LegalShell({ title, onQuickExit, backTo, hideBack = false, children }) 
 
 export function LegalHomePage({ onQuickExit }) {
   const navigate = useNavigate()
+  const [topics, setTopics] = useState(LEGAL_TOPICS)
+
+  useEffect(() => {
+    let active = true
+    fetchLegalTopics().then((items) => {
+      if (active && items.length) setTopics(items)
+    }).catch(() => {})
+    return () => { active = false }
+  }, [])
 
   return (
     <LegalShell title="법률 상담" onQuickExit={onQuickExit} backTo="/home" hideBack>
@@ -106,7 +107,7 @@ export function LegalHomePage({ onQuickExit }) {
           </span>
         </div>
         <div className="legal-topic-list" aria-label="법률 상담 분야">
-          {LEGAL_TOPICS.map(({ id, title, description, icon, tone }) => (
+          {topics.map(({ id, title, description, icon, tone }) => (
             <button type="button" key={id} onClick={() => navigate('/legal/chat', { state: { topic: id } })}>
               <span className={`legal-topic-icon ${tone}`}><img src={icon} alt="" /></span>
               <span className="legal-topic-copy"><strong>{title}</strong><small>{description}</small></span>
@@ -131,12 +132,21 @@ function UserMessage({ children }) {
 export function LegalChatPage({ onQuickExit }) {
   const navigate = useNavigate()
   const { state } = useLocation()
-  const topic = LEGAL_CONVERSATIONS[state?.topic] || LEGAL_CONVERSATIONS.labor
+  const topicId = state?.topic || 'labor'
+  const [topic, setTopic] = useState(LEGAL_CONVERSATIONS[topicId] || LEGAL_CONVERSATIONS.labor)
   const [messages, setMessages] = useState([{ id: 1, role: 'bot', text: topic.initialMessage }])
   const [stage, setStage] = useState(0)
   const [draft, setDraft] = useState('')
   const [saved, setSaved] = useState(false)
   const endRef = useRef(null)
+
+  useEffect(() => {
+    let active = true
+    fetchLegalTopic(topicId).then((item) => {
+      if (active && item.guide) setTopic(item.guide)
+    }).catch(() => {})
+    return () => { active = false }
+  }, [topicId])
 
   useEffect(() => {
     if (messages.length > 1) endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
@@ -166,10 +176,17 @@ export function LegalChatPage({ onQuickExit }) {
     setStage(2)
   }
 
-  const saveChecklist = () => {
-    const existing = readTasks()
-    const additions = topic.checklist.filter((text) => !existing.some((task) => task.text === text)).map((text, index) => ({ id: `${Date.now()}-${index}`, text, done: false }))
-    localStorage.setItem(TASKS_KEY, JSON.stringify([...existing, ...additions]))
+  const saveChecklist = async () => {
+    const local = readChecklist()
+    let remote = []
+    try {
+      remote = (await fetchUserData('checklist')).data || []
+    } catch {
+      // 네트워크가 없어도 이 기기에서는 즉시 사용할 수 있어요.
+    }
+    const next = addChecklistItems(mergeChecklists(local, remote), topic.checklist, `legal:${topicId}`)
+    writeChecklist(next)
+    saveUserData('checklist', next).catch(() => {})
     setSaved(true)
   }
 

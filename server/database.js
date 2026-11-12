@@ -208,10 +208,20 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
       FOREIGN KEY (guest_jti) REFERENCES guest_sessions(jti) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS guest_data (
+      guest_jti TEXT NOT NULL,
+      scope TEXT NOT NULL,
+      payload TEXT NOT NULL DEFAULT '[]',
+      updated_at TEXT NOT NULL,
+      PRIMARY KEY (guest_jti, scope),
+      FOREIGN KEY (guest_jti) REFERENCES guest_sessions(jti) ON DELETE CASCADE
+    );
+
     CREATE INDEX IF NOT EXISTS idx_notices_category ON notices(category);
     CREATE INDEX IF NOT EXISTS idx_shelters_coordinates ON shelters(lat, lng);
     CREATE INDEX IF NOT EXISTS idx_chat_rooms_guest ON chat_rooms(guest_jti);
     CREATE INDEX IF NOT EXISTS idx_push_audience ON push_subscriptions(audience);
+    CREATE INDEX IF NOT EXISTS idx_guest_data_scope ON guest_data(scope, updated_at);
     CREATE INDEX IF NOT EXISTS idx_sync_runs_target ON sync_runs(target, finished_at);
   `)
 
@@ -334,6 +344,14 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     `),
     subscriptionsByAudience: database.prepare('SELECT * FROM push_subscriptions WHERE audience = ?'),
     deleteSubscription: database.prepare('DELETE FROM push_subscriptions WHERE endpoint = ?'),
+    getGuestData: database.prepare('SELECT payload, updated_at FROM guest_data WHERE guest_jti = ? AND scope = ?'),
+    upsertGuestData: database.prepare(`
+      INSERT INTO guest_data (guest_jti, scope, payload, updated_at)
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT(guest_jti, scope) DO UPDATE SET
+        payload = excluded.payload,
+        updated_at = excluded.updated_at
+    `),
     purgeExpiredGuests: database.prepare('DELETE FROM guest_sessions WHERE expires_at <= ? OR revoked_at IS NOT NULL')
   }
 
@@ -480,6 +498,15 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     },
     deleteSubscription(endpoint) {
       statements.deleteSubscription.run(endpoint)
+    },
+    getGuestData(guestJti, scope) {
+      const row = statements.getGuestData.get(guestJti, scope)
+      return row ? { data: parseJson(row.payload, []), updatedAt: row.updated_at } : null
+    },
+    saveGuestData(guestJti, scope, data) {
+      const updatedAt = new Date().toISOString()
+      statements.upsertGuestData.run(guestJti, scope, JSON.stringify(data), updatedAt)
+      return { data, updatedAt }
     },
     purgeExpired(now = new Date().toISOString()) {
       return statements.purgeExpiredGuests.run(now).changes

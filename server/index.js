@@ -11,6 +11,8 @@ import { createDatabase } from './database.js'
 import { syncNoticeFeeds } from './notice-sync.js'
 import { createPushService } from './push.js'
 import { ensureBaselineData, resolveOpenDataConfig, startSyncScheduler, syncAll } from './sync.js'
+import { filterRightsDocuments, getRightsDocument } from '../shared/rightsCatalog.js'
+import { LEGAL_GUIDES, LEGAL_TOPICS, getLegalGuide } from '../shared/legalGuides.js'
 
 const DEFAULT_PORT = 8787
 const MIME_TYPES = {
@@ -59,7 +61,7 @@ function applyCors(request, response, allowedOrigins) {
   if (!allowAny && !allowedOrigins.includes(origin)) return false
 
   response.setHeader('Access-Control-Allow-Origin', allowAny ? '*' : origin)
-  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS')
+  response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
   response.setHeader('Access-Control-Allow-Headers', 'Authorization,Content-Type,X-Admin-Key')
   response.setHeader('Access-Control-Max-Age', '86400')
   if (!allowAny) response.setHeader('Vary', 'Origin')
@@ -125,17 +127,45 @@ async function serveStaticApp({ request, response, url, staticDir }) {
   return false
 }
 
-async function readJson(request) {
+async function readJson(request, limit = 64_000) {
   let body = ''
   for await (const chunk of request) {
     body += chunk
-    if (body.length > 64_000) throw new Error('payload-too-large')
+    if (body.length > limit) throw new Error('payload-too-large')
   }
   try {
     return body ? JSON.parse(body) : {}
   } catch {
     throw new Error('invalid-json')
   }
+}
+
+const GUEST_DATA_SCOPES = new Set(['diary', 'checklist', 'rights-library'])
+
+function cleanGuestData(scope, value) {
+  if (scope === 'diary') {
+    if (!Array.isArray(value)) throw new Error('invalid-guest-data')
+    return value.slice(-370).map((entry) => ({
+      date: typeof entry?.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(entry.date) ? entry.date : '',
+      visual: typeof entry?.visual === 'string' ? entry.visual.slice(0, 80) : 'mood-sun',
+      text: typeof entry?.text === 'string' ? entry.text.slice(0, 4000) : '',
+      photo: typeof entry?.photo === 'string' && entry.photo.startsWith('data:image/') ? entry.photo.slice(0, 1_500_000) : '',
+      updatedAt: typeof entry?.updatedAt === 'string' ? entry.updatedAt : new Date().toISOString()
+    })).filter((entry) => entry.date)
+  }
+
+  if (scope === 'checklist') {
+    if (!Array.isArray(value)) throw new Error('invalid-guest-data')
+    return value.slice(-200).map((task) => ({
+      id: String(task?.id || randomUUID()).slice(0, 120),
+      text: typeof task?.text === 'string' ? task.text.trim().slice(0, 300) : '',
+      done: Boolean(task?.done),
+      source: typeof task?.source === 'string' ? task.source.slice(0, 80) : 'checklist'
+    })).filter((task) => task.text)
+  }
+
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('invalid-guest-data')
+  return value
 }
 
 function validSubscription(body) {
@@ -309,6 +339,59 @@ export function createApiServer(options = {}) {
         return
       }
 
+      if (request.method === 'GET' && url.pathname === '/api/v1/rights/documents') {
+        const category = url.searchParams.get('category') || '전체'
+        const query = url.searchParams.get('q') || ''
+        const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit')) || 100))
+        const offset = Math.max(0, Number(url.searchParams.get('offset')) || 0)
+        const filtered = filterRightsDocuments({ category, query })
+        sendJson(response, 200, {
+          items: filtered.slice(offset, offset + limit),
+          total: filtered.length,
+          limit,
+          offset,
+          updatedAt: '2026-11-13'
+        })
+        return
+      }
+
+      const rightsDocumentMatch = url.pathname.match(/^\/api\/v1\/rights\/documents\/([a-z0-9-]+)$/)
+      if (request.method === 'GET' && rightsDocumentMatch) {
+        const document = getRightsDocument(rightsDocumentMatch[1])
+        sendJson(response, document ? 200 : 404, document || { error: 'rights-document-not-found' })
+        return
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/v1/legal/topics') {
+        sendJson(response, 200, { items: LEGAL_TOPICS.map((topic) => ({ ...topic, guide: LEGAL_GUIDES[topic.id] })) })
+        return
+      }
+
+      const legalTopicMatch = url.pathname.match(/^\/api\/v1\/legal\/topics\/([a-z0-9-]+)$/)
+      if (request.method === 'GET' && legalTopicMatch) {
+        const topic = LEGAL_TOPICS.find((item) => item.id === legalTopicMatch[1])
+        const guide = getLegalGuide(legalTopicMatch[1])
+        sendJson(response, topic && guide ? 200 : 404, topic && guide ? { ...topic, guide } : { error: 'legal-topic-not-found' })
+        return
+      }
+
+      const guestDataMatch = url.pathname.match(/^\/api\/v1\/user-data\/([a-z-]+)$/)
+      if (guestDataMatch && !GUEST_DATA_SCOPES.has(guestDataMatch[1])) {
+        sendJson(response, 404, { error: 'user-data-scope-not-found' })
+        return
+      }
+      if (request.method === 'GET' && guestDataMatch) {
+        const saved = repository.getGuestData(guest.jti, guestDataMatch[1])
+        sendJson(response, 200, saved || { data: guestDataMatch[1] === 'rights-library' ? {} : [], updatedAt: null })
+        return
+      }
+      if (request.method === 'PUT' && guestDataMatch) {
+        const body = await readJson(request, 2_000_000)
+        const data = cleanGuestData(guestDataMatch[1], body.data)
+        sendJson(response, 200, repository.saveGuestData(guest.jti, guestDataMatch[1], data))
+        return
+      }
+
       if (request.method === 'GET' && url.pathname === '/api/v1/notices') {
         const parsedLimit = Number(url.searchParams.get('limit') || 50)
         const parsedOffset = Number(url.searchParams.get('offset') || 0)
@@ -441,7 +524,9 @@ export function createApiServer(options = {}) {
 
       sendJson(response, 404, { error: 'not-found' })
     } catch (error) {
-      const status = error.message === 'payload-too-large' ? 413 : error.message === 'message-required' || error.message === 'invalid-json' ? 400 : 500
+      const status = error.message === 'payload-too-large'
+        ? 413
+        : ['message-required', 'invalid-json', 'invalid-guest-data'].includes(error.message) ? 400 : 500
       sendJson(response, status, { error: status === 500 ? 'internal-error' : error.message })
     }
   })

@@ -4,12 +4,13 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
 import ChatFab from '../components/ChatFab.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
+import { fetchUserData, saveUserData } from '../api.js'
+import { mergeChecklists, readChecklist, writeChecklist } from '../checklistStore.js'
 
 const ASSET_ROOT = '/figma/features'
 const DIARY_ASSET_ROOT = `${ASSET_ROOT}/diary`
 const DIARY_EMOJI_ROOT = `${DIARY_ASSET_ROOT}/figma-emoji`
 const DIARY_KEY = 'haven-mood-diary'
-const TASKS_KEY = 'haven-diary-tasks'
 
 const CHARACTER_OPTIONS = [
   { id: 'character-0', label: '차분해요', icon: 'character-calm.svg' },
@@ -47,6 +48,16 @@ function toDateKey(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+function mergeDiaryEntries(local, remote) {
+  const merged = new Map()
+  for (const entry of [...(Array.isArray(local) ? local : []), ...(Array.isArray(remote) ? remote : [])]) {
+    if (!entry?.date) continue
+    const previous = merged.get(entry.date)
+    if (!previous || Date.parse(entry.updatedAt || 0) >= Date.parse(previous.updatedAt || 0)) merged.set(entry.date, entry)
+  }
+  return [...merged.values()].sort((a, b) => a.date.localeCompare(b.date))
 }
 
 function readDiaryPhoto(file) {
@@ -150,7 +161,7 @@ function DiaryEntrySheet({ entry, onClose, onEdit }) {
 export function DiaryHomePage({ onQuickExit }) {
   const navigate = useNavigate()
   const [cursor, setCursor] = useState(() => new Date())
-  const [entries] = useState(() => readJson(DIARY_KEY, []))
+  const [entries, setEntries] = useState(() => readJson(DIARY_KEY, []))
   const [selectedEntry, setSelectedEntry] = useState(null)
   const year = cursor.getFullYear()
   const month = cursor.getMonth()
@@ -161,6 +172,17 @@ export function DiaryHomePage({ onQuickExit }) {
   const entryByDate = new Map(monthEntries.map((entry) => [entry.date, entry]))
 
   const changeMonth = (amount) => setCursor(new Date(year, month + amount, 1))
+
+  useEffect(() => {
+    let active = true
+    fetchUserData('diary').then((saved) => {
+      if (!active) return
+      const merged = mergeDiaryEntries(readJson(DIARY_KEY, []), saved.data)
+      localStorage.setItem(DIARY_KEY, JSON.stringify(merged))
+      setEntries(merged)
+    }).catch(() => {})
+    return () => { active = false }
+  }, [])
 
   return (
     <DiaryShell onQuickExit={onQuickExit}>
@@ -200,7 +222,9 @@ export function DiaryEntryPage({ onQuickExit }) {
     const date = queryDate || toDateKey(new Date())
     const entries = readJson(DIARY_KEY, [])
     const entry = { date, visual, text: text.trim(), photo: preview, updatedAt: new Date().toISOString() }
-    localStorage.setItem(DIARY_KEY, JSON.stringify([...entries.filter((item) => item.date !== date), entry]))
+    const nextEntries = [...entries.filter((item) => item.date !== date), entry]
+    localStorage.setItem(DIARY_KEY, JSON.stringify(nextEntries))
+    saveUserData('diary', nextEntries).catch(() => {})
     navigate('/diary')
   }
 
@@ -222,12 +246,28 @@ export function DiaryEntryPage({ onQuickExit }) {
 }
 
 export function DiaryChecklistPage({ onQuickExit }) {
-  const [tasks, setTasks] = useState(() => readJson(TASKS_KEY, []))
+  const [tasks, setTasks] = useState(() => readChecklist())
   const [newTask, setNewTask] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [draft, setDraft] = useState('')
+  const remoteReadyRef = useRef(false)
 
-  useEffect(() => { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)) }, [tasks])
+  useEffect(() => {
+    let active = true
+    fetchUserData('checklist').then((saved) => {
+      if (!active) return
+      const merged = mergeChecklists(readChecklist(), saved.data)
+      writeChecklist(merged)
+      setTasks(merged)
+      remoteReadyRef.current = true
+    }).catch(() => { remoteReadyRef.current = true })
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
+    writeChecklist(tasks)
+    if (remoteReadyRef.current) saveUserData('checklist', tasks).catch(() => {})
+  }, [tasks])
 
   const toggle = (id) => {
     if (editingId !== null) return
