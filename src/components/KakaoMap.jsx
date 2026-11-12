@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DEFAULT_CENTER } from '../constants.js'
+import { buildKakaoMapSdkUrl } from '../kakaoSdk.js'
 import { MARKER_LEGEND, markerDescription, markerStyleFor } from '../shelterMarkers.js'
 
 const KAKAO_MAP_APP_KEY = import.meta.env.VITE_KAKAO_MAP_APP_KEY
@@ -39,7 +40,7 @@ function loadKakaoMaps() {
     if (!existingScript) {
       script.dataset.havenKakaoMap = 'true'
       script.async = true
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(KAKAO_MAP_APP_KEY)}&autoload=false`
+      script.src = buildKakaoMapSdkUrl(KAKAO_MAP_APP_KEY)
       document.head.appendChild(script)
     }
 
