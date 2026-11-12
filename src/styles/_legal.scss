@@ -62,18 +62,19 @@
 .legal-chat-main::-webkit-scrollbar { display: none; }
 .legal-chat-log { min-height: 0; padding: 18px 0 10px; flex: 1 0 auto; }
 .legal-message-row { margin: 0 0 16px; display: flex; align-items: flex-start; gap: 8px; }
-.legal-message-row.bot img { width: 42px; height: 42px; flex: 0 0 auto; border: 1px solid #eccb9e; border-radius: 50%; background: #fff; object-fit: cover; }
+.legal-message-row.bot img { width: 42px; height: 42px; flex: 0 0 auto; border: 0; background: transparent; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(104,61,38,.14)); }
 .legal-bubble { max-width: calc(100% - 48px); padding: 12px 14px; border: 1px solid #f0d8b8; border-radius: 8px 20px 20px 20px; background: #fff; color: #4a3428; font-size: 12px; line-height: 1.55; }
 .legal-bubble p { margin: 0; }
 .legal-bubble ol { margin: 9px 0 0; padding-left: 20px; }
 .legal-message-row.user { justify-content: flex-end; }
 .legal-message-row.user .legal-bubble { max-width: 78%; border: 0; border-radius: 20px 8px 20px 20px; background: #ffa32b; color: #fff; font-weight: 800; }
-.legal-choices { margin: -4px 0 18px 50px; display: flex; flex-wrap: wrap; gap: 7px; }
+.legal-quick-row { margin: -4px 0 18px 50px; display: flex; align-items: flex-start; gap: 8px; }
+.legal-choices { min-width: 0; display: flex; flex: 1 1 auto; flex-wrap: wrap; gap: 7px; }
 .legal-choices button { padding: 9px 12px; border: 1px solid #edc894; border-radius: 18px; background: #fffaf3; color: #6f503c; font-size: 11px; font-weight: 800; cursor: pointer; }
 .legal-choices button:hover { background: #fff0d9; }
-.legal-actions { margin: -4px 0 20px 50px; display: flex; flex-wrap: wrap; gap: 8px; }
+.legal-actions { min-width: 0; display: flex; flex: 1 1 auto; flex-wrap: wrap; gap: 8px; }
 .legal-actions a, .legal-actions button { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e8c38e; border-radius: 18px; background: #fff; color: #9f5d2e; font-size: 11px; font-weight: 900; cursor: pointer; }
-.legal-restart { width: 100%; min-height: 44px; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid #e8c38e; border-radius: 18px; background: #fffaf3; color: #8f5a35; font-size: 12px; font-weight: 900; cursor: pointer; }
+.legal-restart { width: 40px; height: 40px; padding: 0; display: grid; flex: 0 0 40px; place-items: center; border: 1px solid #e8c38e; border-radius: 50%; background: #fffaf3; color: #8f5a35; cursor: pointer; }
 .legal-disclaimer { margin: 8px 4px 0; color: #9c887a; font-size: 9px; line-height: 1.4; text-align: center; }
 .legal-chat-composer { flex: 0 0 auto; }
 
@@ -82,7 +83,7 @@
   .legal-chat-main { padding-left: 14px; padding-right: 14px; }
   .legal-shell .feature-header { padding-left: 14px; padding-right: 14px; }
   .legal-shell .feature-exit { width: auto; }
-  .legal-choices, .legal-actions { margin-left: 34px; }
+  .legal-quick-row { margin-left: 34px; }
   .legal-message-row.bot img { width: 36px; height: 36px; }
   .legal-picker { padding-left: 2px; padding-right: 2px; }
   .legal-picker-heading { gap: 11px; }
