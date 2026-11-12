@@ -1,39 +1,19 @@
 import { Check, ChevronLeft, ChevronRight, ExternalLink, FolderOpen, FolderPlus, Plus, Search, Trash2, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { recommendRightsCollection } from '../api.js'
+import { fetchRightsDocuments, fetchUserData, recommendRightsCollection, saveUserData } from '../api.js'
 import FeatureHeader from '../components/FeatureHeader.jsx'
 import BottomNav from '../components/BottomNav.jsx'
 import ChatFab from '../components/ChatFab.jsx'
+import { RIGHTS_DOCUMENTS, RIGHTS_DOCUMENT_DETAILS } from '../../shared/rightsCatalog.js'
 
 const ASSET_ROOT = '/figma/features'
 const SAVED_DOCUMENTS_KEY = 'haven-rights-saved-documents'
 const COLLECTIONS_KEY = 'haven-rights-collections'
 const CATEGORIES = ['전체', '지원', '주거', '생활', '일자리']
 
-const BOOKS = [
-  { id: 'resident', title: '주민등록등본·초본', shortTitle: '주민등록\n등본·초본', category: '생활', tone: 'resident', icon: 'rights-book-resident.svg' },
-  { id: 'family', title: '가족관계증명서', shortTitle: '가족관계\n증명서', category: '생활', tone: 'family', icon: 'rights-book-family.svg' },
-  { id: 'basic', title: '기본증명서', shortTitle: '기본증명서', category: '생활', tone: 'basic', icon: 'rights-book-basic.svg' },
-  { id: 'health', title: '건강보험 자격득실확인서', shortTitle: '건강보험\n자격득실\n확인서', category: '지원', tone: 'health', icon: 'rights-book-health.svg' },
-  { id: 'income', title: '소득금액증명원', shortTitle: '소득금액\n증명원', category: '지원', tone: 'income', icon: 'rights-book-income.svg' },
-  { id: 'protection', title: '보호종료확인서', shortTitle: '보호종료\n확인서', category: '주거', tone: 'protection', icon: 'rights-book-coverage.svg' },
-  { id: 'bank', title: '통장 사본', shortTitle: '통장 사본', category: '지원', tone: 'basic', icon: 'rights-book-basic.svg' },
-  { id: 'lease', title: '임대차계약서', shortTitle: '임대차\n계약서', category: '주거', tone: 'resident', icon: 'rights-book-resident.svg' },
-  { id: 'enrollment', title: '재학증명서', shortTitle: '재학\n증명서', category: '생활', tone: 'family', icon: 'rights-book-family.svg' },
-  { id: 'graduation', title: '졸업증명서', shortTitle: '졸업\n증명서', category: '생활', tone: 'health', icon: 'rights-book-health.svg' },
-  { id: 'employment', title: '근로계약서', shortTitle: '근로\n계약서', category: '일자리', tone: 'income', icon: 'rights-book-income.svg' },
-  { id: 'career', title: '경력증명서', shortTitle: '경력\n증명서', category: '일자리', tone: 'protection', icon: 'rights-book-coverage.svg' }
-]
-
-const DOCUMENT_DETAILS = {
-  resident: { eyebrow: '생활 · 필수 서류', title: '주민등록등본·초본', summary: '내가 사는 곳과 누구와 살고 있는지 알려줘요. 초본은 내 주소가 바뀐 기록 등을 보여줘요.', uses: ['청년 월세 지원', '집 계약', '지원금 신청'] },
-  family: { eyebrow: '생활 · 관계 확인', title: '가족관계증명서', summary: '본인과 가족의 관계를 확인할 때 쓰는 서류예요. 제출처가 일반·상세 중 무엇을 요구하는지 먼저 확인해요.', uses: ['복지 지원', '학교 제출', '가족 관계 확인'] },
-  basic: { eyebrow: '생활 · 신분 확인', title: '기본증명서', summary: '출생과 국적 등 본인의 기본 정보를 확인하는 서류예요. 필요한 정보 범위를 제출처에 먼저 물어봐요.', uses: ['자립 지원', '계약 준비', '신분 정보 확인'] },
-  health: { eyebrow: '지원 · 가입 이력', title: '건강보험 자격득실확인서', summary: '건강보험 자격을 얻고 잃은 기록을 보여줘요. 취업이나 지원 사업에서 가입 이력을 확인할 때 사용해요.', uses: ['취업 서류', '주거 지원', '가입 이력 확인'] },
-  income: { eyebrow: '지원 · 소득 확인', title: '소득금액증명원', summary: '신고된 소득 금액을 확인하는 서류예요. 공고에서 요구하는 귀속 연도와 발급 기준을 확인해요.', uses: ['주거 지원', '장학금', '소득 심사'] },
-  protection: { eyebrow: '지원 · 자립 준비', title: '보호종료확인서', summary: '보호 종료 사실을 확인하는 서류예요. 발급 기관과 제출처가 요구하는 형식을 미리 확인해요.', uses: ['자립 수당', '주거 지원', '취업 지원'] }
-}
+const BOOKS = RIGHTS_DOCUMENTS
+const DOCUMENT_DETAILS = RIGHTS_DOCUMENT_DETAILS
 
 const PREP_METADATA = {
   resident: { detail: '주소 · 세대 정보', meta: '2026.11.01', rule: '제출처 기준 확인' },
@@ -64,6 +44,52 @@ function readCollections() {
     documentIds: Array.isArray(collection.documentIds) ? collection.documentIds : [],
     checkedDocumentIds: Array.isArray(collection.checkedDocumentIds) ? collection.checkedDocumentIds : []
   }))
+}
+
+function useRightsCatalog() {
+  const [books, setBooks] = useState(BOOKS)
+  useEffect(() => {
+    let active = true
+    fetchRightsDocuments().then((items) => {
+      if (active && items.length) setBooks(items)
+    }).catch(() => {})
+    return () => { active = false }
+  }, [])
+  return books
+}
+
+function useRightsLibrary() {
+  const [savedDocumentIds, setSavedDocumentIds] = useState(readSavedDocumentIds)
+  const [collections, setCollections] = useState(readCollections)
+  const hydratedRef = useRef(false)
+
+  useEffect(() => {
+    let active = true
+    fetchUserData('rights-library').then((saved) => {
+      if (!active) return
+      const remote = saved.data && typeof saved.data === 'object' ? saved.data : {}
+      if (saved.updatedAt) {
+        if (Array.isArray(remote.savedDocumentIds)) setSavedDocumentIds(remote.savedDocumentIds)
+        if (Array.isArray(remote.collections)) {
+          setCollections(remote.collections.map((collection) => ({
+            ...collection,
+            documentIds: Array.isArray(collection.documentIds) ? collection.documentIds : [],
+            checkedDocumentIds: Array.isArray(collection.checkedDocumentIds) ? collection.checkedDocumentIds : []
+          })))
+        }
+      }
+      hydratedRef.current = true
+    }).catch(() => { hydratedRef.current = true })
+    return () => { active = false }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem(SAVED_DOCUMENTS_KEY, JSON.stringify(savedDocumentIds))
+    localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections))
+    if (hydratedRef.current) saveUserData('rights-library', { savedDocumentIds, collections }).catch(() => {})
+  }, [collections, savedDocumentIds])
+
+  return { savedDocumentIds, setSavedDocumentIds, collections, setCollections }
 }
 
 function fallbackCollectionSuggestion(title) {
@@ -174,15 +200,15 @@ function DialogShell({ title, onClose, children }) {
   return <div className="rights-sheet-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><section className="rights-sheet" role="dialog" aria-modal="true" aria-label={title}><div className="rights-sheet-handle" /><header><strong>{title}</strong><button type="button" onClick={onClose} aria-label="닫기"><X size={20} /></button></header>{children}</section></div>
 }
 
-function DocumentPicker({ title = '서류 추가하기', selectedIds, onClose, onSave }) {
+function DocumentPicker({ books = BOOKS, title = '서류 추가하기', selectedIds, onClose, onSave }) {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState(selectedIds)
-  const visibleBooks = BOOKS.filter((book) => !query.trim() || book.title.includes(query.trim()))
+  const visibleBooks = books.filter((book) => !query.trim() || book.title.includes(query.trim()))
   const toggle = (id) => setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
   return <DialogShell title={title} onClose={onClose}><label className="rights-sheet-search"><Search size={18} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="서류 이름을 검색해보세요" /></label><div className="rights-document-picker">{visibleBooks.map((book) => { const active = selected.includes(book.id); return <button key={book.id} type="button" className={active ? 'active' : ''} onClick={() => toggle(book.id)}><span className={`rights-mini-book rights-book-${book.tone}`}><img src={`${ASSET_ROOT}/${book.icon}`} alt="" /></span><span><strong>{book.title}</strong><small>{book.category} 서류</small></span><span className="rights-picker-check">{active && <Check size={14} />}</span></button> })}</div><button type="button" className="rights-sheet-primary" onClick={() => onSave(selected)}>선택한 서류 저장하기</button></DialogShell>
 }
 
-function CreateCollectionDialog({ onClose, onCreate }) {
+function CreateCollectionDialog({ books = BOOKS, onClose, onCreate }) {
   const [title, setTitle] = useState('')
   const [suggestion, setSuggestion] = useState(null)
   const [selected, setSelected] = useState([])
@@ -193,7 +219,7 @@ function CreateCollectionDialog({ onClose, onCreate }) {
     setLoading(true)
     try {
       const response = await recommendRightsCollection(cleanTitle)
-      const validIds = response.documentIds?.filter((id) => BOOKS.some((book) => book.id === id)) || []
+      const validIds = response.documentIds?.filter((id) => books.some((book) => book.id === id)) || []
       const next = validIds.length ? { category: response.category, documentIds: validIds } : fallbackCollectionSuggestion(cleanTitle)
       setSuggestion(next); setSelected(next.documentIds)
     } catch {
@@ -203,11 +229,11 @@ function CreateCollectionDialog({ onClose, onCreate }) {
   }
   const toggle = (id) => setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id])
   const create = () => onCreate({ id: `collection-${Date.now()}`, title: title.trim(), category: suggestion?.category || fallbackCollectionSuggestion(title).category, documentIds: selected, checkedDocumentIds: [] })
-  return <DialogShell title="새 준비 책 만들기" onClose={onClose}><p className="rights-sheet-intro">준비할 일의 이름을 적으면 필요한 서류를 먼저 골라드려요. 나중에 서류를 더 넣거나 뺄 수 있어요.</p><label className="rights-collection-name"><span>책 이름</span><input value={title} onChange={(event) => { setTitle(event.target.value); setSuggestion(null) }} placeholder="예: 청년 월세 지원" maxLength={30} /></label>{!suggestion && <button type="button" className="rights-ai-suggest" disabled={!title.trim() || loading} onClick={suggest}>{loading ? '필요한 서류를 찾는 중…' : 'AI로 준비 목록 만들기'}</button>}{suggestion && <><div className="rights-suggestion-heading"><span>{suggestion.category}</span><strong>이 서류부터 준비해볼까요?</strong></div><div className="rights-suggestion-list">{suggestion.documentIds.map((id) => { const book = BOOKS.find((item) => item.id === id); if (!book) return null; const active = selected.includes(id); return <button type="button" key={id} className={active ? 'active' : ''} onClick={() => toggle(id)}><span>{active && <Check size={13} />}</span>{book.title}</button> })}</div><button type="button" className="rights-sheet-primary" disabled={!selected.length} onClick={create}>이 준비 책 만들기</button></>}</DialogShell>
+  return <DialogShell title="새 준비 책 만들기" onClose={onClose}><p className="rights-sheet-intro">준비할 일의 이름을 적으면 필요한 서류를 먼저 골라드려요. 나중에 서류를 더 넣거나 뺄 수 있어요.</p><label className="rights-collection-name"><span>책 이름</span><input value={title} onChange={(event) => { setTitle(event.target.value); setSuggestion(null) }} placeholder="예: 청년 월세 지원" maxLength={30} /></label>{!suggestion && <button type="button" className="rights-ai-suggest" disabled={!title.trim() || loading} onClick={suggest}>{loading ? '필요한 서류를 찾는 중…' : 'AI로 준비 목록 만들기'}</button>}{suggestion && <><div className="rights-suggestion-heading"><span>{suggestion.category}</span><strong>이 서류부터 준비해볼까요?</strong></div><div className="rights-suggestion-list">{suggestion.documentIds.map((id) => { const book = books.find((item) => item.id === id); if (!book) return null; const active = selected.includes(id); return <button type="button" key={id} className={active ? 'active' : ''} onClick={() => toggle(id)}><span>{active && <Check size={13} />}</span>{book.title}</button> })}</div><button type="button" className="rights-sheet-primary" disabled={!selected.length} onClick={create}>이 준비 책 만들기</button></>}</DialogShell>
 }
 
-function PreparationChecklist({ collection, onViewDocument, onToggle, onAddDocuments }) {
-  const books = collection.documentIds.map((id) => BOOKS.find((book) => book.id === id)).filter(Boolean)
+function PreparationChecklist({ catalog = BOOKS, collection, onViewDocument, onToggle, onAddDocuments }) {
+  const books = collection.documentIds.map((id) => catalog.find((book) => book.id === id)).filter(Boolean)
   const done = collection.checkedDocumentIds.filter((id) => collection.documentIds.includes(id)).length
   const progress = books.length ? Math.round((done / books.length) * 100) : 0
   return (
@@ -238,10 +264,11 @@ function PreparationChecklist({ collection, onViewDocument, onToggle, onAddDocum
 
 export function RightsHomePage({ onQuickExit }) {
   const navigate = useNavigate()
+  const books = useRightsCatalog()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('전체')
   const [page, setPage] = useState(1)
-  const filteredBooks = useMemo(() => BOOKS.filter((book) => (!query.trim() || book.title.includes(query.trim())) && (category === '전체' || book.category === category)), [category, query])
+  const filteredBooks = useMemo(() => books.filter((book) => (!query.trim() || book.title.includes(query.trim())) && (category === '전체' || book.category === category)), [books, category, query])
   const totalPages = Math.max(1, Math.ceil(filteredBooks.length / 4))
   const visibleBooks = filteredBooks.slice((page - 1) * 4, page * 4)
   const changeCategory = (nextCategory) => { setCategory(nextCategory); setPage(1) }
@@ -250,16 +277,14 @@ export function RightsHomePage({ onQuickExit }) {
 
 export function RightsCatalogPage({ onQuickExit }) {
   const navigate = useNavigate()
+  const books = useRightsCatalog()
+  const { savedDocumentIds, setSavedDocumentIds, collections, setCollections } = useRightsLibrary()
   const [view, setView] = useState('collections')
   const [category, setCategory] = useState('전체')
   const [page, setPage] = useState(1)
-  const [savedDocumentIds, setSavedDocumentIds] = useState(readSavedDocumentIds)
-  const [collections, setCollections] = useState(readCollections)
   const [dialog, setDialog] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
-  useEffect(() => localStorage.setItem(SAVED_DOCUMENTS_KEY, JSON.stringify(savedDocumentIds)), [savedDocumentIds])
-  useEffect(() => localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections)), [collections])
-  const items = view === 'collections' ? collections : BOOKS.filter((book) => savedDocumentIds.includes(book.id) && (category === '전체' || book.category === category))
+  const items = view === 'collections' ? collections : books.filter((book) => savedDocumentIds.includes(book.id) && (category === '전체' || book.category === category))
   const totalPages = Math.max(1, Math.ceil(items.length / 6))
   const safePage = Math.min(page, totalPages)
   const visibleItems = items.slice((safePage - 1) * 6, safePage * 6)
@@ -272,36 +297,38 @@ export function RightsCatalogPage({ onQuickExit }) {
     else setSavedDocumentIds((current) => current.filter((id) => id !== deleteTarget.id))
     setDeleteTarget(null)
   }
-  return <RightsShell title="내 서류함" onQuickExit={onQuickExit} backTo="/rights" showBack pageClass="rights-shelf-page"><div className="rights-library-switch" role="tablist" aria-label="내 서류함 보기"><button type="button" className={view === 'collections' ? 'active' : ''} onClick={() => changeView('collections')}>준비 책장</button><button type="button" className={view === 'documents' ? 'active' : ''} onClick={() => changeView('documents')}>보관 서류</button></div>{view === 'collections' ? <div className="rights-collection-toolbar"><span>책을 길게 누르면 삭제할 수 있어요.</span><button type="button" onClick={() => setDialog('collection')}><Plus size={17} /> 새 준비 책</button></div> : <FilterRow value={category} onChange={changeCategory} />}<section className="rights-bookshelf" aria-label={view === 'collections' ? '준비 책장' : '보관 서류 책장'}><img className="rights-bookshelf-bg" src={`${ASSET_ROOT}/rights-bookshelf.png`} alt="" /><div className="rights-shelf-grid">{view === 'collections' ? visibleItems.map((collection) => <CollectionBookCard key={collection.id} collection={collection} selectedForDelete={deleteTarget?.type === 'collection' && deleteTarget.id === collection.id} onLongPress={() => setDeleteTarget({ type: 'collection', id: collection.id, title: collection.title })} onCancelDelete={() => setDeleteTarget(null)} onConfirmDelete={deleteSelectedBook} onClick={() => { if (!deleteTarget) navigate(`/rights/documents?collection=${encodeURIComponent(collection.id)}`) }} />) : visibleItems.map((book) => <BookCard key={book.id} book={book} selectedForDelete={deleteTarget?.type === 'document' && deleteTarget.id === book.id} onLongPress={() => setDeleteTarget({ type: 'document', id: book.id, title: book.title })} onCancelDelete={() => setDeleteTarget(null)} onConfirmDelete={deleteSelectedBook} onClick={() => { if (!deleteTarget) navigate(`/rights/document/${book.id}`) }} />)}</div>{!visibleItems.length && <p className="rights-no-results">{view === 'collections' ? '아직 만든 준비 책이 없어요.' : '아직 보관한 서류가 없어요.'}</p>}</section><PageControls page={safePage} totalPages={totalPages} onChange={setPage} /><GovernmentBanner />{dialog === 'collection' && <CreateCollectionDialog onClose={() => setDialog(null)} onCreate={createCollection} />}</RightsShell>
+  return <RightsShell title="내 서류함" onQuickExit={onQuickExit} backTo="/rights" showBack pageClass="rights-shelf-page"><div className="rights-library-switch" role="tablist" aria-label="내 서류함 보기"><button type="button" className={view === 'collections' ? 'active' : ''} onClick={() => changeView('collections')}>준비 책장</button><button type="button" className={view === 'documents' ? 'active' : ''} onClick={() => changeView('documents')}>보관 서류</button></div>{view === 'collections' ? <div className="rights-collection-toolbar"><span>책을 길게 누르면 삭제할 수 있어요.</span><button type="button" onClick={() => setDialog('collection')}><Plus size={17} /> 새 준비 책</button></div> : <FilterRow value={category} onChange={changeCategory} />}<section className="rights-bookshelf" aria-label={view === 'collections' ? '준비 책장' : '보관 서류 책장'}><img className="rights-bookshelf-bg" src={`${ASSET_ROOT}/rights-bookshelf.png`} alt="" /><div className="rights-shelf-grid">{view === 'collections' ? visibleItems.map((collection) => <CollectionBookCard key={collection.id} collection={collection} selectedForDelete={deleteTarget?.type === 'collection' && deleteTarget.id === collection.id} onLongPress={() => setDeleteTarget({ type: 'collection', id: collection.id, title: collection.title })} onCancelDelete={() => setDeleteTarget(null)} onConfirmDelete={deleteSelectedBook} onClick={() => { if (!deleteTarget) navigate(`/rights/documents?collection=${encodeURIComponent(collection.id)}`) }} />) : visibleItems.map((book) => <BookCard key={book.id} book={book} selectedForDelete={deleteTarget?.type === 'document' && deleteTarget.id === book.id} onLongPress={() => setDeleteTarget({ type: 'document', id: book.id, title: book.title })} onCancelDelete={() => setDeleteTarget(null)} onConfirmDelete={deleteSelectedBook} onClick={() => { if (!deleteTarget) navigate(`/rights/document/${book.id}`) }} />)}</div>{!visibleItems.length && <p className="rights-no-results">{view === 'collections' ? '아직 만든 준비 책이 없어요.' : '아직 보관한 서류가 없어요.'}</p>}</section><PageControls page={safePage} totalPages={totalPages} onChange={setPage} /><GovernmentBanner />{dialog === 'collection' && <CreateCollectionDialog books={books} onClose={() => setDialog(null)} onCreate={createCollection} />}</RightsShell>
 }
 
 export function RightsDocumentsPage({ onQuickExit }) {
   const navigate = useNavigate()
+  const books = useRightsCatalog()
+  const { setSavedDocumentIds, collections, setCollections } = useRightsLibrary()
   const { search } = useLocation()
   const requestedId = new URLSearchParams(search).get('collection')
-  const [collections, setCollections] = useState(readCollections)
   const [selectedId, setSelectedId] = useState(requestedId || collections[0]?.id)
   const [pickerOpen, setPickerOpen] = useState(false)
   const selected = collections.find((collection) => collection.id === selectedId) || collections[0]
-  useEffect(() => localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(collections)), [collections])
   const updateSelected = (update) => setCollections((current) => current.map((collection) => collection.id === selected.id ? update(collection) : collection))
   const toggleDocument = (id) => updateSelected((collection) => ({ ...collection, checkedDocumentIds: collection.checkedDocumentIds.includes(id) ? collection.checkedDocumentIds.filter((item) => item !== id) : [...collection.checkedDocumentIds, id] }))
-  const saveDocuments = (ids) => { updateSelected((collection) => ({ ...collection, documentIds: ids, checkedDocumentIds: collection.checkedDocumentIds.filter((id) => ids.includes(id)) })); localStorage.setItem(SAVED_DOCUMENTS_KEY, JSON.stringify([...new Set([...readSavedDocumentIds(), ...ids])])); setPickerOpen(false) }
+  const saveDocuments = (ids) => { updateSelected((collection) => ({ ...collection, documentIds: ids, checkedDocumentIds: collection.checkedDocumentIds.filter((id) => ids.includes(id)) })); setSavedDocumentIds((current) => [...new Set([...current, ...ids])]); setPickerOpen(false) }
   if (!selected) return <RightsShell title="내 서류함" onQuickExit={onQuickExit} backTo="/rights/catalog" showBack pageClass="rights-documents-page"><div className="rights-collection-empty"><FolderPlus size={42} /><h1>먼저 준비 책을 만들어주세요</h1><p>목적에 맞는 서류를 한곳에 모아 체크할 수 있어요.</p><button type="button" onClick={() => navigate('/rights/catalog')}>준비 책장으로 돌아가기</button></div></RightsShell>
-  return <RightsShell title="내 서류함" onQuickExit={onQuickExit} backTo="/rights/catalog" showBack pageClass="rights-documents-page"><GovernmentBanner /><div className="rights-prep-tabs" aria-label="준비 책 선택">{collections.map((collection) => <button type="button" key={collection.id} className={selected.id === collection.id ? 'active' : ''} onClick={() => setSelectedId(collection.id)}>{collection.title}</button>)}</div><aside className="rights-privacy-note"><span aria-hidden="true" /><div><strong>서류 원본 대신, 준비 상태만 체크해요</strong><small>체크 내용은 이 기기에만 저장해요. 주민번호나 계좌번호는 입력하지 마세요.</small></div></aside><PreparationChecklist collection={selected} onViewDocument={(bookId) => navigate(`/rights/document/${bookId}`)} onToggle={toggleDocument} onAddDocuments={() => setPickerOpen(true)} />{pickerOpen && <DocumentPicker title={`${selected.title}에 서류 추가`} selectedIds={selected.documentIds} onClose={() => setPickerOpen(false)} onSave={saveDocuments} />}</RightsShell>
+  return <RightsShell title="내 서류함" onQuickExit={onQuickExit} backTo="/rights/catalog" showBack pageClass="rights-documents-page"><GovernmentBanner /><div className="rights-prep-tabs" aria-label="준비 책 선택">{collections.map((collection) => <button type="button" key={collection.id} className={selected.id === collection.id ? 'active' : ''} onClick={() => setSelectedId(collection.id)}>{collection.title}</button>)}</div><aside className="rights-privacy-note"><span aria-hidden="true" /><div><strong>서류 원본 대신, 준비 상태만 체크해요</strong><small>체크 내용은 익명 세션에 임시 저장돼요. 주민번호나 계좌번호는 입력하지 마세요.</small></div></aside><PreparationChecklist catalog={books} collection={selected} onViewDocument={(bookId) => navigate(`/rights/document/${bookId}`)} onToggle={toggleDocument} onAddDocuments={() => setPickerOpen(true)} />{pickerOpen && <DocumentPicker books={books} title={`${selected.title}에 서류 추가`} selectedIds={selected.documentIds} onClose={() => setPickerOpen(false)} onSave={saveDocuments} />}</RightsShell>
 }
 
 export function RightsDetailPage({ onQuickExit }) {
   const navigate = useNavigate()
+  const books = useRightsCatalog()
+  const { savedDocumentIds, setSavedDocumentIds } = useRightsLibrary()
   const { documentId = 'resident' } = useParams()
-  const book = BOOKS.find((item) => item.id === documentId) || BOOKS[0]
-  const detail = DOCUMENT_DETAILS[documentId] || { eyebrow: `${book.category} · 필요한 서류`, title: book.title, summary: `${book.title}을 준비할 때 필요한 발급 방법과 확인할 내용을 한눈에 살펴봐요.`, uses: [`${book.category} 지원`, '신청 서류', '자격 확인'] }
-  const bookIndex = BOOKS.findIndex((item) => item.id === book.id)
-  const previousBook = BOOKS[(bookIndex - 1 + BOOKS.length) % BOOKS.length]
-  const nextBook = BOOKS[(bookIndex + 1) % BOOKS.length]
-  const [savedDocumentIds, setSavedDocumentIds] = useState(readSavedDocumentIds)
+  const book = books.find((item) => item.id === documentId) || books[0]
+  const detail = book?.detail || DOCUMENT_DETAILS[documentId] || { eyebrow: `${book.category} · 필요한 서류`, title: book.title, summary: `${book.title}을 준비할 때 필요한 발급 방법과 확인할 내용을 한눈에 살펴봐요.`, uses: [`${book.category} 지원`, '신청 서류', '자격 확인'], issuance: {}, checklist: [] }
+  const bookIndex = books.findIndex((item) => item.id === book.id)
+  const previousBook = books[(bookIndex - 1 + books.length) % books.length]
+  const nextBook = books[(bookIndex + 1) % books.length]
   const saved = savedDocumentIds.includes(documentId)
-  useEffect(() => localStorage.setItem(SAVED_DOCUMENTS_KEY, JSON.stringify(savedDocumentIds)), [savedDocumentIds])
   const toggleSaved = () => setSavedDocumentIds((current) => current.includes(documentId) ? current.filter((id) => id !== documentId) : [...current, documentId])
-  return <RightsShell onQuickExit={onQuickExit} backTo="/rights" pageClass="rights-detail-page"><article className="rights-detail-card"><small>{detail.eyebrow}</small><h1>{detail.title}</h1><p className="rights-detail-summary">{detail.summary}</p><section><h2>어디서 떼요?</h2><dl><div><dt>온라인</dt><dd><a href="https://www.gov.kr/portal/main/nologin" target="_blank" rel="noreferrer">정부24 <ExternalLink size={12} /></a><small>참고 예시 · 무료·즉시 / 공동·간편 인증</small></dd></div><div><dt>방문</dt><dd>가까운 주민센터<small>참고 예시 · 신분증 준비</small></dd></div><div><dt>무인발급기</dt><dd>설치 장소 확인<small>참고 예시 · 지문 인식</small></dd></div></dl></section><section><h2>누가 뗄 수 있나요?</h2><p>본인 발급이 기본이에요. 대리 발급은 관계와 신청 방법에 따라 달라요.</p><small>대리인 신분증·위임장 등 필요한 서류를 주민센터에 먼저 확인해 주세요.</small></section><section><h2>이럴 때 필요해요</h2><div className="rights-use-chips">{detail.uses.map((use) => <span key={use}>{use}</span>)}</div></section><section><h2>떼기 전에 꼭 확인해요</h2><ul><li>발급 후 1~3개월 이내 서류를 요구하기도 해요.</li><li>표시 항목은 제출처가 요구한 범위만 선택해요.</li><li>필요한 서류 종류와 유효기간을 먼저 확인해요.</li></ul></section><footer>출처 · 정부24 공식 발급 안내<br />확인 날짜 · 발급 전 최신 공식 안내 확인</footer></article><div className="rights-detail-pagination"><button type="button" onClick={() => navigate(`/rights/document/${previousBook.id}`)}>‹ 이전 장</button><span><b />•••••••</span><button type="button" onClick={() => navigate(`/rights/document/${nextBook.id}`)}>다음 장 ›</button></div><button type="button" className={`rights-prepared ${saved ? 'active' : ''}`} onClick={toggleSaved}>{saved ? <FolderOpen size={19} /> : <FolderPlus size={19} />}<strong>{saved ? '보관 중 · 내 서류함에서 빼기' : '내 서류함에 넣기'}</strong></button><a className="rights-primary-cta" href="https://www.gov.kr/portal/main/nologin" target="_blank" rel="noreferrer">정부24에서 발급 정보 확인하기 <ExternalLink size={16} /></a></RightsShell>
+  const issuance = detail.issuance || {}
+  const primarySource = issuance.online?.url || detail.sourceUrl
+  return <RightsShell onQuickExit={onQuickExit} backTo="/rights" pageClass="rights-detail-page"><article className="rights-detail-card"><small>{detail.eyebrow}</small><h1>{detail.title}</h1><p className="rights-detail-summary">{detail.summary}</p><section><h2>어디서 떼요?</h2><dl>{issuance.online && <div><dt>온라인</dt><dd><a href={issuance.online.url} target="_blank" rel="noreferrer">{issuance.online.label} <ExternalLink size={12} /></a><small>{issuance.online.note}</small></dd></div>}{issuance.visit && <div><dt>방문</dt><dd>{issuance.visit.label}<small>{issuance.visit.note}</small></dd></div>}{issuance.kiosk && <div><dt>무인발급기</dt><dd>{issuance.kiosk.label}<small>{issuance.kiosk.note}</small></dd></div>}</dl></section><section><h2>누가 뗄 수 있나요?</h2><p>{detail.eligibility}</p><small>{detail.proxyNote}</small></section><section><h2>이럴 때 필요해요</h2><div className="rights-use-chips">{detail.uses.map((use) => <span key={use}>{use}</span>)}</div></section><section><h2>떼기 전에 꼭 확인해요</h2><ul>{detail.checklist.map((item) => <li key={item}>{item}</li>)}</ul></section><footer>출처 · {detail.sourceLabel}<br />확인 날짜 · {detail.verifiedAt}</footer></article><div className="rights-detail-pagination"><button type="button" onClick={() => navigate(`/rights/document/${previousBook.id}`)}>‹ 이전 장</button><span><b />•••••••</span><button type="button" onClick={() => navigate(`/rights/document/${nextBook.id}`)}>다음 장 ›</button></div><button type="button" className={`rights-prepared ${saved ? 'active' : ''}`} onClick={toggleSaved}>{saved ? <FolderOpen size={19} /> : <FolderPlus size={19} />}<strong>{saved ? '보관 중 · 내 서류함에서 빼기' : '내 서류함에 넣기'}</strong></button>{primarySource && <a className="rights-primary-cta" href={primarySource} target="_blank" rel="noreferrer">{issuance.online?.label || '공식 발급 안내 확인하기'} <ExternalLink size={16} /></a>}</RightsShell>
 }

@@ -149,6 +149,79 @@ test('rights collection recommendation falls back to a useful document set', asy
   assert.ok(recommendation.documentIds.includes('resident'))
 })
 
+test('rights document catalog exposes expanded official issuance data', async () => {
+  const listResponse = await fetch(`${baseUrl}/api/v1/rights/documents?q=${encodeURIComponent('한부모')}`, { headers: authHeaders() })
+  const list = await listResponse.json()
+  assert.equal(listResponse.status, 200)
+  assert.equal(list.total, 1)
+  assert.equal(list.items[0].id, 'single-parent')
+
+  const allResponse = await fetch(`${baseUrl}/api/v1/rights/documents`, { headers: authHeaders() })
+  const all = await allResponse.json()
+  assert.ok(all.total >= 20)
+
+  const detailResponse = await fetch(`${baseUrl}/api/v1/rights/documents/single-parent`, { headers: authHeaders() })
+  const detail = await detailResponse.json()
+  assert.equal(detailResponse.status, 200)
+  assert.match(detail.detail.issuance.online.url, /10601000001/)
+})
+
+test('legal counseling topics provide backend-driven steps and checklist items', async () => {
+  const listResponse = await fetch(`${baseUrl}/api/v1/legal/topics`, { headers: authHeaders() })
+  const list = await listResponse.json()
+  assert.equal(listResponse.status, 200)
+  assert.equal(list.items.length, 5)
+
+  const detailResponse = await fetch(`${baseUrl}/api/v1/legal/topics/labor`, { headers: authHeaders() })
+  const detail = await detailResponse.json()
+  assert.equal(detailResponse.status, 200)
+  assert.ok(detail.guide.checklist.length >= 3)
+  assert.equal(detail.guide.contact.href, 'tel:1350')
+})
+
+test('anonymous diary and checklist data persist independently', async () => {
+  const checklist = [{ id: 'legal-labor-1', text: '근무 기록 캡처 저장하기', done: false, source: 'legal:labor' }]
+  const checklistSave = await fetch(`${baseUrl}/api/v1/user-data/checklist`, {
+    method: 'PUT',
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ data: checklist })
+  })
+  assert.equal(checklistSave.status, 200)
+
+  const diary = [{ date: '2026-11-13', visual: 'mood-sun', text: '오늘 기록', photo: '', updatedAt: '2026-11-13T01:00:00.000Z' }]
+  const diarySave = await fetch(`${baseUrl}/api/v1/user-data/diary`, {
+    method: 'PUT',
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ data: diary })
+  })
+  assert.equal(diarySave.status, 200)
+
+  const checklistResponse = await fetch(`${baseUrl}/api/v1/user-data/checklist`, { headers: authHeaders() })
+  const savedChecklist = await checklistResponse.json()
+  assert.deepEqual(savedChecklist.data, checklist)
+
+  const diaryResponse = await fetch(`${baseUrl}/api/v1/user-data/diary`, { headers: authHeaders() })
+  const savedDiary = await diaryResponse.json()
+  assert.deepEqual(savedDiary.data, diary)
+})
+
+test('rights library state persists without replacing other backend data', async () => {
+  const library = {
+    savedDocumentIds: ['resident', 'single-parent'],
+    collections: [{ id: 'rent', title: '월세 지원', category: '주거', documentIds: ['resident'], checkedDocumentIds: [] }]
+  }
+  const saveResponse = await fetch(`${baseUrl}/api/v1/user-data/rights-library`, {
+    method: 'PUT',
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ data: library })
+  })
+  assert.equal(saveResponse.status, 200)
+
+  const response = await fetch(`${baseUrl}/api/v1/user-data/rights-library`, { headers: authHeaders() })
+  const saved = await response.json()
+  assert.deepEqual(saved.data, library)
+})
+
 test('chat room supports HTTP messages and permanent deletion', async () => {
   const roomResponse = await fetch(`${baseUrl}/api/v1/chat/rooms`, { method: 'POST', headers: authHeaders() })
   const room = await roomResponse.json()

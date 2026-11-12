@@ -117,6 +117,39 @@ export async function recommendRightsCollection(title) {
   })
 }
 
+export async function fetchRightsDocuments(filters = {}) {
+  const query = new URLSearchParams()
+  if (filters.category && filters.category !== '전체') query.set('category', filters.category)
+  if (filters.query) query.set('q', filters.query)
+  const suffix = query.size ? `?${query}` : ''
+  const response = await requestJson(`/api/v1/rights/documents${suffix}`)
+  return response.items || []
+}
+
+export async function fetchRightsDocument(id) {
+  return requestJson(`/api/v1/rights/documents/${encodeURIComponent(id)}`)
+}
+
+export async function fetchLegalTopics() {
+  const response = await requestJson('/api/v1/legal/topics')
+  return response.items || []
+}
+
+export async function fetchLegalTopic(id) {
+  return requestJson(`/api/v1/legal/topics/${encodeURIComponent(id)}`)
+}
+
+export async function fetchUserData(scope) {
+  return requestJson(`/api/v1/user-data/${encodeURIComponent(scope)}`)
+}
+
+export async function saveUserData(scope, data) {
+  return requestJson(`/api/v1/user-data/${encodeURIComponent(scope)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ data })
+  })
+}
+
 export async function createChatRoom() {
   return requestJson('/api/v1/chat/rooms', { method: 'POST', body: '{}' })
 }
