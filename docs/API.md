@@ -126,6 +126,26 @@ npm run sync:notices    # 지원사업/공지만
 { "type": "reply", "reply": "...", "actions": ["find-shelter", "call-1388"] }
 ```
 
+## 서류사전·법률상담·사용자 기록
+
+- `GET /api/v1/rights/documents` — `category`, `q`, `limit`, `offset`로 서류를 검색합니다.
+- `GET /api/v1/rights/documents/{id}` — 온라인·방문·무인발급 경로와 공식 출처를 반환합니다.
+- `GET /api/v1/legal/topics` — 법률상담 분야, 선택지, 대응 단계, 연락처와 체크리스트를 반환합니다.
+- `GET /api/v1/legal/topics/{id}` — 한 상담 분야의 상세 안내를 반환합니다.
+- `GET/PUT /api/v1/user-data/{scope}` — `diary`, `checklist`, `rights-library`만 허용합니다.
+
+사용자 기록은 가입 정보가 아닌 24시간 익명 게스트 세션에 연결됩니다. 일기 사진은 브라우저에서 축소한 뒤 저장하며, 주민등록번호·계좌번호 같은 민감정보는 서류함에 입력하거나 업로드하지 않도록 화면에서 안내합니다. 법률상담의 `체크리스트에 추가`는 같은 `checklist` 범위에 저장되어 일기장 체크리스트에서 바로 이어서 볼 수 있습니다. 네트워크가 끊긴 경우에는 기기 저장소를 사용하고 연결이 복구되면 익명 저장소와 합칩니다.
+
+## 카카오맵 리소스 전환 점검
+
+지도 화면은 공식 JavaScript SDK 로더(`https://dapi.kakao.com/v2/maps/sdk.js`)를 사용하고, 백엔드 좌표 보정은 공식 Local REST API(`https://dapi.kakao.com/v2/local/...`)를 사용합니다. `*.daumcdn.net` 내부 리소스 주소를 직접 호출하거나 별도로 저장하지 않으므로 2026년 12월 제공 종료 대상 방식에 의존하지 않습니다.
+
+```bash
+npm run check:kakao-cdn
+```
+
+이 검증은 `src`, `server`, `public`에서 `daumcdn.net` 직접 호출이 다시 추가되면 실패합니다. CDN 주소의 도메인만 임의로 바꾸지 말고 계속 공식 SDK/API를 사용해야 합니다.
+
 ## 긴급 종료
 
 `DELETE /api/v1/chat/rooms/{room_id}`는 해당 상담방의 메시지와 연결된 SOS 위치 데이터를 하나의 트랜잭션에서 삭제합니다. 서버는 별도의 HTTP 접근 로그를 저장하지 않습니다. 리버스 프록시를 사용하는 경우에도 상담·SOS 경로의 접근 로그를 비활성화하거나 즉시 파기하도록 운영 설정이 필요합니다.

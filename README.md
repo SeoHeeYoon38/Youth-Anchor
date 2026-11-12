@@ -11,6 +11,8 @@
 | 대피처 (`/shelters`) | 성평등가족부_청소년쉼터 오픈API | 전국 137곳 동봉 (파일데이터 기반) |
 | 자립 지원 (`/support`) | 한국사회보장정보원_중앙부처복지서비스 오픈API | 서비스키 필요 |
 | 익명 상담·긴급 SOS | 자체 DB + WebSocket | 동작 |
+| 서류사전·법률상담 안내 | 자체 검증 카탈로그 API | 동작 |
+| 일기·체크리스트·내 서류함 | 24시간 익명 세션 저장소 + 기기 저장소 | 동작 |
 
 ## 로컬 실행
 
@@ -94,6 +96,11 @@ npm run dev
 | `GET` | `/api/v1/notices/{id}` | 공지·지원 사업 상세 |
 | `GET` | `/api/v1/shelters/nearby` | 좌표·반경 기준 주변 쉼터 |
 | `GET` | `/api/v1/shelters/{id}` | 쉼터 상세 |
+| `GET` | `/api/v1/rights/documents` | 서류사전 목록·검색·분류 |
+| `GET` | `/api/v1/rights/documents/{id}` | 공식 발급 경로가 포함된 서류 상세 |
+| `GET` | `/api/v1/legal/topics` | 법률상담 분야와 안내 목록 |
+| `GET` | `/api/v1/legal/topics/{id}` | 법률상담 단계·연락처·체크리스트 |
+| `GET/PUT` | `/api/v1/user-data/{scope}` | 일기·체크리스트·내 서류함 익명 임시 저장 |
 | `POST` | `/api/v1/chat/rooms` | 익명 상담방 생성 |
 | `WS` | `/api/v1/chat/rooms/{id}/socket` | 실시간 익명 상담 |
 | `POST` | `/api/v1/chat/rooms/{id}/messages` | 웹소켓 장애 시 상담 요청 |
@@ -111,8 +118,11 @@ npm run dev
 ```bash
 npm test
 npm run lint
+npm run check:kakao-cdn
 npm run build
 ```
+
+카카오맵은 `https://dapi.kakao.com/v2/maps/sdk.js` 공식 JavaScript SDK와 `dapi.kakao.com` REST API만 사용합니다. `daumcdn.net`의 내부 스크립트·타일·로드뷰 주소를 직접 호출하거나 저장하지 않으며, 검증 명령이 재도입을 막습니다.
 
 테스트는 빈 인메모리 SQLite를 사용하여 인증, 공지, 쉼터, HTTP/웹소켓 상담, 퀵 엑시트 삭제, SOS, 푸시 구독을 검증합니다. 공공데이터 연동은 실제 응답 스키마를 그대로 옮긴 픽스처로 XML/JSON 파싱, 페이지 순회, 좌표 보정, 재실행 시 중복 방지, 인증 오류 처리를 검증합니다.
 
