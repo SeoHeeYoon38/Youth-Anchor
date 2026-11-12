@@ -4,8 +4,8 @@ self.addEventListener('push', (event) => {
   const body = payload.type === 'sos' ? '긴급 도움 요청이 접수되었습니다.' : payload.body || '새로운 지원 정보를 확인해 주세요.'
   event.waitUntil(self.registration.showNotification(title, {
     body,
-    icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
+    icon: '/icon-192x192.png?v=2',
+    badge: '/icon-192x192.png?v=2',
     data: payload
   }))
 })
