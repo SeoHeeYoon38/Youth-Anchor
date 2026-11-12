@@ -15,6 +15,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "check:env": "node --env-file-if-exists=.env scripts/check-env.mjs",
+    "check:kakao-cdn": "node scripts/check-kakao-cdn.mjs",
     "test": "node --test server/*.test.js src/*.test.js",
     "sync": "node --env-file-if-exists=.env server/sync.js",
     "sync:shelters": "node --env-file-if-exists=.env server/sync.js shelters",
