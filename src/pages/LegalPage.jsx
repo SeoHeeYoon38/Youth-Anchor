@@ -1,4 +1,4 @@
-import { Check, ChevronRight, ClipboardCheck, LockKeyhole, Navigation, Phone, Power, RotateCcw } from 'lucide-react'
+import { Check, ChevronRight, ClipboardCheck, LockKeyhole, Navigation, Phone, Power } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
@@ -77,14 +77,14 @@ function readTasks() {
   }
 }
 
-function LegalShell({ title, onQuickExit, backTo, children }) {
+function LegalShell({ title, onQuickExit, backTo, hideBack = false, children }) {
   const { pathname } = useLocation()
   const shellRef = useRef(null)
 
   useEffect(() => { shellRef.current?.scrollTo({ top: 0 }) }, [pathname])
 
   return (
-    <div className="feature-shell legal-shell" ref={shellRef}>
+    <div className={`feature-shell legal-shell ${hideBack ? 'legal-shell-hide-back' : ''}`} ref={shellRef}>
       <FeatureHeader title={title} onQuickExit={onQuickExit} backTo={backTo} />
       <main className="legal-main">{children}</main>
       <BottomNav warm supportLast />
@@ -96,7 +96,7 @@ export function LegalHomePage({ onQuickExit }) {
   const navigate = useNavigate()
 
   return (
-    <LegalShell title="법률 상담" onQuickExit={onQuickExit} backTo="/home">
+    <LegalShell title="법률 상담" onQuickExit={onQuickExit} backTo="/home" hideBack>
       <section className="legal-picker" aria-labelledby="legal-picker-title">
         <div className="legal-picker-heading">
           <span className="legal-picker-symbol"><img src={`${ASSET_ROOT}/legal-scale.svg`} alt="" /></span>
@@ -129,6 +129,7 @@ function UserMessage({ children }) {
 }
 
 export function LegalChatPage({ onQuickExit }) {
+  const navigate = useNavigate()
   const { state } = useLocation()
   const topic = LEGAL_CONVERSATIONS[state?.topic] || LEGAL_CONVERSATIONS.labor
   const [messages, setMessages] = useState([{ id: 1, role: 'bot', text: topic.initialMessage }])
@@ -193,7 +194,8 @@ export function LegalChatPage({ onQuickExit }) {
             {stage === 0 && <div className="legal-choices">{topic.issueOptions.map((option) => <button type="button" key={option} onClick={() => chooseIssue(option)}>{option}</button>)}</div>}
             {stage === 1 && <div className="legal-choices">{topic.evidenceOptions.map((option) => <button type="button" key={option} onClick={() => chooseEvidence(option)}>{option}</button>)}</div>}
             {stage === 2 && <div className="legal-actions"><a href={topic.contact.href}><Phone size={17} />{topic.contact.label}</a><button type="button" onClick={saveChecklist}>{saved ? <Check size={17} /> : <ClipboardCheck size={17} />}{saved ? '체크리스트에 추가됨' : '체크리스트에 추가'}</button></div>}
-            <button type="button" className="legal-restart" onClick={restartConversation} aria-label="처음으로" title="처음으로"><RotateCcw size={18} /></button>
+            <button type="button" className="legal-restart" onClick={restartConversation}>처음으로</button>
+            <button type="button" className="legal-restart" onClick={() => navigate('/legal')}>홈</button>
           </div>
           <div ref={endRef} />
         </section>
