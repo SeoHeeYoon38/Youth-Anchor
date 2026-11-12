@@ -1,15 +1,15 @@
 import { ArrowLeft, Power } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
-export default function FeatureHeader({ title, onQuickExit, backTo = '/home', children }) {
+export default function FeatureHeader({ title, onQuickExit, backTo = '/home', showBack = true, children }) {
   const navigate = useNavigate()
 
   return (
     <header className="feature-header">
       <div className="feature-header-title">
-        <button type="button" className="feature-back" onClick={() => navigate(backTo)} aria-label="이전 화면">
+        {showBack && <button type="button" className="feature-back" onClick={() => navigate(backTo)} aria-label="이전 화면">
           <ArrowLeft size={20} />
-        </button>
+        </button>}
         <strong>{title}</strong>
       </div>
       <div className="feature-header-actions">

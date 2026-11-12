@@ -136,6 +136,19 @@ test('notice list and detail are backed by sqlite', async () => {
   assert.equal(detail.title, '식사 지원 신청')
 })
 
+test('rights collection recommendation falls back to a useful document set', async () => {
+  const response = await fetch(`${baseUrl}/api/v1/rights/recommend`, {
+    method: 'POST',
+    headers: authHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ title: '청년 월세 지원' })
+  })
+  const recommendation = await response.json()
+  assert.equal(response.status, 200)
+  assert.equal(recommendation.category, '주거')
+  assert.ok(recommendation.documentIds.includes('lease'))
+  assert.ok(recommendation.documentIds.includes('resident'))
+})
+
 test('chat room supports HTTP messages and permanent deletion', async () => {
   const roomResponse = await fetch(`${baseUrl}/api/v1/chat/rooms`, { method: 'POST', headers: authHeaders() })
   const room = await roomResponse.json()

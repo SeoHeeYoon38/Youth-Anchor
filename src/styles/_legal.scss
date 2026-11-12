@@ -1,48 +1,104 @@
-.legal-shell { background: linear-gradient(180deg, #fffaf2 0%, #fff5e9 58%, #f5d69d 100%); }
-.legal-main { min-height: calc(100dvh - 76px); padding: 0 20px calc(20px + env(safe-area-inset-bottom)); }
-.legal-hero { padding: 24px 22px; border: 1px solid #f0d6b9; border-radius: 25px; background: rgba(255,255,255,.76); }
-.legal-hero-icon { width: 54px; height: 54px; margin-bottom: 18px; display: grid; place-items: center; border-radius: 17px; background: #ffdf9b; color: #af6b2f; }
-.legal-hero > small { color: #b0784a; font-size: 11px; font-weight: 900; }
-.legal-hero h1 { margin: 7px 0 8px; font-size: 24px; line-height: 1.3; }
-.legal-hero p { margin: 0; color: #816b5c; font-size: 13px; line-height: 1.6; }
-.legal-menu { margin-top: 14px; display: grid; gap: 10px; }
-.legal-menu > button, .legal-menu > a { min-height: 82px; padding: 14px; display: grid; grid-template-columns: 46px 1fr 20px; grid-template-rows: 1fr 1fr; gap: 1px 12px; align-items: center; border: 1px solid #f0d6b9; border-radius: 20px; background: #fff; color: #3e241a; text-align: left; cursor: pointer; }
-.legal-menu > :is(button,a) > span { width: 46px; height: 46px; display: grid; grid-row: 1 / 3; place-items: center; border-radius: 15px; background: #f8d892; color: #b26f34; }
-.legal-menu > :is(button,a) > strong { align-self: end; font-size: 15px; }
-.legal-menu > :is(button,a) > small { align-self: start; color: #8f7868; font-size: 11px; }
-.legal-menu > :is(button,a) > svg { grid-column: 3; grid-row: 1 / 3; color: #bd855c; }
-.legal-safety-note { margin-top: 14px; padding: 13px 15px; display: flex; gap: 10px; align-items: flex-start; border: 1px solid #f0cdab; border-radius: 17px; background: #fff2df; color: #9b542f; }
-.legal-safety-note strong, .legal-safety-note small { display: block; }
-.legal-safety-note strong { font-size: 12px; }
-.legal-safety-note small { margin-top: 4px; color: #856b5c; font-size: 10px; line-height: 1.45; }
-.legal-mini-nav { height: 58px; margin-top: 24px; display: grid; grid-template-columns: repeat(2, 1fr); border: 1px solid #f0d6b9; border-radius: 18px; background: #fff; }
-.legal-mini-nav button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 0; background: transparent; color: #99867a; font-size: 9px; font-weight: 800; cursor: pointer; }
-.legal-mini-nav button.active { color: #e98b2d; }
-
-.legal-status { padding: 2px 0 10px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #9b806e; font-size: 10px; }
-.legal-status span { width: 7px; height: 7px; border-radius: 50%; background: #73ba7c; box-shadow: 0 0 0 3px rgba(115,186,124,.15); }
-.legal-privacy { padding: 10px 13px; display: flex; align-items: center; gap: 8px; border: 1px solid #f0d4b7; border-radius: 14px; background: #fff3e0; color: #795f50; font-size: 10px; line-height: 1.45; }
-.legal-chat-log { min-height: 540px; padding: 18px 0 10px; }
+.legal-shell {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--haven-warm-background);
+}
+.legal-shell .feature-header {
+  min-height: 76px;
+  padding: max(20px, env(safe-area-inset-top)) 20px 12px;
+  position: relative;
+  flex: 0 0 auto;
+  background: transparent;
+  backdrop-filter: none;
+}
+.legal-shell .feature-header-title { gap: 4px; }
+.legal-shell .feature-header-title > strong { color: #724a33; font-size: 19px; }
+.legal-shell .feature-back { width: 37px; height: 37px; border: 0; background: #fff; color: #c8ad7d; }
+.legal-shell-hide-back .feature-back { visibility: hidden; pointer-events: none; }
+.legal-shell .feature-exit { width: 100px; height: 36px; min-height: 36px; padding: 0 12px; border-color: #eae1d4; color: #dc2626; font-size: 13px; }
+.legal-main { min-height: 0; padding: 6px 20px 20px; flex: 1 1 auto; overflow-y: auto; scrollbar-width: none; }
+.legal-main::-webkit-scrollbar { display: none; }
+.legal-picker { padding: 6px 12px 4px; }
+.legal-picker-heading { display: grid; grid-template-columns: 49px minmax(0, 1fr); align-items: center; gap: 16px; }
+.legal-picker-symbol { width: 49px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: #ffb246; color: #76502f; }
+.legal-picker-symbol img { width: 29px; height: 29px; display: block; }
+.legal-picker-heading h1 { margin: 0; color: #674331; font-size: clamp(20px, 5.2vw, 24px); font-weight: 900; line-height: 1.2; }
+.legal-picker-heading p { margin: 3px 0 0; color: #87654b; font-size: 13px; font-weight: 700; letter-spacing: .02em; }
+.legal-topic-list { margin-top: 52px; display: grid; gap: 24px; }
+.legal-topic-list > button { min-height: 99px; padding: 14px 19px 14px 24px; display: grid; grid-template-columns: 61px minmax(0, 1fr) 22px; align-items: center; gap: 24px; border: 0; border-radius: 20px; background: linear-gradient(90deg, #fff 0%, #fffdfa 100%); color: #633d2a; text-align: left; box-shadow: 2px 7px 2px rgba(84, 66, 51, .32); cursor: pointer; }
+.legal-topic-icon { width: 61px; height: 61px; display: grid; place-items: center; border-radius: 20px; }
+.legal-topic-icon img { width: 29px; height: 29px; display: block; }
+.legal-topic-icon.labor { background: #fce6d2; color: #bd7234; }
+.legal-topic-icon.school { background: #e8f0ff; color: #5f82c8; }
+.legal-topic-icon.digital { background: #eee8ff; color: #8066cf; }
+.legal-topic-icon.family { background: #fbe7e4; color: #c7655c; }
+.legal-topic-icon.money { background: #e8f5e5; color: #65a45d; }
+.legal-topic-copy { min-width: 0; display: grid; gap: 8px; }
+.legal-topic-copy strong { font-size: 16px; font-weight: 900; line-height: 1.2; }
+.legal-topic-copy small { color: #9c7f5c; font-size: 10px; font-weight: 700; line-height: 1.4; }
+.legal-topic-list > button > svg { color: #bba88b; }
+.legal-safety-copy { margin: 18px 0 0; padding-left: 14px; position: relative; color: #c5895a; font-size: 12px; font-weight: 700; line-height: 1.4; }
+.legal-safety-copy::before { content: '•'; position: absolute; left: 0; }
+.legal-safety-copy strong { color: #ff7d19; }
+.legal-chat-shell { position: relative; color: #4d3424; background: linear-gradient(180deg, #fffdf7 0%, #fffdf9 58%, #fffaf3 100%); }
+.legal-chat-shell::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 78px -22% 64px;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 22% at 4% 14%, rgba(255, 211, 104, .3) 0 43%, rgba(255, 211, 104, .14) 61%, transparent 78%),
+    radial-gradient(ellipse 63% 25% at 96% 50%, rgba(247, 224, 101, .3) 0 42%, rgba(247, 224, 101, .14) 62%, transparent 79%),
+    radial-gradient(ellipse 57% 23% at 92% 73%, rgba(246, 169, 145, .26) 0 44%, rgba(246, 169, 145, .12) 63%, transparent 80%),
+    radial-gradient(ellipse 58% 21% at 3% 89%, rgba(255, 213, 99, .28) 0 42%, rgba(255, 213, 99, .12) 62%, transparent 80%);
+  filter: blur(15px);
+  transform: scale(1.06);
+}
+.legal-chat-shell > * { position: relative; z-index: 1; }
+.legal-chat-header { flex: 0 0 auto; }
+.legal-chat-main { min-height: 0; padding: 0 20px 10px; display: flex; flex: 1 1 auto; flex-direction: column; overflow-y: auto; scrollbar-width: none; }
+.legal-chat-main::-webkit-scrollbar { display: none; }
+.legal-chat-log { min-height: 0; padding: 18px 0 10px; flex: 1 0 auto; }
 .legal-message-row { margin: 0 0 16px; display: flex; align-items: flex-start; gap: 8px; }
-.legal-message-row.bot img { width: 42px; height: 42px; flex: 0 0 auto; border: 1px solid #eccb9e; border-radius: 50%; background: #fff; object-fit: cover; }
+.legal-message-row.bot img { width: 42px; height: 42px; flex: 0 0 auto; border: 0; background: transparent; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(104,61,38,.14)); }
 .legal-bubble { max-width: calc(100% - 48px); padding: 12px 14px; border: 1px solid #f0d8b8; border-radius: 8px 20px 20px 20px; background: #fff; color: #4a3428; font-size: 12px; line-height: 1.55; }
 .legal-bubble p { margin: 0; }
 .legal-bubble ol { margin: 9px 0 0; padding-left: 20px; }
 .legal-message-row.user { justify-content: flex-end; }
 .legal-message-row.user .legal-bubble { max-width: 78%; border: 0; border-radius: 20px 8px 20px 20px; background: #ffa32b; color: #fff; font-weight: 800; }
-.legal-choices { margin: -4px 0 18px 50px; display: flex; flex-wrap: wrap; gap: 7px; }
+.legal-quick-row { margin: -4px 0 18px 50px; display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+.legal-choices { display: contents; }
 .legal-choices button { padding: 9px 12px; border: 1px solid #edc894; border-radius: 18px; background: #fffaf3; color: #6f503c; font-size: 11px; font-weight: 800; cursor: pointer; }
 .legal-choices button:hover { background: #fff0d9; }
-.legal-actions { margin: -4px 0 20px 50px; display: flex; flex-wrap: wrap; gap: 8px; }
+.legal-actions { display: contents; }
 .legal-actions a, .legal-actions button { min-height: 38px; padding: 0 13px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e8c38e; border-radius: 18px; background: #fff; color: #9f5d2e; font-size: 11px; font-weight: 900; cursor: pointer; }
-.legal-input { min-height: 86px; padding: 10px 10px 10px 14px; display: grid; grid-template-columns: 1fr 44px; gap: 8px; position: sticky; bottom: 0; z-index: 12; border: 1px solid #edcfa9; border-radius: 20px; background: #fff; box-shadow: 0 -8px 20px rgba(117,67,38,.06); }
-.legal-input textarea { min-width: 0; resize: none; border: 0; outline: 0; color: #4a3428; font-size: 12px; line-height: 1.5; }
-.legal-input textarea::placeholder { color: #b5a294; }
-.legal-input button { width: 44px; height: 44px; align-self: end; display: grid; place-items: center; border: 0; border-radius: 50%; background: #9b5037; color: #fff; cursor: pointer; }
+.legal-restart { min-height: 38px; padding: 9px 15px; display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; border: 1px solid #edc894; border-radius: 18px; background: #fffaf3; color: #6f503c; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.legal-restart:hover { background: #fff0d9; }
 .legal-disclaimer { margin: 8px 4px 0; color: #9c887a; font-size: 9px; line-height: 1.4; text-align: center; }
+.legal-chat-composer { flex: 0 0 auto; }
 
 @media (max-width: 370px) {
   .legal-main { padding-left: 14px; padding-right: 14px; }
-  .legal-choices, .legal-actions { margin-left: 34px; }
+  .legal-chat-main { padding-left: 14px; padding-right: 14px; }
+  .legal-shell .feature-header { padding-left: 14px; padding-right: 14px; }
+  .legal-shell .feature-exit { width: auto; }
+  .legal-quick-row { margin-left: 34px; }
   .legal-message-row.bot img { width: 36px; height: 36px; }
+  .legal-picker { padding-left: 2px; padding-right: 2px; }
+  .legal-picker-heading { gap: 11px; }
+  .legal-picker-heading h1 { font-size: 19px; }
+  .legal-picker-heading p { font-size: 11px; }
+  .legal-topic-list { margin-top: 38px; gap: 18px; }
+  .legal-topic-list > button { min-height: 91px; padding-left: 14px; grid-template-columns: 54px minmax(0, 1fr) 18px; gap: 13px; }
+  .legal-topic-icon { width: 54px; height: 54px; border-radius: 18px; }
+}
+
+@media (min-width: 430px) {
+  .legal-main { padding-left: 32px; padding-right: 32px; }
+  .legal-picker { padding-left: 16px; padding-right: 16px; }
+  .legal-chat-log { padding-left: 8px; padding-right: 8px; }
+  .legal-bubble { font-size: 13px; }
 }

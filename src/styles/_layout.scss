@@ -1,14 +1,12 @@
 .bottom-nav { width: 100%; height: calc(76px + env(safe-area-inset-bottom)); padding: 9px 10px env(safe-area-inset-bottom); display: grid; grid-template-columns: repeat(4, 1fr); flex: 0 0 auto; position: relative; z-index: 40; border-top: 1px solid rgba(255,255,255,.12); background: #0b001f; box-shadow: 0 -18px 38px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.08); }
 .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; background: transparent; color: #8c91a0; font-size: 10px; cursor: pointer; }
-.nav-item.active { color: #fff; font-weight: 800; }
+.nav-item.active { color: #eb8f25; font-weight: 800; }
 .nav-item svg { transition: transform .25s ease, filter .25s ease; }
-.nav-item.active svg { transform: translateY(-2px) scale(1.1); filter: drop-shadow(0 0 10px rgba(87,236,226,.46)); }
+.nav-item.active svg { transform: translateY(-2px) scale(1.1); filter: drop-shadow(0 3px 7px rgba(235,143,37,.22)); }
 
 .app-shell.route-home {
   color: #2a210f;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.36) 0%, rgba(248,214,176,.36) 53.365%, rgba(239,166,82,.36) 75.481%, rgba(220,117,0,.36) 100%),
-    #fdfaed;
+  background: var(--haven-warm-background);
   box-shadow: 0 0 42px rgba(62,36,26,.16);
 }
 
@@ -55,7 +53,10 @@
 :is(.route-home, .route-support) .topbar .icon-button { width: 40px; height: 40px; border-color: #e2e8f0; border-radius: 50%; background: #fff; box-shadow: none; }
 :is(.route-home, .route-support) .exit-button { min-height: 36px; padding: 0 14px; gap: 8px; border: 1px solid #e2e8f0; background: #fff; color: #e24b00; box-shadow: none; }
 
-:is(.route-home, .route-shelters, .route-chat, .route-support) > .bottom-nav {
+:is(.route-home, .route-shelters, .route-chat, .route-support) > .bottom-nav,
+.rights-shell > .bottom-nav,
+.legal-shell > .bottom-nav,
+.diary-shell > .bottom-nav {
   width: auto;
   height: calc(66px + env(safe-area-inset-bottom));
   margin: 0 20px 12px;
@@ -67,14 +68,29 @@
   box-shadow: none;
 }
 
-:is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item { gap: 4px; color: #8b7664; font-size: 11px; font-weight: 600; }
-:is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item.active { color: #eb8f25; }
-:is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item.active .home-nav-icon { transform: translateY(-1px); }
+:is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item,
+.rights-shell .nav-item,
+.legal-shell .nav-item,
+.diary-shell .nav-item { gap: 4px; color: #8b7664; font-size: 11px; font-weight: 600; }
+:is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item.active,
+.rights-shell .nav-item.active,
+.legal-shell .nav-item.active,
+.diary-shell .nav-item.active { color: #eb8f25; }
+:is(.route-home, .route-shelters, .route-chat, .route-support) .nav-item.active .home-nav-icon,
+.rights-shell .nav-item.active .home-nav-icon,
+.legal-shell .nav-item.active .home-nav-icon,
+.diary-shell .nav-item.active .home-nav-icon { transform: translateY(-1px); }
+.home-nav-icon img { filter: brightness(0) saturate(100%) invert(51%) sepia(13%) saturate(638%) hue-rotate(346deg) brightness(92%) contrast(87%); transition: filter .2s ease; }
+.nav-item.active .home-nav-icon img { filter: brightness(0) saturate(100%) invert(61%) sepia(68%) saturate(1450%) hue-rotate(345deg) brightness(99%) contrast(86%); }
+.warm-bottom-nav .nav-item.active svg { transform: none; filter: none; }
 .home-nav-icon { width: 22px; height: 22px; display: grid; place-items: center; transition: transform .25s ease; }
 
 @media (max-width: 390px) {
   :is(.route-home, .route-support) .topbar { padding-left: 14px; padding-right: 14px; }
-  :is(.route-home, .route-shelters, .route-chat, .route-support) > .bottom-nav { margin-left: 14px; margin-right: 14px; padding-left: 18px; padding-right: 18px; gap: 10px; }
+  :is(.route-home, .route-shelters, .route-chat, .route-support) > .bottom-nav,
+  .rights-shell > .bottom-nav,
+  .legal-shell > .bottom-nav,
+  .diary-shell > .bottom-nav { margin-left: 14px; margin-right: 14px; padding-left: 18px; padding-right: 18px; gap: 10px; }
 }
 
 @media (max-width: 350px) {

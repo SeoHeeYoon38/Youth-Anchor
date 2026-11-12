@@ -13,6 +13,30 @@ const SAFETY_INSTRUCTIONS = `당신은 위기청소년과 자립준비청년을 
 - 쉼터의 입소 가능 여부나 잔여석을 단정하지 말고, 방문 전에 1388 또는 해당 시설에 전화하도록 안내하세요.
 - 사용자의 감정을 인정하되 과장된 위로나 확신을 피하고, 지금 할 수 있는 가장 작은 다음 행동을 제안하세요.`
 
+const RIGHTS_DOCUMENTS = [
+  ['resident', '주민등록등본·초본', '생활'],
+  ['family', '가족관계증명서', '생활'],
+  ['basic', '기본증명서', '생활'],
+  ['health', '건강보험 자격득실확인서', '지원'],
+  ['income', '소득금액증명원', '지원'],
+  ['protection', '보호종료확인서', '주거'],
+  ['bank', '통장 사본', '지원'],
+  ['lease', '임대차계약서', '주거'],
+  ['enrollment', '재학증명서', '생활'],
+  ['graduation', '졸업증명서', '생활'],
+  ['employment', '근로계약서', '일자리'],
+  ['career', '경력증명서', '일자리']
+]
+
+export function fallbackRightsRecommendation(title = '') {
+  const normalized = title.replace(/\s/g, '')
+  if (/월세|주거|집|임대|전세/.test(normalized)) return { category: '주거', documentIds: ['resident', 'family', 'bank', 'lease', 'income'], source: 'rules' }
+  if (/취업|일자리|근로|회사/.test(normalized)) return { category: '일자리', documentIds: ['resident', 'employment', 'career', 'bank'], source: 'rules' }
+  if (/학교|장학|학업|입학/.test(normalized)) return { category: '생활', documentIds: ['resident', 'family', 'enrollment', 'graduation', 'income'], source: 'rules' }
+  if (/자립|지원|생활비|복지/.test(normalized)) return { category: '지원', documentIds: ['resident', 'family', 'bank', 'income', 'protection'], source: 'rules' }
+  return { category: '생활', documentIds: ['resident', 'family', 'basic'], source: 'rules' }
+}
+
 export function detectChatActions(message) {
   const actions = new Set()
   if (/위험|폭력|맞았|죽고|자해|살려|납치|협박|쫓아|무서|두려/.test(message)) {
@@ -64,6 +88,30 @@ export function createChatService(options = {}) {
     configured: Boolean(client),
     provider: 'openai',
     model,
+    async recommendRightsCollection({ title }) {
+      const fallback = fallbackRightsRecommendation(title)
+      if (!client) return fallback
+
+      const catalogue = RIGHTS_DOCUMENTS.map(([id, name, category]) => `${id}: ${name} (${category})`).join('\n')
+      try {
+        const response = await client.responses.create({
+          model,
+          instructions: `사용자가 만들 준비 책의 이름을 보고 필요한 한국 행정 서류를 골라주세요. 아래 목록의 id만 사용할 수 있습니다. category는 지원, 주거, 생활, 일자리 중 하나여야 합니다. 결과는 설명 없이 {"category":"주거","documentIds":["resident"]} 형태의 JSON 한 개만 출력하세요.\n${catalogue}`,
+          input: [{ role: 'user', content: title }],
+          max_output_tokens: 160,
+          store: false
+        })
+        const parsed = JSON.parse(response.output_text?.trim() || '{}')
+        const validIds = new Set(RIGHTS_DOCUMENTS.map(([id]) => id))
+        const documentIds = Array.isArray(parsed.documentIds) ? [...new Set(parsed.documentIds.filter((id) => validIds.has(id)))].slice(0, 8) : []
+        const category = ['지원', '주거', '생활', '일자리'].includes(parsed.category) ? parsed.category : fallback.category
+        if (!documentIds.length) return fallback
+        return { category, documentIds, source: 'openai' }
+      } catch (error) {
+        logger.warn?.(`[rights] OpenAI recommendation unavailable (${error?.code || error?.message || 'unknown'}); using rules`)
+        return fallback
+      }
+    },
     async reply({ message, history = [] }) {
       const actions = detectChatActions(message)
       if (!client) return { ...fallbackChatReply(message), source: 'safety-fallback' }

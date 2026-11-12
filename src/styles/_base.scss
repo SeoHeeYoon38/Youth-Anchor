@@ -34,6 +34,9 @@
   --glass: rgba(255,255,255,.1);
   --glass-strong: rgba(255,255,255,.16);
   --glow: 0 0 28px rgba(149,91,255,.35), 0 0 56px rgba(86,236,226,.12);
+  --haven-warm-background:
+    linear-gradient(180deg, rgba(255,255,255,.36) 0%, rgba(248,214,176,.36) 53.365%, rgba(239,166,82,.36) 75.481%, rgba(220,117,0,.36) 100%),
+    #fdfaed;
 }
 
 * { box-sizing: border-box; }
