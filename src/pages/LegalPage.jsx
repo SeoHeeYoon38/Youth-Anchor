@@ -101,10 +101,10 @@ export function LegalHomePage({ onQuickExit }) {
       <section className="legal-picker" aria-labelledby="legal-picker-title">
         <div className="legal-picker-heading">
           <span className="legal-picker-symbol"><img src={`${ASSET_ROOT}/legal-scale.svg`} alt="" /></span>
-          <span>
+          <div className="legal-picker-intro">
             <h1 id="legal-picker-title">어떤 일이 있었는지 골라 주세요!</h1>
             <p>이름이나 학교는 말하지 않아도 괜찮아요</p>
-          </span>
+          </div>
         </div>
         <div className="legal-topic-list" aria-label="법률 상담 분야">
           {topics.map(({ id, title, description, icon, tone }) => (
