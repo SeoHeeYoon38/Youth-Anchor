@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import { KYCI_DIRECTORY_URL, shelterStatusUrl, statusRegionName } from '../shared/shelterStatus.js'
-import { fetchShelterStatus } from '../server/opendata/shelterStatus.js'
+import { fetchShelterStatus, loadShelterStatus } from '../server/opendata/shelterStatus.js'
 
 test('KYCI가 제공하는 모든 지역 탭을 시·도명과 약칭으로 연결한다', () => {
   const regions = ['서울특별시', '부산광역시', '대구광역시', '인천광역시', '광주광역시', '대전광역시', '울산광역시',
@@ -28,4 +28,15 @@ test('정원과 현원, 입소 판단을 공식 표기 그대로 읽는다', asy
   })
   assert.deepEqual(items, [{ id: 'tj10', name: '[서구] 쉼터', capacity: 10, residents: 0, status: '입소불가' }])
   await assert.rejects(fetchShelterStatus('6', () => new Response('<html>점검 중</html>')))
+})
+
+test('직접 조회가 실패하면 같은 지역을 다시 조회하고 원래 조회 시각을 유지한다', async () => {
+  const data = { items: [{ id: 'tj10', residents: 0 }], checkedAt: '2026-11-25T09:00:00Z' }
+  const status = await loadShelterStatus('6', (url) => {
+    if (url.hostname === 'www.kyci.or.kr') return new Response(null, { status: 503 })
+    assert.equal(url.href, 'https://haven-youth-anchor.vercel.app/api/shelter-status?region=6')
+    return Response.json(data)
+  })
+  assert.deepEqual(status, data)
+  await assert.rejects(loadShelterStatus('6', () => new Response(null, { status: 503 })))
 })

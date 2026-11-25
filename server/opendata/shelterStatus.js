@@ -11,7 +11,7 @@ export async function fetchShelterStatus(region, fetchImpl = fetch) {
   const url = new URL('https://www.kyci.or.kr/Shelter/shelter_list.new.asp')
   url.searchParams.set('local', region)
   const response = await fetchImpl(url, { signal: AbortSignal.timeout(6500) })
-  if (!response.ok) throw new Error('kyci-unavailable')
+  if (!response.ok) throw new Error(`kyci-http-${response.status}`)
   const root = parse(await response.text())
   const items = root.querySelectorAll('li[data-id]').map((row) => {
     const name = row.querySelector('#list_Name')?.text.trim()
@@ -27,4 +27,18 @@ export async function fetchShelterStatus(region, fetchImpl = fetch) {
   // An empty or redesigned upstream response cannot establish that a region has no shelters.
   if (!items.length) throw new Error('unexpected-kyci-response')
   return { items, checkedAt: new Date().toISOString() }
+}
+
+export async function loadShelterStatus(region, fetchImpl = fetch) {
+  if (!statusRegionName(region)) throw new Error('unknown-region')
+  try {
+    return await fetchShelterStatus(region, fetchImpl)
+  } catch (error) {
+    console.warn('공식 입소 현황 직접 조회 실패', region, error.cause?.code || error.message)
+    const url = new URL('https://haven-youth-anchor.vercel.app/api/shelter-status')
+    url.searchParams.set('region', region)
+    const response = await fetchImpl(url, { signal: AbortSignal.timeout(12000) })
+    if (!response.ok) throw new Error('shelter-status-unavailable', { cause: error })
+    return response.json()
+  }
 }

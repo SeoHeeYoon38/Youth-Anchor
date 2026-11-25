@@ -8,7 +8,7 @@ import { WebSocketServer } from 'ws'
 import { bearerToken, createGuestToken, verifyGuestToken } from './auth.js'
 import { createChatService } from './ai-chat.js'
 import { createDatabase } from './database.js'
-import { fetchShelterStatus } from './opendata/shelterStatus.js'
+import { loadShelterStatus } from './opendata/shelterStatus.js'
 import { statusRegionName } from '../shared/shelterStatus.js'
 import { syncNoticeFeeds } from './notice-sync.js'
 import { createPushService } from './push.js'
@@ -429,7 +429,7 @@ export function createApiServer(options = {}) {
           return
         }
         try {
-          sendJson(response, 200, await fetchShelterStatus(region))
+          sendJson(response, 200, await loadShelterStatus(region))
         } catch {
           sendJson(response, 502, { error: 'shelter-status-unavailable' })
         }
