@@ -40,7 +40,7 @@ function RegionalStatus({ region }) {
 export default function ShelterStatusPage({ onQuickExit }) {
   const { region } = useParams()
   const name = statusRegionName(region)
-  return <div className="feature-shell legal-shell">
+  return <div className="feature-shell legal-shell plain-back-arrow">
     <FeatureHeader title="쉼터 입소 현황" backTo="/shelters" onQuickExit={onQuickExit} />
     <main className="legal-main family-main shelter-status-page">
       <h1>{name || (region === 'sejong' ? '세종' : '지역별')} 청소년쉼터</h1>
