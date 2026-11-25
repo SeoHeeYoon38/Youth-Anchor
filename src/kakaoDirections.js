@@ -18,7 +18,7 @@ function placeSegment(name, point) {
 
 export function buildKakaoDirectionsUrl({ shelter, origin }) {
   const destinationLocation = coordinates(shelter)
-  const destination = placeSegment(shelter?.name || '대피처', shelter)
+  const destination = placeSegment(shelter?.name || '청소년쉼터', shelter)
   const currentOrigin = coordinates(origin)
 
   if (!currentOrigin) return `https://map.kakao.com/link/to/${destination}`

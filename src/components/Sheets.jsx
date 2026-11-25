@@ -12,13 +12,36 @@ import {
   ShieldCheck,
   X
 } from 'lucide-react'
-import { useState } from 'react'
-import { buildKakaoDirectionsUrl, geolocationErrorMessage, requestCurrentPosition } from '../kakaoDirections.js'
+import { useEffect, useRef } from 'react'
+import { buildKakaoDirectionsUrl } from '../kakaoDirections.js'
+import { shelterStatusUrl } from '../../shared/shelterStatus.js'
 
 function SheetFrame({ children, onClose, labelledBy, className = '' }) {
+  const dialog = useRef(null)
+  useEffect(() => {
+    const trigger = document.activeElement
+    dialog.current?.focus()
+    return () => { trigger?.focus({ preventScroll: true }) }
+  }, [])
+
+  function handleKey(event) {
+    if (event.key === 'Escape') onClose()
+    if (event.key !== 'Tab') return
+    const controls = dialog.current.querySelectorAll('a[href], button:not(:disabled)')
+    if (!controls.length) return
+    const first = controls[0]
+    const last = controls[controls.length - 1]
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog.current)) {
+      event.preventDefault()
+      last.focus()
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault()
+      first.focus()
+    }
+  }
   return (
     <div className="sheet-backdrop" role="presentation" onMouseDown={onClose}>
-      <section className={`bottom-sheet ${className}`} role="dialog" aria-modal="true" aria-labelledby={labelledBy} onMouseDown={(event) => event.stopPropagation()}>
+      <section ref={dialog} tabIndex={-1} onKeyDown={handleKey} className={`bottom-sheet ${className}`} role="dialog" aria-modal="true" aria-labelledby={labelledBy} onMouseDown={(event) => event.stopPropagation()}>
         <div className="sheet-handle" />
         {children}
       </section>
@@ -27,65 +50,43 @@ function SheetFrame({ children, onClose, labelledBy, className = '' }) {
 }
 
 export function ShelterSheet({ shelter, origin = null, onClose }) {
-  const [addressVisible, setAddressVisible] = useState(false)
-  const [routePending, setRoutePending] = useState(false)
-  const [routeError, setRouteError] = useState('')
   const mapUrl = buildKakaoDirectionsUrl({ shelter, origin })
-
-  const openDirections = (event) => {
-    event.preventDefault()
-    if (routePending) return
-
-    setRoutePending(true)
-    setRouteError('')
-    const navigateToKakaoMap = (routeOrigin) => {
-      const url = buildKakaoDirectionsUrl({ shelter, origin: routeOrigin })
-      setRoutePending(false)
-      window.location.assign(url)
-    }
-
-    requestCurrentPosition(navigator.geolocation)
-      .then(navigateToKakaoMap)
-      .catch((error) => {
-        setRoutePending(false)
-        setRouteError(geolocationErrorMessage(error))
-      })
-  }
-  // 공공데이터에서 대표전화를 받아오면 그 번호로 걸고, 없으면 청소년전화 1388로 안내한다.
-  const phone = shelter.phone || '1388'
-  const dialNumber = phone.replace(/[^0-9+]/g, '') || '1388'
+  const [firstPhone] = (shelter.phone || '').trim().split(/[,;/~]/)
+  const displayPhone = firstPhone.trim().replace(/^(02|0\d{2})(\d{3,4})(\d{4})$/, '$1-$2-$3')
+  const dialNumber = firstPhone.replace(/[\s().-]/g, '')
+  const hasPhone = /^(?:0\d{8,10}|\+82\d{8,10}|1[5-8]\d{6})$/.test(dialNumber)
+  const target = shelter.entryTarget || (shelter.source === 'mogef-teen-shelter' ? '' : shelter.ages)
+  const inquiry = '쉼터에 문의'
   return (
     <SheetFrame onClose={onClose} labelledBy="shelter-sheet-title" className="shelter-sheet warm-sheet">
-      <div className="sheet-title-row">
-        <span className="sheet-place-icon"><img src="/figma/warm/map-shelter.svg" alt="" aria-hidden="true" /></span>
-        <div className="shelter-title-copy">
-          <span className="section-kicker">안전 공간 정보</span>
-          <button
-            className={`shelter-title-trigger ${addressVisible ? 'address-visible' : ''}`}
-            type="button"
-            aria-expanded={addressVisible}
-            aria-describedby="shelter-sheet-address"
-            onClick={() => setAddressVisible((visible) => !visible)}
-          >
-            <h2 id="shelter-sheet-title">{shelter.name}</h2>
-            <span className="shelter-title-tags">{shelter.features.slice(0, 3).map((feature) => `#${feature}`).join(' ')}</span>
-            <span className="sheet-address-popover" id="shelter-sheet-address" role="tooltip">{shelter.address}</span>
-          </button>
+      <header className="shelter-detail-heading">
+        <img src="/figma/warm/map-shelter.svg" alt="" />
+        <div>
+          <p>{[shelter.gender, shelter.type].filter(Boolean).join(' · ')}</p>
+          <h2 id="shelter-sheet-title">{shelter.name}</h2>
         </div>
-      </div>
-      <div className="sheet-facts">
-        <div><span>이용 대상</span><strong>{shelter.gender}<br />{shelter.ages}</strong></div>
-        <div><span>운영 시간</span><strong>{shelter.open}</strong></div>
-        <div><span>입소 문의</span><strong>{phone}</strong></div>
-      </div>
-      <p className="sheet-warning shelter-warning">출발 전 전화로 입소 가능 여부를 다시 확인해 주세요. 연결이 어렵다면 청소년전화 1388을 이용하세요.</p>
+        <button type="button" className="help-close" onClick={onClose} aria-label="쉼터 상세 닫기"><X size={19} /></button>
+      </header>
+      <dl className="shelter-admission">
+        <div className="shelter-capacity"><dt>전체 정원</dt>
+          <dd><span>{Number.isInteger(shelter.capacity) && shelter.capacity >= 0 ? `${shelter.capacity}명` : inquiry}</span>
+            <a className="shelter-status-action" href={shelterStatusUrl(shelter)} target="_blank" rel="noreferrer">
+              공식 입소 현황 보기 <ExternalLink size={14} aria-hidden="true" />
+            </a>
+          </dd>
+        </div>
+        <div><dt>입소 대상</dt><dd>{target || inquiry}</dd></div>
+        <div><dt>입소 기간</dt><dd>{shelter.entryPeriod || inquiry}</dd></div>
+        <div><dt>주소</dt><dd>{shelter.address || inquiry}</dd></div>
+        <div><dt>대표전화</dt><dd>{hasPhone ? <a href={`tel:${dialNumber}`}>{displayPhone}</a> : '시설 번호 미제공'}</dd></div>
+      </dl>
+      <p className="admission-note">현재 입소 가능 여부는 방문 전에 전화로 확인해 주세요.</p>
       <div className="sheet-actions">
-        <a className="secondary-action" href={`tel:${dialNumber}`}><Phone size={18} /> 전화 확인</a>
-        <a className="primary-action" href={mapUrl} onClick={openDirections} aria-busy={routePending}>
-          <Navigation size={18} /> {routePending ? '현재 위치 확인 중' : '경로 안내받기'}
+        <a className="secondary-action" href={hasPhone ? `tel:${dialNumber}` : 'tel:1388'} aria-label={hasPhone ? '전화로 입소 가능 여부 확인' : '청소년상담 1388에 문의'}>
+          <Phone size={18} /> {hasPhone ? '전화 확인' : '1388 문의'}
         </a>
+        <a className="primary-action" href={mapUrl} target="_blank" rel="noreferrer" aria-label="카카오맵 길 찾기"><Navigation size={18} /> 경로 안내받기</a>
       </div>
-      {routeError && <p className="route-permission-message" role="alert">{routeError}</p>}
     </SheetFrame>
   )
 }

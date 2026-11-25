@@ -91,6 +91,9 @@ test('admin can register a shelter and nearby search returns location details', 
       address: '서울 중구',
       phone: '1388',
       open: '24시간',
+      capacity: 10,
+      entryTarget: '만 9세~24세 청소년',
+      entryPeriod: '24시간 이내',
       features: ['숙박', '식사']
     })
   })
@@ -104,10 +107,30 @@ test('admin can register a shelter and nearby search returns location details', 
   assert.equal(nearbyResponse.status, 200)
   assert.equal(nearby.items.length, 1)
   assert.equal(typeof nearby.items[0].distance, 'number')
-  assert.equal('capacity' in nearby.items[0], false)
+  assert.equal(nearby.items[0].capacity, 10)
+  assert.equal(nearby.items[0].entryTarget, '만 9세~24세 청소년')
+  assert.equal(nearby.items[0].entryPeriod, '24시간 이내')
+  assert.equal('available' in nearby.items[0], false)
 
   const detailResponse = await fetch(`${baseUrl}/api/v1/shelters/${created.id}`, { headers: authHeaders() })
   assert.equal(detailResponse.status, 200)
+  assert.equal((await detailResponse.json()).capacity, 10)
+})
+
+test('전국 목록은 서울시청의 검색 반경 밖에 있는 제주 쉼터도 반환한다', async () => {
+  const seoul = server.repository.createShelter({
+    name: '서울 전국조회 테스트 쉼터', type: '단기쉼터', address: '서울특별시 중구', lat: 37.5663, lng: 126.978
+  })
+  const jeju = server.repository.createShelter({
+    name: '제주 테스트 쉼터', type: '단기쉼터', address: '제주특별자치도 제주시', lat: 33.5, lng: 126.5
+  })
+  const list = await fetch(`${baseUrl}/api/v1/shelters`, { headers: authHeaders() })
+  assert.equal(list.status, 200)
+  const { items } = await list.json()
+  assert.ok(items.some((item) => item.id === seoul.id))
+  assert.ok(items.some((item) => item.id === jeju.id && item.capacity === null))
+  const nearby = await fetch(`${baseUrl}/api/v1/shelters/nearby?lat=37.5663&lng=126.978`, { headers: authHeaders() })
+  assert.ok(!(await nearby.json()).items.some((item) => item.id === jeju.id))
 })
 
 test('notice list and detail are backed by sqlite', async () => {

@@ -1,7 +1,7 @@
 import { Bell, ExternalLink } from 'lucide-react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
-import ChatFab from '../components/ChatFab.jsx'
+import JobSearchFab from '../components/JobSearchFab.jsx'
 import Mascot from '../components/Mascot.jsx'
 
 export default function HavenLayout({ onQuickExit, onNotice }) {
@@ -41,7 +41,7 @@ export default function HavenLayout({ onQuickExit, onNotice }) {
 
       <main><Outlet /></main>
 
-      {pathname !== '/chat' && <ChatFab key={pathname} />}
+      {pathname !== '/chat' && <JobSearchFab key={pathname} />}
 
       <BottomNav warm={usesWarmNav} mapTheme={isShelters} />
     </div>

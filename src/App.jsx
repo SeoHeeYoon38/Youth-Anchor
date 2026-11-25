@@ -7,7 +7,9 @@ import HavenLayout from './layouts/HavenLayout.jsx'
 import ChatPage from './pages/ChatPage.jsx'
 import AdminNotificationsPage from './pages/AdminNotificationsPage.jsx'
 import HomePage from './pages/HomePage.jsx'
+import FamilyHelpPage from './pages/FamilyHelpPage.jsx'
 import SheltersPage from './pages/SheltersPage.jsx'
+import ShelterStatusPage from './pages/ShelterStatusPage.jsx'
 import SupportPage from './pages/SupportPage.jsx'
 import WelcomePage from './pages/WelcomePage.jsx'
 import { RightsCatalogPage, RightsDetailPage, RightsDocumentsPage, RightsHomePage } from './pages/RightsPage.jsx'
@@ -35,13 +37,13 @@ export default function App() {
 
   useEffect(() => {
     let active = true
-    fetchShelters(position || DEFAULT_CENTER)
+    fetchShelters()
       .then((items) => {
-        if (active && Array.isArray(items) && items.length > 0) setShelterItems(items)
+        if (active && Array.isArray(items)) setShelterItems(items)
       })
       .catch(() => {})
     return () => { active = false }
-  }, [position])
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -83,7 +85,7 @@ export default function App() {
         setLocating(false)
       },
       () => {
-        setLocationMessage('위치 권한 없이도 대피처를 확인할 수 있어요')
+        setLocationMessage('위치 권한 없이도 쉼터를 확인할 수 있어요')
         setLocating(false)
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
@@ -123,11 +125,14 @@ export default function App() {
         <Route path="/rights" element={<RightsHomePage onQuickExit={quickExit} />} />
         <Route path="/rights/catalog" element={<RightsCatalogPage onQuickExit={quickExit} />} />
         <Route path="/rights/documents" element={<RightsDocumentsPage onQuickExit={quickExit} />} />
+        <Route path="/rights/document/youth-labor-guide" element={<Navigate to="/rights/documents?collection=youth-labor-guide" replace />} />
         <Route path="/rights/document/:documentId" element={<RightsDetailPage onQuickExit={quickExit} />} />
         <Route path="/diary" element={<DiaryHomePage onQuickExit={quickExit} />} />
         <Route path="/diary/new" element={<DiaryEntryPage onQuickExit={quickExit} />} />
         <Route path="/diary/checklist" element={<DiaryChecklistPage onQuickExit={quickExit} />} />
         <Route path="/legal" element={<LegalHomePage onQuickExit={quickExit} />} />
+        <Route path="/family-help/:topicId?" element={<FamilyHelpPage onQuickExit={quickExit} />} />
+        <Route path="/shelters/status/:region" element={<ShelterStatusPage onQuickExit={quickExit} />} />
         <Route path="/legal/chat" element={<LegalChatPage onQuickExit={quickExit} />} />
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
           <Route path="/home" element={<HomePage shelters={sortedShelters} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} onOpenGuide={() => setGuideOpen(true)} />} />

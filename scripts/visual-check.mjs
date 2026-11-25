@@ -1,3 +1,4 @@
+import assert from 'node:assert/strict'
 import { mkdir } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
@@ -23,6 +24,7 @@ const cases = [
   { name: 'haven-welcome-mobile', path: '/', viewport: { width: 390, height: 844 } },
   { name: 'haven-home-mobile', path: '/home', viewport: { width: 390, height: 844 } },
   { name: 'haven-shelters-mobile', path: '/shelters', viewport: { width: 390, height: 844 } },
+  { name: 'haven-family-help-mobile', path: '/family-help', viewport: { width: 390, height: 844 } },
   { name: 'haven-chat-mobile', path: '/chat', viewport: { width: 390, height: 844 } },
   { name: 'haven-support-mobile', path: '/support', viewport: { width: 390, height: 844 } },
   { name: 'haven-home-desktop', path: '/home', viewport: { width: 1100, height: 900 } }
@@ -63,9 +65,12 @@ for (const item of cases) {
 
 const interactionPage = await browser.newPage({ viewport: { width: 390, height: 844 } })
 await interactionPage.goto(`${appUrl}/home`, { waitUntil: 'networkidle' })
-await interactionPage.getByRole('button', { name: /SOS 대피처/ }).click()
+assert.deepEqual(await interactionPage.locator('.feature-tile strong').allTextContents(), ['지원', '법률 상담', '일기장', '안전 가이드'])
+await interactionPage.getByRole('button', { name: /지도에서 모두 보기/ }).click()
 await interactionPage.waitForURL('**/shelters')
-await interactionPage.getByRole('button', { name: '가온 헬퍼 채팅 열기' }).click()
+const jobs = interactionPage.getByRole('link', { name: '일자리를 찾아봐요', exact: true })
+assert.match(await jobs.getAttribute('href'), /^https:\/\/www\.work24\.go\.kr\/wk\/a\/b\/1200\//)
+await interactionPage.getByRole('link', { name: '채팅', exact: true }).click()
 await interactionPage.waitForURL('**/chat')
 await interactionPage.goto(`${appUrl}/shelters`, { waitUntil: 'networkidle' })
 await interactionPage.locator('.haven-map-marker').first().click()
@@ -73,14 +78,14 @@ await interactionPage.getByRole('dialog').waitFor()
 await interactionPage.keyboard.press('Escape')
 await interactionPage.goto(`${appUrl}/home`, { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: /안전 가이드/ }).click()
-await interactionPage.getByRole('dialog', { name: /가온의 안전 가이드/ }).waitFor()
+await interactionPage.getByRole('dialog', { name: /HAVEN의 안전 가이드/ }).waitFor()
 await interactionPage.goto(`${appUrl}/support`, { waitUntil: 'networkidle' })
 await interactionPage.getByRole('tab', { name: '식사' }).click()
 await interactionPage.getByText('식사 지원', { exact: true }).waitFor()
 await interactionPage.getByText(/학교우유급식|농식품바우처|청소년방과후아카데미운영지원/).first().waitFor()
 await interactionPage.goto(`${appUrl}/home`, { waitUntil: 'networkidle' })
-await interactionPage.getByRole('button', { name: '가온 헬퍼 플로팅 버튼 닫기' }).click()
-await interactionPage.getByRole('button', { name: '가온 헬퍼 플로팅 버튼 닫기' }).waitFor({ state: 'detached' })
+await interactionPage.getByRole('button', { name: '일자리 찾기 닫기' }).click()
+await jobs.waitFor({ state: 'detached' })
 await interactionPage.goto(`${appUrl}/chat`, { waitUntil: 'networkidle' })
 await interactionPage.getByRole('button', { name: '그냥 이야기하고 싶어요' }).click()
 await interactionPage.getByText('그냥 이야기하고 싶어요', { exact: true }).waitFor()

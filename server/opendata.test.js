@@ -198,6 +198,16 @@ test('이름이나 주소가 없는 레코드와 비노출 레코드는 버린�
   assert.equal(normalizeShelter({ ...SHELTER_RECORD, expsrYn: 'false' }), null)
 })
 
+test('정원 미제공과 정원 0명을 구분하고 시설별 연령과 연락처는 추정하지 않는다', () => {
+  for (const cpctCnt of ['', '  ', null, undefined]) {
+    assert.equal(normalizeShelter({ ...SHELTER_RECORD, cpctCnt }).capacity, null)
+  }
+  const facility = normalizeShelter({ ...SHELTER_RECORD, cpctCnt: '0', etrTrgtCn: '여자', rprsTelno: '' })
+  assert.equal(facility.capacity, 0)
+  assert.equal(facility.ages, '')
+  assert.equal(facility.phone, '')
+})
+
 test('좌표가 비어도 정규화는 성공하고 좌표만 null이 된다', () => {
   const shelter = normalizeShelter({ ...SHELTER_RECORD, lat: 0, lot: '' })
   assert.equal(shelter.lat, null)

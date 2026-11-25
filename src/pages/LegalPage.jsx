@@ -69,14 +69,14 @@ const LEGAL_CONVERSATIONS = {
   }
 }
 
-function LegalShell({ title, onQuickExit, backTo, hideBack = false, children }) {
+function LegalShell({ title, onQuickExit, backTo, children }) {
   const { pathname } = useLocation()
   const shellRef = useRef(null)
 
   useEffect(() => { shellRef.current?.scrollTo({ top: 0 }) }, [pathname])
 
   return (
-    <div className={`feature-shell legal-shell ${hideBack ? 'legal-shell-hide-back' : ''}`} ref={shellRef}>
+    <div className="feature-shell legal-shell plain-back-arrow" ref={shellRef}>
       <FeatureHeader title={title} onQuickExit={onQuickExit} backTo={backTo} />
       <main className="legal-main">{children}</main>
       <BottomNav warm supportLast />
@@ -97,7 +97,7 @@ export function LegalHomePage({ onQuickExit }) {
   }, [])
 
   return (
-    <LegalShell title="법률 상담" onQuickExit={onQuickExit} backTo="/home" hideBack>
+    <LegalShell title="법률 상담" onQuickExit={onQuickExit} backTo="/home">
       <section className="legal-picker" aria-labelledby="legal-picker-title">
         <div className="legal-picker-heading">
           <span className="legal-picker-symbol"><img src={`${ASSET_ROOT}/legal-scale.svg`} alt="" /></span>

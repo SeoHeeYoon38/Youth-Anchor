@@ -1,14 +1,15 @@
 import { LocateFixed } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ShelterCard from '../components/ShelterCard.jsx'
+import { FamilyHelpCard, ShelterVisitNote } from '../components/ShelterHelp.jsx'
 
 const WARM_ASSET_ROOT = '/figma/warm'
 const FEATURE_ASSET_ROOT = '/figma/features'
 
 const QUICK_ACTIONS = [
-  { label: '일기장', description: '오늘의 기분을 남겨보기', icon: `${FEATURE_ASSET_ROOT}/home-action-diary-book.svg`, tone: 'diary', to: '/diary' },
   { label: '지원', description: '주거·생활 지원 찾아보기', icon: `${WARM_ASSET_ROOT}/nav-support.svg`, tone: 'rights', to: '/support' },
   { label: '법률 상담', description: '부당한 일, 같이 대응하기', icon: `${FEATURE_ASSET_ROOT}/home-action-legal-2.png`, tone: 'legal', to: '/legal' },
+  { label: '일기장', description: '오늘의 기분을 남겨보기', icon: `${FEATURE_ASSET_ROOT}/home-action-diary-book.svg`, tone: 'diary', to: '/diary' },
   { label: '안전 가이드', description: '흔적 없이 안전하게', icon: `${FEATURE_ASSET_ROOT}/home-action-guide.svg`, tone: 'guide', action: 'guide' }
 ]
 
@@ -52,22 +53,20 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
 
       <section className="nearby-section">
         <div className="home-section-heading nearby-title">
-          <div><span>가까운 안전 공간</span><h2>지금 갈 수 있는 대피처</h2><p>{locationMessage}</p></div>
+          <div><span>안전하게 머물 곳</span><h2>가까운 청소년쉼터</h2><p>{locationMessage}</p></div>
           <button className="locate-button transition hover:-translate-y-0.5" onClick={locateMe} disabled={locating}>
             <LocateFixed size={18} className={locating ? 'spin' : ''} /> {locating ? '찾는 중' : '내 위치'}
           </button>
         </div>
-        <button className="shelter-intro-card" onClick={() => navigate('/shelters')}>
-          <span className="shelter-intro-icon" aria-hidden="true"><img src={`${WARM_ASSET_ROOT}/shelter-intro.svg`} alt="" /></span>
-          <span><strong>가까운 대피처를 찾아보세요</strong><small>방문 전 운영 여부와 이용 가능 인원을 확인한 뒤 갈 수 있는 대피처를 찾아보세요.</small></span>
-        </button>
+        <FamilyHelpCard />
         <div className="shelter-strip">
           {shelters.slice(0, 3).map((shelter) => (
             <ShelterCard key={shelter.id} shelter={shelter} variant="warm" onClick={() => onSelectShelter(shelter)} />
           ))}
-          {shelters.length === 0 && <div className="empty-state compact"><strong>등록된 대피처가 없어요</strong><p>관리자가 정보를 등록하면 가까운 순서로 표시돼요.</p></div>}
+          {shelters.length === 0 && <div className="empty-state compact"><strong>표시할 쉼터가 없어요</strong><p>잠시 후 다시 확인해 주세요.</p></div>}
         </div>
         <button className="section-link group" onClick={() => navigate('/shelters')}>지도에서 모두 보기 <span aria-hidden="true">&gt;</span></button>
+        <ShelterVisitNote />
       </section>
     </div>
   )

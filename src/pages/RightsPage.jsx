@@ -1,11 +1,12 @@
-import { Check, ChevronLeft, ChevronRight, ExternalLink, FolderOpen, FolderPlus, Plus, Search, Trash2, X } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, ExternalLink, FolderOpen, FolderPlus, Phone, Plus, Search, Trash2, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { fetchRightsDocuments, fetchUserData, recommendRightsCollection, saveUserData } from '../api.js'
 import FeatureHeader from '../components/FeatureHeader.jsx'
 import BottomNav from '../components/BottomNav.jsx'
-import ChatFab from '../components/ChatFab.jsx'
+import JobSearchFab from '../components/JobSearchFab.jsx'
 import { RIGHTS_DOCUMENTS, RIGHTS_DOCUMENT_DETAILS } from '../../shared/rightsCatalog.js'
+import { laborStarterCollection, laborTopics } from '../laborGuide.js'
 
 const ASSET_ROOT = '/figma/features'
 const SAVED_DOCUMENTS_KEY = 'haven-rights-saved-documents'
@@ -37,13 +38,17 @@ function readStoredArray(key, fallback) {
   }
 }
 
-function readSavedDocumentIds() { return readStoredArray(SAVED_DOCUMENTS_KEY, DEFAULT_SAVED_DOCUMENT_IDS) }
-function readCollections() {
-  return readStoredArray(COLLECTIONS_KEY, DEFAULT_COLLECTIONS).map((collection) => ({
+function withoutOldGuide(ids) { return ids.filter((id) => id !== laborStarterCollection.id) }
+function readSavedDocumentIds() { return withoutOldGuide(readStoredArray(SAVED_DOCUMENTS_KEY, DEFAULT_SAVED_DOCUMENT_IDS)) }
+function prepareCollections(stored, starter = laborStarterCollection) {
+  const collections = stored.map((collection) => ({
     ...collection,
-    documentIds: Array.isArray(collection.documentIds) ? collection.documentIds : [],
-    checkedDocumentIds: Array.isArray(collection.checkedDocumentIds) ? collection.checkedDocumentIds : []
+    title: collection.id === laborStarterCollection.id && !collection.removed ? laborStarterCollection.title : collection.title,
+    documentIds: withoutOldGuide(Array.isArray(collection.documentIds) ? collection.documentIds : []),
+    checkedDocumentIds: withoutOldGuide(Array.isArray(collection.checkedDocumentIds) ? collection.checkedDocumentIds : [])
   }))
+  // A deleted starter stays in storage as a marker so a later visit won't seed it again.
+  return collections.some(({ id }) => id === laborStarterCollection.id) ? collections : [starter, ...collections]
 }
 
 function useRightsCatalog() {
@@ -60,7 +65,7 @@ function useRightsCatalog() {
 
 function useRightsLibrary() {
   const [savedDocumentIds, setSavedDocumentIds] = useState(readSavedDocumentIds)
-  const [collections, setCollections] = useState(readCollections)
+  const [collections, setCollections] = useState(() => prepareCollections(readStoredArray(COLLECTIONS_KEY, DEFAULT_COLLECTIONS)))
   const hydratedRef = useRef(false)
 
   useEffect(() => {
@@ -69,13 +74,9 @@ function useRightsLibrary() {
       if (!active) return
       const remote = saved.data && typeof saved.data === 'object' ? saved.data : {}
       if (saved.updatedAt) {
-        if (Array.isArray(remote.savedDocumentIds)) setSavedDocumentIds(remote.savedDocumentIds)
+        if (Array.isArray(remote.savedDocumentIds)) setSavedDocumentIds(withoutOldGuide(remote.savedDocumentIds))
         if (Array.isArray(remote.collections)) {
-          setCollections(remote.collections.map((collection) => ({
-            ...collection,
-            documentIds: Array.isArray(collection.documentIds) ? collection.documentIds : [],
-            checkedDocumentIds: Array.isArray(collection.checkedDocumentIds) ? collection.checkedDocumentIds : []
-          })))
+          setCollections((local) => prepareCollections(remote.collections, local.find(({ id }) => id === laborStarterCollection.id)))
         }
       }
       hydratedRef.current = true
@@ -89,7 +90,7 @@ function useRightsLibrary() {
     if (hydratedRef.current) saveUserData('rights-library', { savedDocumentIds, collections }).catch(() => {})
   }, [collections, savedDocumentIds])
 
-  return { savedDocumentIds, setSavedDocumentIds, collections, setCollections }
+  return { savedDocumentIds, setSavedDocumentIds, collections: collections.filter((book) => !book.removed), setCollections }
 }
 
 function fallbackCollectionSuggestion(title) {
@@ -109,7 +110,7 @@ function RightsShell({ title = '서류사전', onQuickExit, backTo = '/home', pa
   const shellRef = useRef(null)
   const displayBack = showBack || pageClass.includes('rights-detail-page')
   useEffect(() => { shellRef.current?.scrollTo({ top: 0 }) }, [pathname])
-  return <div className={`feature-shell rights-shell ${pageClass}`} ref={shellRef}><FeatureHeader title={title} onQuickExit={onQuickExit} backTo={backTo} showBack={displayBack} /><main className="rights-main">{children}</main><ChatFab key={pathname} /><BottomNav warm /></div>
+  return <div className={`feature-shell rights-shell ${pageClass}`} ref={shellRef}><FeatureHeader title={title} onQuickExit={onQuickExit} backTo={backTo} showBack={displayBack} /><main className="rights-main">{children}</main><JobSearchFab key={pathname} /><BottomNav warm /></div>
 }
 
 function GovernmentBanner() {
@@ -233,25 +234,38 @@ function CreateCollectionDialog({ books = BOOKS, onClose, onCreate }) {
 }
 
 function PreparationChecklist({ catalog = BOOKS, collection, onViewDocument, onToggle, onAddDocuments }) {
-  const books = collection.documentIds.map((id) => catalog.find((book) => book.id === id)).filter(Boolean)
+  const [expandedTopic, setExpandedTopic] = useState(null)
+  const entries = collection.id === laborStarterCollection.id ? [...laborTopics, ...catalog] : catalog
+  const books = collection.documentIds.map((id) => entries.find((book) => book.id === id)).filter(Boolean)
   const done = collection.checkedDocumentIds.filter((id) => collection.documentIds.includes(id)).length
   const progress = books.length ? Math.round((done / books.length) * 100) : 0
   return (
     <section className="rights-prep-card">
       <div className="rights-prep-heading"><span><small>{collection.category} · 나의 준비 목록</small><h1>{collection.title}</h1></span><button type="button" onClick={onAddDocuments}><Plus size={15} /> 서류 추가</button></div>
-      <p>하나씩 준비하면 돼요. 벌써 {done}개를 모았어요.</p>
+      <p>{collection.id === laborStarterCollection.id ? '내용을 읽고 확인한 항목에 체크해요.' : `하나씩 준비하면 돼요. 벌써 ${done}개를 모았어요.`}</p>
       <div className="rights-progress-row"><strong>{done} / {books.length} 준비</strong><b>{progress}%</b></div>
       <div className="rights-progress"><span style={{ width: `${progress}%` }} /></div>
       <div className="rights-prep-list">
         {books.map((book) => {
-          const metadata = prepMetadataFor(book)
+          const topic = laborTopics.find((item) => item.id === book.id)
+          const metadata = topic ? null : prepMetadataFor(book)
           const complete = collection.checkedDocumentIds.includes(book.id)
           return (
             <div key={book.id} className={`rights-prep-item ${complete ? 'done' : ''}`}>
-              <button type="button" className="rights-check" onClick={() => onToggle(book.id)} aria-label={`${book.title} ${complete ? '준비 전으로 변경' : '준비 완료로 변경'}`} />
+              <button type="button" className="rights-check" onClick={() => onToggle(book.id)} aria-pressed={complete} aria-label={`${book.title} ${complete ? '준비 전으로 변경' : '준비 완료로 변경'}`} />
               <div className="rights-prep-document">
-                <span><strong>{book.title}</strong><small>{metadata.detail}<br />유효 기준 · {metadata.rule}</small></span>
-                <span className="rights-prep-actions"><em>{complete ? '준비완료' : '준비 전'}</em><button type="button" onClick={() => onViewDocument(book.id)}>찾아보기</button></span>
+                <span><strong>{book.title}</strong>{metadata && <small>{metadata.detail}<br />유효 기준 · {metadata.rule}</small>}</span>
+                <span className="rights-prep-actions">
+                  <em>{complete ? '준비완료' : '준비 전'}</em>
+                  {topic
+                    ? <button type="button" aria-expanded={expandedTopic === topic.id} onClick={() => setExpandedTopic(expandedTopic === topic.id ? null : topic.id)}>{expandedTopic === topic.id ? '접기' : '내용 보기'}</button>
+                    : <button type="button" onClick={() => onViewDocument(book.id)}>찾아보기</button>}
+                </span>
+                {topic && expandedTopic === topic.id && <div className="rights-prep-topic">
+                  <p>{topic.body}</p>
+                  {topic.phone && <a className="help-primary" href={`tel:${topic.phone.replaceAll('-', '')}`}><Phone size={16} /> {topic.phone} 전화로 상담하기</a>}
+                  <a className="help-text-link" href={topic.url} target="_blank" rel="noreferrer">{topic.source} <ExternalLink size={13} /></a>
+                </div>}
               </div>
             </div>
           )
@@ -266,13 +280,36 @@ export function RightsHomePage({ onQuickExit }) {
   const navigate = useNavigate()
   const books = useRightsCatalog()
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('전체')
+  const [params, setParams] = useSearchParams()
+  const requestedCategory = params.get('category')
+  const category = CATEGORIES.includes(requestedCategory) ? requestedCategory : '전체'
   const [page, setPage] = useState(1)
-  const filteredBooks = useMemo(() => books.filter((book) => (!query.trim() || book.title.includes(query.trim())) && (category === '전체' || book.category === category)), [books, category, query])
+  const filteredBooks = useMemo(() => books.filter((book) => book.title.replace(/\s/g, '').includes(query.replace(/\s/g, '')) && (category === '전체' || book.category === category)), [books, category, query])
   const totalPages = Math.max(1, Math.ceil(filteredBooks.length / 4))
   const visibleBooks = filteredBooks.slice((page - 1) * 4, page * 4)
-  const changeCategory = (nextCategory) => { setCategory(nextCategory); setPage(1) }
-  return <RightsShell onQuickExit={onQuickExit} pageClass="rights-home-page"><section className="rights-featured"><span className="rights-pill">생활 · 필수 서류</span><h1>주민등록등본·초본</h1><p>내가 사는 곳과 누구와 살고 있는지 알려줘요. 초본은 내 주소가 바뀐 기록 등을 보여줘요.</p><div className="rights-document-art" aria-hidden="true"><strong>주민등록등본</strong><span /><span /><span /></div><img className="rights-sparkles" src={`${ASSET_ROOT}/rights-sparkles.png`} alt="" /></section><label className="rights-search rights-main-search"><Search size={21} /><input value={query} onChange={(event) => { setQuery(event.target.value); setPage(1) }} placeholder="필요한 서류를 검색해보세요!" /></label><CategoryTabs value={category} onChange={changeCategory} /><div className="rights-catalog-grid">{visibleBooks.map((book) => <BookCard key={book.id} book={book} variant="grid" onClick={() => navigate(`/rights/document/${book.id}`)} />)}</div>{visibleBooks.length === 0 && <p className="rights-catalog-empty">검색 결과가 없어요.</p>}<PageControls page={page} totalPages={totalPages} onChange={setPage} /><GovernmentBanner /><button type="button" className="rights-secondary-cta" onClick={() => navigate('/rights/catalog')}><FolderOpen size={24} /> 내 서류함으로 이동하기</button></RightsShell>
+  const changeCategory = (nextCategory) => {
+    setParams(nextCategory === '전체' ? {} : { category: nextCategory }, { replace: true })
+    setPage(1)
+  }
+  return (
+    <RightsShell onQuickExit={onQuickExit} pageClass="rights-home-page">
+      <section className="rights-featured">
+        <span className="rights-pill">생활 · 필수 서류</span><h1>주민등록등본·초본</h1>
+        <p>내가 사는 곳과 누구와 살고 있는지 알려줘요. 초본은 내 주소가 바뀐 기록 등을 보여줘요.</p>
+        <div className="rights-document-art" aria-hidden="true"><strong>주민등록등본</strong><span /><span /><span /></div>
+        <img className="rights-sparkles" src={`${ASSET_ROOT}/rights-sparkles.png`} alt="" />
+      </section>
+      <label className="rights-search rights-main-search"><Search size={21} /><input aria-label="서류 검색" value={query} onChange={(event) => { setQuery(event.target.value); setPage(1) }} placeholder="서류 이름을 검색해 보세요" /></label>
+      <CategoryTabs value={category} onChange={changeCategory} />
+      {visibleBooks.length > 0 && <>
+        <div className="rights-catalog-grid">{visibleBooks.map((book) => <BookCard key={book.id} book={book} variant="grid" onClick={() => navigate(`/rights/document/${book.id}`)} />)}</div>
+        <PageControls page={page} totalPages={totalPages} onChange={setPage} />
+      </>}
+      {!visibleBooks.length && <p className="rights-catalog-empty">검색 결과가 없어요.</p>}
+      <GovernmentBanner />
+      <button type="button" className="rights-secondary-cta" onClick={() => navigate('/rights/catalog')}><FolderOpen size={24} /> 내 서류함으로 이동하기</button>
+    </RightsShell>
+  )
 }
 
 export function RightsCatalogPage({ onQuickExit }) {
@@ -293,7 +330,9 @@ export function RightsCatalogPage({ onQuickExit }) {
   const createCollection = (collection) => { setCollections((current) => [...current, collection]); setSavedDocumentIds((current) => [...new Set([...current, ...collection.documentIds])]); setDialog(null) }
   const deleteSelectedBook = () => {
     if (!deleteTarget) return
-    if (deleteTarget.type === 'collection') setCollections((current) => current.filter((collection) => collection.id !== deleteTarget.id))
+    if (deleteTarget.id === laborStarterCollection.id && deleteTarget.type === 'collection') {
+      setCollections((current) => current.map((book) => book.id === deleteTarget.id ? { id: book.id, removed: true } : book))
+    } else if (deleteTarget.type === 'collection') setCollections((current) => current.filter((collection) => collection.id !== deleteTarget.id))
     else setSavedDocumentIds((current) => current.filter((id) => id !== deleteTarget.id))
     setDeleteTarget(null)
   }
@@ -311,7 +350,12 @@ export function RightsDocumentsPage({ onQuickExit }) {
   const selected = collections.find((collection) => collection.id === selectedId) || collections[0]
   const updateSelected = (update) => setCollections((current) => current.map((collection) => collection.id === selected.id ? update(collection) : collection))
   const toggleDocument = (id) => updateSelected((collection) => ({ ...collection, checkedDocumentIds: collection.checkedDocumentIds.includes(id) ? collection.checkedDocumentIds.filter((item) => item !== id) : [...collection.checkedDocumentIds, id] }))
-  const saveDocuments = (ids) => { updateSelected((collection) => ({ ...collection, documentIds: ids, checkedDocumentIds: collection.checkedDocumentIds.filter((id) => ids.includes(id)) })); setSavedDocumentIds((current) => [...new Set([...current, ...ids])]); setPickerOpen(false) }
+  const saveDocuments = (ids) => {
+    updateSelected((collection) => ({ ...collection, documentIds: ids, checkedDocumentIds: collection.checkedDocumentIds.filter((id) => ids.includes(id)) }))
+    const documentIds = ids.filter((id) => books.some((book) => book.id === id))
+    setSavedDocumentIds((current) => [...new Set([...current, ...documentIds])])
+    setPickerOpen(false)
+  }
   if (!selected) return <RightsShell title="내 서류함" onQuickExit={onQuickExit} backTo="/rights/catalog" showBack pageClass="rights-documents-page"><div className="rights-collection-empty"><FolderPlus size={42} /><h1>먼저 준비 책을 만들어주세요</h1><p>목적에 맞는 서류를 한곳에 모아 체크할 수 있어요.</p><button type="button" onClick={() => navigate('/rights/catalog')}>준비 책장으로 돌아가기</button></div></RightsShell>
   return <RightsShell title="내 서류함" onQuickExit={onQuickExit} backTo="/rights/catalog" showBack pageClass="rights-documents-page"><GovernmentBanner /><div className="rights-prep-tabs" aria-label="준비 책 선택">{collections.map((collection) => <button type="button" key={collection.id} className={selected.id === collection.id ? 'active' : ''} onClick={() => setSelectedId(collection.id)}>{collection.title}</button>)}</div><aside className="rights-privacy-note"><span aria-hidden="true" /><div><strong>서류 원본 대신, 준비 상태만 체크해요</strong><small>체크 내용은 익명 세션에 임시 저장돼요. 주민번호나 계좌번호는 입력하지 마세요.</small></div></aside><PreparationChecklist catalog={books} collection={selected} onViewDocument={(bookId) => navigate(`/rights/document/${bookId}`)} onToggle={toggleDocument} onAddDocuments={() => setPickerOpen(true)} />{pickerOpen && <DocumentPicker books={books} title={`${selected.title}에 서류 추가`} selectedIds={selected.documentIds} onClose={() => setPickerOpen(false)} onSave={saveDocuments} />}</RightsShell>
 }
@@ -322,13 +366,43 @@ export function RightsDetailPage({ onQuickExit }) {
   const { savedDocumentIds, setSavedDocumentIds } = useRightsLibrary()
   const { documentId = 'resident' } = useParams()
   const book = books.find((item) => item.id === documentId) || books[0]
-  const detail = book?.detail || DOCUMENT_DETAILS[documentId] || { eyebrow: `${book.category} · 필요한 서류`, title: book.title, summary: `${book.title}을 준비할 때 필요한 발급 방법과 확인할 내용을 한눈에 살펴봐요.`, uses: [`${book.category} 지원`, '신청 서류', '자격 확인'], issuance: {}, checklist: [] }
+  const detail = book.detail || DOCUMENT_DETAILS[documentId]
   const bookIndex = books.findIndex((item) => item.id === book.id)
   const previousBook = books[(bookIndex - 1 + books.length) % books.length]
   const nextBook = books[(bookIndex + 1) % books.length]
   const saved = savedDocumentIds.includes(documentId)
   const toggleSaved = () => setSavedDocumentIds((current) => current.includes(documentId) ? current.filter((id) => id !== documentId) : [...current, documentId])
-  const issuance = detail.issuance || {}
-  const primarySource = issuance.online?.url || detail.sourceUrl
-  return <RightsShell onQuickExit={onQuickExit} backTo="/rights" pageClass="rights-detail-page"><article className="rights-detail-card"><small>{detail.eyebrow}</small><h1>{detail.title}</h1><p className="rights-detail-summary">{detail.summary}</p><section><h2>어디서 떼요?</h2><dl>{issuance.online && <div><dt>온라인</dt><dd><a href={issuance.online.url} target="_blank" rel="noreferrer">{issuance.online.label} <ExternalLink size={12} /></a><small>{issuance.online.note}</small></dd></div>}{issuance.visit && <div><dt>방문</dt><dd>{issuance.visit.label}<small>{issuance.visit.note}</small></dd></div>}{issuance.kiosk && <div><dt>무인발급기</dt><dd>{issuance.kiosk.label}<small>{issuance.kiosk.note}</small></dd></div>}</dl></section><section><h2>누가 뗄 수 있나요?</h2><p>{detail.eligibility}</p><small>{detail.proxyNote}</small></section><section><h2>이럴 때 필요해요</h2><div className="rights-use-chips">{detail.uses.map((use) => <span key={use}>{use}</span>)}</div></section><section><h2>떼기 전에 꼭 확인해요</h2><ul>{detail.checklist.map((item) => <li key={item}>{item}</li>)}</ul></section><footer>출처 · {detail.sourceLabel}<br />확인 날짜 · {detail.verifiedAt}</footer></article><div className="rights-detail-pagination"><button type="button" onClick={() => navigate(`/rights/document/${previousBook.id}`)}>‹ 이전 장</button><span><b />•••••••</span><button type="button" onClick={() => navigate(`/rights/document/${nextBook.id}`)}>다음 장 ›</button></div><button type="button" className={`rights-prepared ${saved ? 'active' : ''}`} onClick={toggleSaved}>{saved ? <FolderOpen size={19} /> : <FolderPlus size={19} />}<strong>{saved ? '보관 중 · 내 서류함에서 빼기' : '내 서류함에 넣기'}</strong></button>{primarySource && <a className="rights-primary-cta" href={primarySource} target="_blank" rel="noreferrer">{issuance.online?.label || '공식 발급 안내 확인하기'} <ExternalLink size={16} /></a>}</RightsShell>
+  const issuance = detail?.issuance || {}
+  const primarySource = issuance.online?.url || detail?.sourceUrl
+
+  return (
+    <RightsShell onQuickExit={onQuickExit} backTo="/rights" pageClass="rights-detail-page">
+        <article className="rights-detail-card">
+          <small>{detail?.eyebrow || `${book.category} · 필요한 서류`}</small>
+          <h1>{detail?.title || book.title}</h1>
+          <p className="rights-detail-summary">{detail?.summary || `${book.title}을 준비할 때 필요한 발급 방법과 확인할 내용을 한눈에 살펴봐요.`}</p>
+          <section><h2>어디서 떼요?</h2><dl>
+            {issuance.online && <div><dt>온라인</dt><dd><a href={issuance.online.url} target="_blank" rel="noreferrer">{issuance.online.label} <ExternalLink size={12} /></a><small>{issuance.online.note}</small></dd></div>}
+            {issuance.visit && <div><dt>방문</dt><dd>{issuance.visit.label}<small>{issuance.visit.note}</small></dd></div>}
+            {issuance.kiosk && <div><dt>무인발급기</dt><dd>{issuance.kiosk.label}<small>{issuance.kiosk.note}</small></dd></div>}
+          </dl></section>
+          <section><h2>누가 뗄 수 있나요?</h2><p>{detail?.eligibility}</p><small>{detail?.proxyNote}</small></section>
+          <section><h2>이럴 때 필요해요</h2><div className="rights-use-chips">
+            {(detail?.uses || [`${book.category} 지원`, '신청 서류', '자격 확인']).map((use) => <span key={use}>{use}</span>)}
+          </div></section>
+          <section><h2>떼기 전에 꼭 확인해요</h2><ul>{(detail?.checklist || []).map((item) => <li key={item}>{item}</li>)}</ul></section>
+          <footer>출처 · {detail?.sourceLabel}<br />확인 날짜 · {detail?.verifiedAt}</footer>
+        </article>
+      <div className="rights-detail-pagination">
+        <button type="button" onClick={() => navigate(`/rights/document/${previousBook.id}`)}>‹ 이전 장</button>
+        <span><b />•••••••</span>
+        <button type="button" onClick={() => navigate(`/rights/document/${nextBook.id}`)}>다음 장 ›</button>
+      </div>
+      <button type="button" className={`rights-prepared ${saved ? 'active' : ''}`} onClick={toggleSaved}>
+        {saved ? <FolderOpen size={19} /> : <FolderPlus size={19} />}
+        <strong>{saved ? '보관 중 · 내 서류함에서 빼기' : '내 서류함에 넣기'}</strong>
+      </button>
+      {primarySource && <a className="rights-primary-cta" href={primarySource} target="_blank" rel="noreferrer">{issuance.online?.label || '공식 발급 안내 확인하기'} <ExternalLink size={16} /></a>}
+    </RightsShell>
+  )
 }

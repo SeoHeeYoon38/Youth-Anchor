@@ -16,7 +16,7 @@
 .legal-shell .feature-header-title { gap: 4px; }
 .legal-shell .feature-header-title > strong { color: #724a33; font-size: 19px; }
 .legal-shell .feature-back { width: 37px; height: 37px; border: 0; background: #fff; color: #c8ad7d; }
-.legal-shell-hide-back .feature-back { visibility: hidden; pointer-events: none; }
+.plain-back-arrow .feature-back { background: transparent; border-radius: 0; color: #92794e; }
 .legal-shell .feature-exit { width: 100px; height: 36px; min-height: 36px; padding: 0 12px; border-color: #eae1d4; color: #dc2626; font-size: 13px; }
 .legal-main { min-height: 0; padding: 6px 20px 20px; flex: 1 1 auto; overflow-y: auto; scrollbar-width: none; }
 .legal-main::-webkit-scrollbar { display: none; }
