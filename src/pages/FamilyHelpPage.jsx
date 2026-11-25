@@ -137,7 +137,7 @@ export default function FamilyHelpPage({ onQuickExit }) {
   const topic = topics.find((item) => item.id === topicId)
   if (topicId && !topic) return <Navigate to="/family-help" state={{ from }} replace />
   return (
-    <div className="feature-shell legal-shell">
+    <div className="feature-shell legal-shell plain-back-arrow">
       <FeatureHeader title="가정 문제 도움" backTo={topic ? '/family-help' : from} backState={topic ? { from } : undefined} onQuickExit={onQuickExit} />
       <main key={topicId || 'topics'} className="legal-main family-main">
         {topic ? <TopicGuide topic={topic} from={from} /> : (
