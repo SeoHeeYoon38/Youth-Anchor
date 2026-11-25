@@ -2,7 +2,7 @@ import { CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, LockKey
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
-import ChatFab from '../components/ChatFab.jsx'
+import JobSearchFab from '../components/JobSearchFab.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
 import { fetchUserData, saveUserData } from '../api.js'
 import { mergeChecklists, readChecklist, writeChecklist } from '../checklistStore.js'
@@ -97,7 +97,7 @@ function DiaryShell({ title = '내 일기장', onQuickExit, backTo = '/home', sc
     <div className={`feature-shell diary-shell ${screenClass}`} ref={shellRef}>
       <FeatureHeader title={title} onQuickExit={onQuickExit} backTo={backTo} />
       <main className="diary-main">{children}</main>
-      {showNavigation && <><ChatFab key={pathname} /><BottomNav warm /></>}
+      {showNavigation && <><JobSearchFab key={pathname} /><BottomNav warm /></>}
     </div>
   )
 }

@@ -20,7 +20,9 @@ function text(value) {
 }
 
 function numeric(value) {
-  const parsed = Number(text(value))
+  const raw = text(value)
+  if (!raw) return null
+  const parsed = Number(raw)
   return Number.isFinite(parsed) ? parsed : null
 }
 
@@ -50,12 +52,10 @@ function normalizeType(facilityType, operationMode) {
   return facilityType || '청소년쉼터'
 }
 
-/** 입소대상 문구에서 연령 범위를 뽑는다. 못 찾으면 청소년복지지원법 기준을 쓴다. */
+/** 시설이 입소 대상으로 명시한 연령 범위만 표시한다. */
 function normalizeAges(entryTarget) {
   const match = AGE_PATTERN.exec(entryTarget || '')
-  if (match) return `${match[1]}~${match[2]}세`
-  if (/청소년/.test(entryTarget || '')) return '9~24세'
-  return '9~24세'
+  return match ? `${match[1]}~${match[2]}세` : ''
 }
 
 /**
@@ -100,7 +100,7 @@ export function normalizeShelter(record) {
     lat: coordinate(record.lat, 90),
     lng: coordinate(record.lot, 180),
     address,
-    phone: text(record.rprsTelno) || '1388',
+    phone: text(record.rprsTelno),
     open: operationMode ? `${operationMode} 운영` : '운영시간 전화 확인',
     features: buildFeatures(record, type),
     capacity: numeric(record.cpctCnt),

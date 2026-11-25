@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { ChevronRight, House, LocateFixed, MapPin, SlidersHorizontal, X } from 'lucide-react'
 import KakaoMap from '../components/KakaoMap.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
+import { ShelterVisitNote } from '../components/ShelterHelp.jsx'
 import {
   DEFAULT_SHELTER_FILTER,
   SHELTER_AUDIENCE_FILTERS,
@@ -27,31 +28,31 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
   }, [filter, shelters, searchQuery])
 
   const filterActive = isFilterActive(filter) || searchQuery.trim() !== ''
-  const locationCopy = locationMessage || '위치 권한 없이도 대피처를 확인할 수 있어요'
-  const highlightedLocationCopy = locationCopy.split(/(서울시청|대피처)/g).filter(Boolean)
+  const locationCopy = locationMessage || '위치 권한 없이도 쉼터를 확인할 수 있어요'
+  const highlightedLocationCopy = locationCopy.split(/(서울시청|쉼터)/g).filter(Boolean)
 
   return (
     <>
       <div className="view shelter-view page-enter">
         <header className="map-header">
-          <div><span>HAVEN</span><h1>SOS 대피처</h1></div>
+          <div><span>HAVEN</span><h1>청소년쉼터 지도</h1></div>
         </header>
 
         <div className={`map-search${searchQuery ? ' has-query' : ''}`}>
           <img src="/figma/warm/map-search.svg" alt="" aria-hidden="true" />
           <span className="map-search-copy" aria-hidden="true">
             {highlightedLocationCopy.map((segment, index) => (
-              segment === '서울시청' || segment === '대피처'
+              segment === '서울시청' || segment === '쉼터'
                 ? <strong key={`${segment}-${index}`}>{segment}</strong>
                 : <span key={`${segment}-${index}`}>{segment}</span>
             ))}
           </span>
           <input
             type="text"
-            placeholder="대피처 이름 또는 주소 검색"
+            placeholder="쉼터 이름 또는 주소 검색"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            aria-label="대피처 이름 또는 주소 검색"
+            aria-label="쉼터 이름 또는 주소 검색"
           />
           {searchQuery && (
             <button
@@ -118,13 +119,8 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
           </div>
         )}
 
-        <button className="map-intro-card" onClick={() => setViewMode('map')}>
-          <span className="map-intro-icon" aria-hidden="true"><img src="/figma/warm/map-intro.svg" alt="" /></span>
-          <span><strong>가까운 대피처를 찾아보세요</strong><small>방문 전 운영 여부와 이용 가능 인원을 확인한 뒤 갈 수 있는 대피처를 찾아보세요.</small></span>
-        </button>
-
         {viewMode === 'map' ? (
-          <KakaoMap position={position} shelters={visibleShelters} onSelectShelter={onSelectShelter} />
+          <KakaoMap position={position} shelters={visibleShelters} searching={Boolean(searchQuery.trim())} onSelectShelter={onSelectShelter} />
         ) : (
           <div className="shelter-list page-enter">
             {visibleShelters.map((shelter) => <ShelterCard key={shelter.id} shelter={shelter} onClick={() => onSelectShelter(shelter)} />)}
@@ -134,14 +130,14 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
         {visibleShelters.length === 0 && (
           <div className="empty-state">
             <MapPin size={25} />
-            <strong>조건에 맞는 대피처가 없어요</strong>
+            <strong>조건에 맞는 쉼터가 없어요</strong>
             <p>{filterActive ? '조건을 바꾸거나 검색어를 초기화해 보세요.' : '잠시 후 다시 확인해 주세요.'}</p>
           </div>
         )}
 
         {viewMode === 'map' && visibleShelters.length > 0 && (
           <section className="map-results reveal-card">
-            <div className="results-heading"><strong>가까운 대피처</strong><span>{visibleShelters.length}곳</span></div>
+            <div className="results-heading"><strong>가까운 쉼터</strong><span>{visibleShelters.length}곳</span></div>
             {visibleShelters.slice(0, 3).map((shelter) => (
               <button className="result-row group" key={shelter.id} onClick={() => onSelectShelter(shelter)}>
                 <span className="result-icon transition group-hover:scale-110"><House size={21} /></span>
@@ -152,6 +148,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
           </section>
         )}
         <p className="data-note"><span aria-hidden="true">•</span> 위치는 가까운 순서를 계산할 때만 사용해요</p>
+        <ShelterVisitNote />
       </div>
     </>
   )

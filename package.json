@@ -25,6 +25,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
+    "node-html-parser": "^7.1.0",
     "openai": "^7.20.0",
     "react": "latest",
     "react-dom": "latest",

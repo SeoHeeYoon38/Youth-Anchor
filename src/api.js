@@ -72,6 +72,10 @@ async function requestJson(path, options = {}, retry = true) {
 }
 
 export async function fetchShelters(position, filters = {}) {
+  if (!position) {
+    const response = await requestJson('/api/v1/shelters')
+    return response.items
+  }
   const query = new URLSearchParams({
     lat: String(position.lat),
     lng: String(position.lng),
@@ -85,6 +89,10 @@ export async function fetchShelters(position, filters = {}) {
 
 export async function fetchShelter(id) {
   return requestJson(`/api/v1/shelters/${id}`)
+}
+
+export function fetchShelterStatus(region) {
+  return requestJson(`/api/v1/shelters/status/${encodeURIComponent(region)}`)
 }
 
 export async function fetchNotices(filters = {}) {

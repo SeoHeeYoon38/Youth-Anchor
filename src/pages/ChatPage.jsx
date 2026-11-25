@@ -229,7 +229,7 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
         {replying && <div className="message helper">{freeConversationMode && <ChatMascot className="chat-message-mascot" />}<p className="typing" aria-label="답변 작성 중"><i /><i /><i /></p></div>}
         {actions.length > 0 && (
           <div className={`chat-actions page-enter${showQuickReplies ? ' followed-by-replies' : ''}`}>
-            {actions.includes('find-shelter') && <button className="action-shelter" onClick={() => navigate('/shelters')}><MessageCircle size={17} /> 가까운 대피처 보기</button>}
+            {actions.includes('find-shelter') && <button className="action-shelter" onClick={() => navigate('/shelters')}><MessageCircle size={17} /> 가까운 쉼터 보기</button>}
             {actions.includes('view-support') && <button className="action-support" onClick={() => navigate('/support')}><MessageCircle size={17} /> 지원 사업 확인하기</button>}
             {actions.includes('send-sos') && <button className="action-alert" onClick={sendSos} disabled={sosSending}><LockKeyhole size={17} /> {sosSending ? '전송 중...' : '긴급 알림 보내기'}</button>}
             {actions.includes('call-112') && <a className="action-call" href="tel:112"><Phone size={17} /> 112 전화하기</a>}

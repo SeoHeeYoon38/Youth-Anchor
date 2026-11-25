@@ -17,6 +17,8 @@ function searchableShelterText(shelter) {
   return [
     shelter?.name,
     shelter?.address,
+    shelter?.region,
+    shelter?.entryTarget,
     shelter?.type,
     shelter?.gender,
     shelter?.ages,

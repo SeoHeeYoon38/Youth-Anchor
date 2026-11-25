@@ -8,6 +8,8 @@ import { WebSocketServer } from 'ws'
 import { bearerToken, createGuestToken, verifyGuestToken } from './auth.js'
 import { createChatService } from './ai-chat.js'
 import { createDatabase } from './database.js'
+import { fetchShelterStatus } from './opendata/shelterStatus.js'
+import { statusRegionName } from '../shared/shelterStatus.js'
 import { syncNoticeFeeds } from './notice-sync.js'
 import { createPushService } from './push.js'
 import { ensureBaselineData, resolveOpenDataConfig, startSyncScheduler, syncAll } from './sync.js'
@@ -411,6 +413,26 @@ export function createApiServer(options = {}) {
       if (request.method === 'GET' && noticeMatch) {
         const notice = repository.getNotice(Number(noticeMatch[1]))
         sendJson(response, notice ? 200 : 404, notice || { error: 'notice-not-found' })
+        return
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/v1/shelters') {
+        sendJson(response, 200, { items: repository.listShelters() })
+        return
+      }
+
+      const statusMatch = url.pathname.match(/^\/api\/v1\/shelters\/status\/([^/]+)$/)
+      if (request.method === 'GET' && statusMatch) {
+        const region = statusMatch[1]
+        if (!statusRegionName(region)) {
+          sendJson(response, 404, { error: 'unknown-region' })
+          return
+        }
+        try {
+          sendJson(response, 200, await fetchShelterStatus(region))
+        } catch {
+          sendJson(response, 502, { error: 'shelter-status-unavailable' })
+        }
         return
       }
 
