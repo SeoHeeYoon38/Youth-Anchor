@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, ExternalLink, Heart, MapPin, MessagesSquare, Phone, TriangleAlert } from 'lucide-react'
+import { ChevronDown, ChevronRight, ExternalLink, Heart, MapPin, Phone, TriangleAlert } from 'lucide-react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
@@ -18,7 +18,7 @@ const youthShelters = {
 
 const topics = [
   {
-    id: 'conflict', title: '부모님·가족과 갈등이 있어요', icon: MessagesSquare, tone: 'peach',
+    id: 'conflict', title: '부모님·가족과 갈등이 있어요', artwork: '/icons/help/family-conflict.png', tone: 'peach',
     agency: counselingCenters,
     examples: [
       { home: '부모님 두 집을 오가며 살 때', story: '주말에 어느 집에서 지낼지 정할 때마다 내 의견을 말하기 어려워요.' },
