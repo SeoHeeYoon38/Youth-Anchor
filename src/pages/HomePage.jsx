@@ -7,9 +7,9 @@ const WARM_ASSET_ROOT = '/figma/warm'
 const FEATURE_ASSET_ROOT = '/figma/features'
 
 const QUICK_ACTIONS = [
-  { label: '지원', description: '주거·생활 지원 찾아보기', icon: `${WARM_ASSET_ROOT}/nav-support.svg`, tone: 'rights', to: '/support' },
-  { label: '법률 상담', description: '부당한 일, 같이 대응하기', icon: `${FEATURE_ASSET_ROOT}/home-action-legal-2.png`, tone: 'legal', to: '/legal' },
-  { label: '일기장', description: '오늘의 기분을 남겨보기', icon: `${FEATURE_ASSET_ROOT}/home-action-diary-book.svg`, tone: 'diary', to: '/diary' },
+  { label: '지원', description: '주거·생활 지원 찾아보기', icon: '/icons/help/support.svg', tone: 'rights', to: '/support' },
+  { label: '법률 상담', description: '부당한 일, 같이 대응하기', icon: '/icons/help/scales.svg', tone: 'legal', to: '/legal' },
+  { label: '일기장', description: '오늘의 기분을 남겨보기', icon: '/icons/help/diary.svg', tone: 'diary', to: '/diary' },
   { label: '안전 가이드', description: '흔적 없이 안전하게', icon: `${FEATURE_ASSET_ROOT}/home-action-guide.svg`, tone: 'guide', action: 'guide' }
 ]
 

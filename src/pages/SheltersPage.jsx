@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ChevronRight, House, LocateFixed, MapPin, SlidersHorizontal, X } from 'lucide-react'
+import { ChevronRight, LocateFixed, MapPin, SlidersHorizontal, X } from 'lucide-react'
 import KakaoMap from '../components/KakaoMap.jsx'
 import DragBackHeader from '../components/DragBackHeader.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
@@ -141,7 +141,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
             <div className="results-heading"><strong>가까운 쉼터</strong><span>{visibleShelters.length}곳</span></div>
             {visibleShelters.slice(0, 3).map((shelter) => (
               <button className="result-row group" key={shelter.id} onClick={() => onSelectShelter(shelter)}>
-                <span className="result-icon transition group-hover:scale-110"><House size={21} /></span>
+                <img className="result-icon transition group-hover:scale-110" src="/icons/help/shelter-house.svg" alt="" />
                 <span className="result-copy"><strong>{shelter.name}</strong><small>{formatDistance(shelter.distance)} · {shelter.type} · {shelter.gender}</small></span>
                 <ChevronRight className="result-chevron" size={18} />
               </button>

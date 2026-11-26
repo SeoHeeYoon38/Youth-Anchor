@@ -101,6 +101,7 @@ export function ShelterSheet({ shelter, origin = null, onClose }) {
         <ShelterCapacity key={shelter.id} shelter={shelter} />
         <div><dt>입소 대상</dt><dd>{target || inquiry}</dd></div>
         <div><dt>입소 기간</dt><dd>{shelter.entryPeriod?.trim() || inquiry}</dd></div>
+        {shelter.features?.length > 0 && <div><dt>시설 특징</dt><dd>{shelter.features.join(' · ')}</dd></div>}
         <div><dt>주소</dt><dd>{shelter.address || inquiry}</dd></div>
         <div><dt>대표전화</dt><dd>{hasPhone ? <a href={`tel:${dialNumber}`}>{displayPhone}</a> : '시설 번호 미제공'}</dd></div>
       </dl>

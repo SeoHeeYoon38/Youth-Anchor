@@ -101,7 +101,7 @@ export function LegalHomePage({ onQuickExit }) {
     <LegalShell title="법률 상담" onQuickExit={onQuickExit} backTo="/home">
       <section className="legal-picker" aria-labelledby="legal-picker-title">
         <div className="legal-picker-heading">
-          <span className="legal-picker-symbol"><img src={`${ASSET_ROOT}/legal-scale.svg`} alt="" /></span>
+          <img className="legal-picker-symbol" src="/icons/help/scales.svg" alt="" />
           <div className="legal-picker-intro">
             <h1 id="legal-picker-title">어떤 일이 있었는지 골라 주세요!</h1>
             <p>이름이나 학교는 말하지 않아도 괜찮아요</p>

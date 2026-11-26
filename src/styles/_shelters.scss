@@ -65,7 +65,7 @@
 .results-heading span { color: var(--muted); font-size: 11px; }
 .result-row { width: 100%; min-height: 66px; padding: 9px 0; display: grid; grid-template-columns: 40px 1fr auto; gap: 9px; align-items: center; border: 0; border-bottom: 1px solid rgba(255,255,255,.12); background: transparent; color: #fff; text-align: left; cursor: pointer; }
 .result-row:last-child { border-bottom: 0; }
-.result-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 14px; background: rgba(87,236,226,.14); color: var(--aqua); }
+.result-icon { width: 40px; height: 40px; display: block; object-fit: contain; }
 .result-copy { min-width: 0; }
 .result-copy strong, .result-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-copy strong { font-size: 12px; }
@@ -287,7 +287,6 @@
 }
 .route-shelters .results-heading span { color: #a07f63; }
 .route-shelters .result-row { border-bottom-color: #f0dfc8; color: #4d3424; }
-.route-shelters .result-icon { background: #fff0d9; color: #ef9130; }
 .route-shelters .result-copy small { color: #8b7664; }
 .route-shelters .result-chevron { color: #ef9130; }
 .route-shelters .shelter-list { padding: 0 20px; }

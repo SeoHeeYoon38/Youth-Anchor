@@ -1,4 +1,4 @@
-import { ChevronRight, House, Info } from 'lucide-react'
+import { ChevronRight, Info } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 
 export function ShelterVisitNote() {
@@ -9,7 +9,7 @@ export function FamilyHelpCard() {
   const { pathname } = useLocation()
   return (
     <Link className="family-help-card" to="/family-help" state={{ from: pathname }}>
-      <span className="help-icon rose"><House aria-hidden="true" /></span>
+      <img className="family-house-icon" src="/icons/help/family-house.svg" alt="" />
       <span>
         <strong>집에서 힘든 일을 겪고 있나요?</strong>
         <small>학대·방임이나 가족 갈등 등 상황에 맞는 도움과 상담기관을 확인해 보세요.</small>
