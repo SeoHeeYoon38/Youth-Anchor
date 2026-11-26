@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Compass, ExternalLink, HandHeart, Heart, House, MapPin, MessagesSquare, Phone, Shield, TriangleAlert } from 'lucide-react'
+import { ChevronDown, ChevronRight, ExternalLink, Heart, MapPin, Phone, TriangleAlert } from 'lucide-react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
@@ -18,7 +18,7 @@ const youthShelters = {
 
 const topics = [
   {
-    id: 'conflict', title: '부모님·가족과 갈등이 있어요', icon: MessagesSquare, tone: 'peach',
+    id: 'conflict', title: '부모님·가족과 갈등이 있어요', artwork: '/icons/help/family-conflict.png', tone: 'peach',
     agency: counselingCenters,
     examples: [
       { home: '부모님 두 집을 오가며 살 때', story: '주말에 어느 집에서 지낼지 정할 때마다 내 의견을 말하기 어려워요.' },
@@ -30,7 +30,7 @@ const topics = [
     related: ['violence', 'distress']
   },
   {
-    id: 'violence', title: '폭언이나 폭력을 겪고 있어요', icon: Shield, tone: 'rose', urgent: true,
+    id: 'violence', title: '폭언이나 폭력을 겪고 있어요', artwork: '/icons/help/family-violence.png', tone: 'rose', urgent: true,
     agency: childProtectionCenters,
     examples: [
       { home: '부모님과 함께 살 때', story: '화가 날 때마다 나한테 욕을 하고 물건을 던져서 무서워요.' },
@@ -42,7 +42,7 @@ const topics = [
     related: ['unsafe', 'care']
   },
   {
-    id: 'care', title: '보호자의 돌봄을 받지 못하고 있어요', icon: HandHeart, tone: 'sage', urgent: true,
+    id: 'care', title: '보호자의 돌봄을 받지 못하고 있어요', artwork: '/icons/help/family-care.png', tone: 'sage', urgent: true,
     agency: childProtectionCenters,
     examples: [
       { home: '보호자 한 분과 살 때', story: '보호자가 며칠째 집을 비웠고 연락도 닿지 않아요. 먹을 게 떨어졌는데 누구에게 말해야 할까요?' },
@@ -54,7 +54,7 @@ const topics = [
     related: ['unsafe', 'unsure']
   },
   {
-    id: 'unsafe', title: '집에 있는 것이 안전하지 않아요', icon: House, tone: 'sand', urgent: true,
+    id: 'unsafe', title: '집에 있는 것이 안전하지 않아요', artwork: '/icons/help/family-unsafe.png', tone: 'sand', urgent: true,
     agency: youthShelters,
     examples: [
       { home: '가족과 한집에 살 때', story: '가족끼리 몸싸움이 벌어져 잠깐 밖으로 나왔어요. 오늘 밤 안전하게 지낼 곳이 필요해요.' },
@@ -78,7 +78,7 @@ const topics = [
     related: ['conflict', 'unsure']
   },
   {
-    id: 'unsure', title: '어디에 도움을 요청할지 모르겠어요', icon: Compass, tone: 'blue',
+    id: 'unsure', title: '어디에 도움을 요청할지 모르겠어요', artwork: '/icons/help/family-unsure.png', tone: 'blue',
     agency: counselingCenters,
     examples: [
       { home: '보호자가 바뀌어 친척 집으로 옮겼을 때', story: '전학도 해야 하고 생활비도 걱정돼요. 어느 것부터 누구에게 물어봐야 할지 모르겠어요.' },
@@ -91,21 +91,26 @@ const topics = [
   }
 ]
 
-function TopicLink({ topic, from }) {
+function TopicIcon({ topic, size = 24 }) {
   const Icon = topic.icon
+  return <span className={`help-icon ${topic.tone}`} aria-hidden="true">
+    {topic.artwork ? <img src={topic.artwork} alt="" /> : <Icon size={size} />}
+  </span>
+}
+
+function TopicLink({ topic, from }) {
   return (
     <Link className="family-topic" to={`/family-help/${topic.id}`} state={{ from }}>
-      <span className={`help-icon ${topic.tone}`}><Icon size={21} aria-hidden="true" /></span>
+      <TopicIcon topic={topic} size={21} />
       <span>{topic.title}</span><ChevronRight size={17} aria-hidden="true" />
     </Link>
   )
 }
 
 function TopicGuide({ topic, from }) {
-  const Icon = topic.icon
   return (
     <article className="family-guide">
-      <div className="family-guide-title"><span className={`help-icon ${topic.tone}`}><Icon aria-hidden="true" /></span><h1>{topic.title}</h1></div>
+      <div className="family-guide-title"><TopicIcon topic={topic} /><h1>{topic.title}</h1></div>
       {topic.urgent && <a className="family-emergency" href="tel:112"><TriangleAlert size={17} /> 지금 위험하면 112에 신고하기</a>}
       <section><h2>지금 해볼 수 있는 방법</h2><p>{topic.now}</p></section>
       <section><h2>어디에서 도움받을 수 있나요?</h2><p>{topic.where}</p>
@@ -145,7 +150,7 @@ export default function FamilyHelpPage({ onQuickExit }) {
         {topic ? <TopicGuide topic={topic} from={from} /> : (
           <>
             <div className="legal-picker-heading">
-              <span className="help-icon rose"><House aria-hidden="true" /></span>
+              <img className="family-house-icon" src="/icons/help/family-house.svg" alt="" />
               <div><h1>집에서 어떤 어려움을 겪고 있나요?</h1><p>지금 상황과 가까운 항목을 골라 주세요.</p></div>
             </div>
             <nav className="family-topic-list" aria-label="상황별 도움">

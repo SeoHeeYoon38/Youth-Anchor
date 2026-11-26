@@ -139,7 +139,7 @@ export default function App() {
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
           <Route path="/home" element={<HomePage shelters={sortedShelters} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} onOpenGuide={() => setGuideOpen(true)} />} />
           <Route path="/shelters" element={<SheltersPage shelters={sortedShelters} position={position} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} />} />
-          <Route path="/chat" element={<ChatPage position={position} onRoomChange={setActiveRoomId} onQuickExit={quickExit} />} />
+          <Route path="/chat" element={<ChatPage onRoomChange={setActiveRoomId} onQuickExit={quickExit} />} />
           <Route path="/support" element={<SupportPage supports={supportItems} onSelect={setSelectedSupport} />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

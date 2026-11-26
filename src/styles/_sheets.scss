@@ -13,7 +13,6 @@
 .sheet-title-row h2 { margin: 7px 0 3px; font-size: 18px; line-height: 1.4; }
 .sheet-title-row p { margin: 0; color: #c8bdd8; font-size: 11px; }
 .sheet-place-icon { width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; background: rgba(87,236,226,.14); color: var(--aqua); }
-.sheet-place-icon.support { background: var(--yellow-soft); color: var(--yellow-dark); }
 .sheet-place-icon.guide { background: var(--purple-soft); color: var(--purple-dark); }
 .sheet-place-icon.notice { background: var(--coral-soft); color: var(--coral-dark); }
 .live-status { display: flex; align-items: center; gap: 5px; color: var(--aqua); font-size: 10px; font-weight: 800; }
@@ -132,7 +131,7 @@
 
 .support-sheet .sheet-handle { width: 42px; margin-bottom: 18px; }
 .support-sheet .sheet-title-row { grid-template-columns: 52px minmax(0, 1fr) 40px; gap: 10px; align-items: flex-start; }
-.support-sheet .sheet-place-icon.support { width: 52px; height: 52px; border-radius: 16px; background: #fff0d7; color: #d97827; }
+.support-document-icon { width: 52px; height: 52px; object-fit: contain; }
 .support-sheet .sheet-title-row h2 { margin: 7px 0 3px; color: #4d3424; font-size: 18px; font-weight: 800; }
 .support-sheet .sheet-title-row p { color: #8b7664; font-size: 11px; }
 .support-sheet .icon-button { border-color: #ead8c8; background: rgba(255,255,255,.72); color: #8b6f57; }

@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="1478 833 403 412">
+  <defs><linearGradient id="cream" x2="1" y2="1"><stop stop-color="#fcf0d8"/><stop offset="1" stop-color="#f6ead3"/></linearGradient></defs>
+  <path fill="url(#cream)" stroke="#4a2a17" stroke-width="20" stroke-linejoin="round" d="M1547 859c23-13 42-7 55 17l29 54c9 19 5 34-13 46l-9 7q-14 11-6 32c16 33 56 75 97 100 14 9 27 5 38-9l8-8c13-14 29-13 43-4l47 27c22 13 29 27 22 48-15 42-57 64-99 55-109-23-240-150-259-256-8-46 5-85 47-109z"/>
+</svg>

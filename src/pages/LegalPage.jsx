@@ -7,15 +7,7 @@ import DragBackHeader from '../components/DragBackHeader.jsx'
 import { fetchLegalTopic, fetchLegalTopics, fetchUserData, saveUserData } from '../api.js'
 import { addChecklistItems, mergeChecklists, readChecklist, writeChecklist } from '../checklistStore.js'
 
-const ASSET_ROOT = '/figma/features'
-
-const LEGAL_TOPICS = [
-  { id: 'labor', title: '노동권 보호', description: '알바하면서 부당한 대우를 받았을 때 선택하세요', icon: `${ASSET_ROOT}/legal-briefcase.svg`, tone: 'labor' },
-  { id: 'school', title: '학교폭력 대응', description: '학교 안팎에서 괴롭힘을 당했을 때 선택하세요', icon: `${ASSET_ROOT}/legal-graduation.svg`, tone: 'school' },
-  { id: 'digital', title: '디지털 범죄 대응', description: '온라인 협박이나 사진 유포 피해를 당했을 때 선택하세요', icon: `${ASSET_ROOT}/legal-smartphone.svg`, tone: 'digital' },
-  { id: 'family', title: '가정폭력·아동학대', description: '가정에서 안전을 위협받을 때 선택하세요', icon: `${ASSET_ROOT}/legal-home-heart.svg`, tone: 'family' },
-  { id: 'money', title: '금전·사기 피해', description: '온라인 사기나 돈을 빼앗겼을 때 선택하세요', icon: `${ASSET_ROOT}/legal-dollar.svg`, tone: 'money' }
-]
+import { LEGAL_TOPICS } from '../../shared/legalGuides.js'
 
 const LEGAL_CONVERSATIONS = {
   labor: {

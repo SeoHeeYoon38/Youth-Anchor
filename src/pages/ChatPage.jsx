@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronRight, LockKeyhole, MessageCircle, Navigation, Phone, Power } from 'lucide-react'
+import { ChevronRight, LockKeyhole, Navigation, Power } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import DragBackHeader from '../components/DragBackHeader.jsx'
-import { connectChatRoom, createChatRoom, createSosAlert, requestChatReply } from '../api.js'
+import { connectChatRoom, createChatRoom, requestChatReply } from '../api.js'
 import { quickReplies } from '../data.js'
 
 const CHAT_MASCOT_SRC = '/figma/warm/chat-bear-face-cutout.png'
@@ -14,7 +14,7 @@ const CHAT_EMOTES = {
 }
 const QUICK_REPLY_ACTIONS = {
   '오늘 잘 곳이 없어요': ['find-shelter', 'call-1388'],
-  '지금 위험해요': ['send-sos', 'call-112'],
+  '지금 위험해요': ['call-112'],
   '돈과 식사가 필요해요': ['view-support']
 }
 
@@ -22,7 +22,6 @@ function detectLocalActions(text) {
   const actions = new Set()
   if (/(위험|폭력|맞았|죽고|자해|살려|납치|협박|쫓아|무서|두려)/.test(text)) {
     actions.add('call-112')
-    actions.add('send-sos')
   }
   if (/(잘\s*곳|잘곳|잠.{0,4}곳|쉼터|가출|집에.{0,5}못|머물|노숙|숙소)/.test(text)) {
     actions.add('find-shelter')
@@ -54,14 +53,12 @@ function ChatMascot({ className = '', alt = '' }) {
   )
 }
 
-export default function ChatPage({ position, onRoomChange, onQuickExit }) {
+export default function ChatPage({ onRoomChange, onQuickExit }) {
   const navigate = useNavigate()
   const [input, setInput] = useState('')
   const [replying, setReplying] = useState(false)
   const [showQuickReplies, setShowQuickReplies] = useState(true)
   const [actions, setActions] = useState([])
-  const [sosStatus, setSosStatus] = useState(null)
-  const [sosSending, setSosSending] = useState(false)
   const [freeConversationMode, setFreeConversationMode] = useState(false)
   const [messages, setMessages] = useState([INITIAL_MESSAGE])
   const messagesEnd = useRef(null)
@@ -145,7 +142,6 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
       ...(emote ? [{ id: createMessageId('emote'), role: 'emote', emote }] : [])
     ])
     setActions([])
-    setSosStatus(null)
     setInput('')
     setReplying(true)
     try {
@@ -167,50 +163,10 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
     }
   }
 
-  const requestPosition = () => new Promise((resolve, reject) => {
-    if (position) {
-      resolve(position)
-      return
-    }
-    if (!navigator.geolocation) {
-      reject(new Error('geolocation-unavailable'))
-      return
-    }
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => resolve({ lat: coords.latitude, lng: coords.longitude }),
-      reject,
-      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 30_000 }
-    )
-  })
-
-  const sendSos = async () => {
-    if (sosSending) return
-    setSosSending(true)
-    setSosStatus({ tone: 'loading', text: '위치를 확인하고 있어요.' })
-    try {
-      const currentPosition = await requestPosition()
-      const room = await ensureRoom()
-      const result = await createSosAlert({ position: currentPosition, roomId: room.id, message: '채팅 화면에서 긴급 도움 요청' })
-      const delivery = result?.delivery
-
-      if (delivery?.delivered > 0) {
-        setSosStatus({ tone: 'success', text: `긴급 알림이 관리자 기기 ${delivery.delivered}대에 전송됐어요. 즉시 위험하면 112에도 연락해 주세요.` })
-      } else if (delivery?.configured) {
-        setSosStatus({ tone: 'warning', text: '긴급 요청은 서버에 접수됐지만 관리자 알림 기기가 연결되어 있지 않아요. 즉시 위험하면 112에 연락해 주세요.' })
-      } else {
-        setSosStatus({ tone: 'warning', text: '긴급 요청은 서버에 접수됐지만 푸시 알림이 설정되지 않았어요. 즉시 위험하면 112에 연락해 주세요.' })
-      }
-    } catch {
-      setSosStatus({ tone: 'error', text: '긴급 알림을 보내지 못했어요. 112에 바로 연락해 주세요.' })
-    } finally {
-      setSosSending(false)
-    }
-  }
-
   return (
     <div className="view chat-view page-enter">
       <DragBackHeader className="chat-header">
-        <span className="chat-header-call-icon" aria-hidden="true"><Phone size={25} /></span>
+        <img className="chat-header-call-icon general-chat-phone" src="/icons/help/phone.svg" alt="" />
         <div><h1>AI 안내 가온</h1><span><i /> 온라인</span></div>
         <button className="exit-compact transition active:scale-95" onClick={onQuickExit} aria-label="긴급 종료"><Power size={19} /> 긴급종료</button>
       </DragBackHeader>
@@ -230,15 +186,13 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
         {replying && <div className="message helper">{freeConversationMode && <ChatMascot className="chat-message-mascot" />}<p className="typing" aria-label="답변 작성 중"><i /><i /><i /></p></div>}
         {actions.length > 0 && (
           <div className={`chat-actions page-enter${showQuickReplies ? ' followed-by-replies' : ''}`}>
-            {actions.includes('find-shelter') && <button className="action-shelter" onClick={() => navigate('/shelters')}><MessageCircle size={17} /> 가까운 쉼터 보기</button>}
-            {actions.includes('view-support') && <button className="action-support" onClick={() => navigate('/support')}><MessageCircle size={17} /> 지원 사업 확인하기</button>}
-            {actions.includes('send-sos') && <button className="action-alert" onClick={sendSos} disabled={sosSending}><LockKeyhole size={17} /> {sosSending ? '전송 중...' : '긴급 알림 보내기'}</button>}
-            {actions.includes('call-112') && <a className="action-call" href="tel:112"><Phone size={17} /> 112 전화하기</a>}
-            {actions.includes('call-1388') && <a className="action-call" href="tel:1388"><Phone size={17} /> 1388 전화하기</a>}
+            {actions.includes('find-shelter') && <button className="action-shelter" onClick={() => navigate('/shelters')}><img src="/icons/help/chat-bubble.svg" alt="" /> 가까운 쉼터 보기</button>}
+            {actions.includes('view-support') && <button className="action-support" onClick={() => navigate('/support')}><img src="/icons/help/chat-bubble.svg" alt="" /> 지원 사업 확인하기</button>}
+            {actions.includes('call-112') && <a className="action-call" href="tel:112"><img src="/icons/help/phone.svg" alt="" /> 112 전화하기</a>}
+            {actions.includes('call-1388') && <a className="action-call" href="tel:1388"><img src="/icons/help/phone.svg" alt="" /> 1388 전화하기</a>}
           </div>
         )}
         {showQuickReplies && <div className={`quick-replies stagger-grid${actions.length ? ' after-actions' : ''}`}>{quickReplies.map((reply) => <button className="group transition hover:-translate-y-0.5" key={reply} onClick={() => sendMessage(reply)}>{reply}<ChevronRight className="transition group-hover:translate-x-1" size={17} /></button>)}</div>}
-        {sosStatus && <p className={`sos-status ${sosStatus.tone}`} role="status">{sosStatus.text}</p>}
         <div ref={messagesEnd} />
       </div>
       <form className="chat-composer" onSubmit={(event) => { event.preventDefault(); sendMessage(input) }}>

@@ -202,13 +202,6 @@ export async function deleteChatRoom(roomId) {
   await requestJson(`/api/v1/chat/rooms/${roomId}`, { method: 'DELETE' })
 }
 
-export async function createSosAlert({ position, roomId, message }) {
-  return requestJson('/api/v1/sos/alerts', {
-    method: 'POST',
-    body: JSON.stringify({ lat: position.lat, lng: position.lng, roomId, message })
-  })
-}
-
 export async function subscribeToPush(subscription, audience = 'guest', adminKey = '') {
   const headers = {}
   if (audience === 'admin' && adminKey) headers['X-Admin-Key'] = adminKey

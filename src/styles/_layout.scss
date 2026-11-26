@@ -82,6 +82,7 @@
 .diary-shell .nav-item.active .home-nav-icon { transform: translateY(-1px); }
 .home-nav-icon img { filter: brightness(0) saturate(100%) invert(51%) sepia(13%) saturate(638%) hue-rotate(346deg) brightness(92%) contrast(87%); transition: filter .2s ease; }
 .nav-item.active .home-nav-icon img { filter: brightness(0) saturate(100%) invert(61%) sepia(68%) saturate(1450%) hue-rotate(345deg) brightness(99%) contrast(86%); }
+.nav-item.active .home-nav-icon .nav-artwork { width: 22px; height: 22px; object-fit: contain; filter: none; }
 .warm-bottom-nav .nav-item.active svg { transform: none; filter: none; }
 .home-nav-icon { width: 22px; height: 22px; display: grid; place-items: center; transition: transform .25s ease; }
 

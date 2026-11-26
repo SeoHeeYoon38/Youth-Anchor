@@ -3,7 +3,6 @@ import {
   CircleAlert,
   Clock3,
   ExternalLink,
-  FileHeart,
   LockKeyhole,
   MessageCircle,
   Navigation,
@@ -90,7 +89,7 @@ export function ShelterSheet({ shelter, origin = null, onClose }) {
   return (
     <SheetFrame onClose={onClose} labelledBy="shelter-sheet-title" className="shelter-sheet warm-sheet">
       <header className="shelter-detail-heading">
-        <img src="/figma/warm/map-shelter.svg" alt="" />
+        <img src="/icons/help/shelter-house.svg" alt="" />
         <div>
           <p>{[shelter.gender, shelter.type].filter(Boolean).join(' · ')}</p>
           <h2 id="shelter-sheet-title">{shelter.name}</h2>
@@ -121,7 +120,7 @@ export function SupportSheet({ support, onClose }) {
   return (
     <SheetFrame onClose={onClose} labelledBy="support-sheet-title" className="support-sheet warm-sheet">
       <div className="sheet-title-row">
-        <span className="sheet-place-icon support"><FileHeart size={26} /></span>
+        <img className="support-document-icon" src="/icons/help/support-document.svg" alt="" />
         <div><span className={`category-badge category-${support.category}`}>{support.category}</span><h2 id="support-sheet-title">{support.title}</h2><p>{support.provider}</p></div>
         <button className="icon-button" onClick={onClose} aria-label="닫기"><X size={20} /></button>
       </div>

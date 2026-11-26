@@ -1,16 +1,15 @@
-import { LocateFixed } from 'lucide-react'
+import { LocateFixed, LockKeyhole } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ShelterCard from '../components/ShelterCard.jsx'
 import { FamilyHelpCard, ShelterVisitNote } from '../components/ShelterHelp.jsx'
 
 const WARM_ASSET_ROOT = '/figma/warm'
-const FEATURE_ASSET_ROOT = '/figma/features'
 
 const QUICK_ACTIONS = [
   { label: '지원', description: '주거·생활 지원 찾아보기', icon: '/icons/help/support.svg', tone: 'rights', to: '/support' },
   { label: '법률 상담', description: '부당한 일, 같이 대응하기', icon: '/icons/help/scales.svg', tone: 'legal', to: '/legal' },
   { label: '일기장', description: '오늘의 기분을 남겨보기', icon: '/icons/help/diary.svg', tone: 'diary', to: '/diary' },
-  { label: '안전 가이드', description: '흔적 없이 안전하게', icon: `${FEATURE_ASSET_ROOT}/home-action-guide.svg`, tone: 'guide', action: 'guide' }
+  { label: '안전 가이드', description: '흔적 없이 안전하게', icon: '/icons/help/safety-lock.svg', tone: 'guide', action: 'guide' }
 ]
 
 export default function HomePage({ shelters, locationMessage, locateMe, locating, onSelectShelter, onOpenGuide }) {
@@ -25,7 +24,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
           <p>HAVEN과 함께 필요한 도움을 찾아봐요.</p>
         </div>
         <a href="tel:1388" className="home-help-line group transition duration-300 hover:-translate-y-1">
-          <span className="home-help-icon" aria-hidden="true"><img src={`${WARM_ASSET_ROOT}/heart.svg`} alt="" /></span>
+          <img className="home-help-icon" src="/icons/help/phone-heart.svg" alt="" />
           <span className="home-help-copy"><strong>1388에 바로 연결</strong><small>24시간 무료 청소년 상담</small></span>
           <img className="home-chevron" src={`${WARM_ASSET_ROOT}/chevron-right.svg`} alt="" aria-hidden="true" />
         </a>
@@ -34,7 +33,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
       <section className="feature-section" aria-labelledby="feature-title">
         <div className="home-section-heading">
           <div><span>바로 도움받기</span><h2 id="feature-title">무엇을 도와드릴까요?</h2></div>
-          <small>개인정보 없이 이용가능</small>
+          <small><LockKeyhole size={13} aria-hidden="true" />개인정보 없이 이용가능</small>
         </div>
         <div className="feature-grid stagger-grid">
           {QUICK_ACTIONS.map((item) => (
