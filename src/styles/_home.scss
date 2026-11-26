@@ -138,10 +138,6 @@
   gap: 12px;
   position: relative;
   overflow: hidden;
-  border: 1px solid #8e7659;
-  border-radius: 18px;
-  background: linear-gradient(136deg, rgba(235,143,37,.3) 7%, rgba(88,0,0,.3) 89%), #eda971;
-  color: #fff2e3;
   text-align: left;
   scroll-snap-align: start;
   cursor: pointer;
@@ -152,8 +148,8 @@
 .warm-shelter-copy strong,
 .warm-shelter-copy small { display: block; }
 .warm-shelter-copy strong { font-size: 13px; line-height: 1.4; }
-.warm-shelter-copy small { margin-top: 2px; color: #5c4324; font-size: 10px; line-height: 1.4; }
-.warm-shelter-more { margin-top: auto; align-self: flex-end; color: #fff0dc; font-size: 9px; font-weight: 800; }
+.warm-shelter-copy small { margin-top: 2px; color: #79634e; font-size: 10px; line-height: 1.4; }
+.warm-shelter-more { margin-top: auto; align-self: flex-end; color: #79634e; font-size: 9px; font-weight: 800; }
 
 .section-link {
   width: 100%;

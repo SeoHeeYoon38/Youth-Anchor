@@ -65,7 +65,7 @@
     #f5cf94;
   box-shadow: 0 18px 40px rgba(77,45,20,.2);
 }
-.notice-sheet .sheet-handle { display: none; }
+.notice-sheet .sheet-handle { margin-top: -12px; margin-bottom: 8px; }
 .notice-heading { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 18px; align-items: center; }
 .notice-bell { width: 58px; height: 58px; display: grid; place-items: center; border: 1px solid rgba(100,75,54,.15); border-radius: 20px; background: rgba(255,255,255,.92); color: #887768; }
 .notice-heading span:not(.notice-bell) { display: block; color: #9d744f; font-size: 12px; font-weight: 800; line-height: 1.4; }

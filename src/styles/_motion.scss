@@ -1,4 +1,17 @@
 .page-enter { animation: page-in .48s cubic-bezier(.2,.8,.2,1) both; }
+[role='dialog'], .drag-back-header { transition: translate .16s ease-out; }
+[role='dialog'] { overscroll-behavior-y: contain; }
+.drag-back-header { touch-action: pan-x pinch-zoom; }
+[data-pulling] { transition: none; user-select: none; cursor: grabbing; }
+.sheet-handle, .diary-entry-handle, .rights-sheet-handle { position: relative; cursor: grab; }
+.sheet-handle::after, .diary-entry-handle::after, .rights-sheet-handle::after {
+  content: '';
+  position: absolute;
+  inset: -10px -20px;
+}
+@media (prefers-reduced-motion: reduce) {
+  [role='dialog'], .drag-back-header { transition: none; }
+}
 .reveal-card { animation: card-in .58s cubic-bezier(.2,.8,.2,1) both; }
 .reveal-stack > * { animation: text-in .55s cubic-bezier(.2,.8,.2,1) both; }
 .reveal-stack > :nth-child(2) { animation-delay: .09s; }

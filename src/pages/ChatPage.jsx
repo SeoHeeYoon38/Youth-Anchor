@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChevronRight, LockKeyhole, MessageCircle, Navigation, Phone, Power } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import DragBackHeader from '../components/DragBackHeader.jsx'
 import { connectChatRoom, createChatRoom, createSosAlert, requestChatReply } from '../api.js'
 import { quickReplies } from '../data.js'
 
@@ -208,11 +209,11 @@ export default function ChatPage({ position, onRoomChange, onQuickExit }) {
 
   return (
     <div className="view chat-view page-enter">
-      <header className="chat-header">
+      <DragBackHeader className="chat-header">
         <span className="chat-header-call-icon" aria-hidden="true"><Phone size={25} /></span>
         <div><h1>AI 안내 가온</h1><span><i /> 온라인</span></div>
         <button className="exit-compact transition active:scale-95" onClick={onQuickExit} aria-label="긴급 종료"><Power size={19} /> 긴급종료</button>
-      </header>
+      </DragBackHeader>
       <div className="privacy-strip"><LockKeyhole size={17} /> 대화는 익명으로 임시 저장되며 긴급 종료 시 즉시 삭제돼요.</div>
       <div className="messages" aria-live="polite">
         <div className="time-marker">오늘 · 익명 대화</div>
