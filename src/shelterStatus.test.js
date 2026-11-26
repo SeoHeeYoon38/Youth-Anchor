@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { KYCI_DIRECTORY_URL, shelterStatusUrl, statusRegionName } from '../shared/shelterStatus.js'
+import { shelterStatusRegion, statusRegionName } from '../shared/shelterStatus.js'
 import { fetchShelterStatus, loadShelterStatus } from '../server/opendata/shelterStatus.js'
 
 test('KYCI가 제공하는 모든 지역 탭을 시·도명과 약칭으로 연결한다', () => {
@@ -8,15 +8,15 @@ test('KYCI가 제공하는 모든 지역 탭을 시·도명과 약칭으로 연�
     '경기도', '강원특별자치도', '충청북도', '충청남도', '전북특별자치도', '전라남도', '경상북도', '경상남도', '제주특별자치도']
   const shortNames = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '경기', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주']
   for (const [index, region] of regions.entries()) {
-    const path = shelterStatusUrl({ region: ` ${region} 시군구` })
-    assert.equal(path, `/shelters/status/${index + 1}`)
+    const id = shelterStatusRegion({ region: ` ${region} 시군구` })
+    assert.equal(id, String(index + 1))
     assert.equal(statusRegionName(String(index + 1)), shortNames[index])
-    assert.equal(shelterStatusUrl({ address: `${shortNames[index]} 시군구 도로명` }), path)
+    assert.equal(shelterStatusRegion({ address: `${shortNames[index]} 시군구 도로명` }), id)
   }
-  assert.equal(shelterStatusUrl({ address: '전라북도 전주시' }), shelterStatusUrl({ region: '전북특별자치도' }))
-  assert.equal(shelterStatusUrl({ region: '경기도 광주시', address: '광주시' }), shelterStatusUrl({ region: '경기' }))
-  assert.equal(shelterStatusUrl({ region: '세종특별자치시' }), '/shelters/status/sejong')
-  assert.equal(shelterStatusUrl({}), KYCI_DIRECTORY_URL)
+  assert.equal(shelterStatusRegion({ address: '전라북도 전주시' }), shelterStatusRegion({ region: '전북특별자치도' }))
+  assert.equal(shelterStatusRegion({ region: '경기도 광주시', address: '광주시' }), shelterStatusRegion({ region: '경기' }))
+  assert.equal(shelterStatusRegion({ region: '세종특별자치시' }), null)
+  assert.equal(shelterStatusRegion({}), null)
   assert.equal(statusRegionName('17'), undefined)
 })
 

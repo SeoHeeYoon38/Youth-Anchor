@@ -60,7 +60,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
         </div>
         <FamilyHelpCard />
         <div className="shelter-strip">
-          {shelters.slice(0, 3).map((shelter) => (
+          {shelters.map((shelter) => (
             <ShelterCard key={shelter.id} shelter={shelter} variant="warm" onClick={() => onSelectShelter(shelter)} />
           ))}
           {shelters.length === 0 && <div className="empty-state compact"><strong>표시할 쉼터가 없어요</strong><p>잠시 후 다시 확인해 주세요.</p></div>}

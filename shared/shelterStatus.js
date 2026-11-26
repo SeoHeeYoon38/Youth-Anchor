@@ -13,13 +13,13 @@ export function statusRegionName(id) {
   return /^[1-9]\d?$/.test(id) ? regionTabs[Number(id) - 1]?.[1] : undefined
 }
 
-export function shelterStatusUrl(shelter) {
+export function shelterStatusRegion(shelter) {
   for (const field of [shelter.region, shelter.address]) {
     const region = field?.trim()
     if (!region) continue
-    if (/^세종/.test(region)) return '/shelters/status/sejong'
+    if (/^세종/.test(region)) return null
     const index = regionTabs.findIndex(([pattern]) => pattern.test(region))
-    if (index >= 0) return `/shelters/status/${index + 1}`
+    if (index >= 0) return String(index + 1)
   }
-  return KYCI_DIRECTORY_URL
+  return null
 }

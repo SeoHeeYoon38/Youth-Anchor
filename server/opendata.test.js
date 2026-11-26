@@ -11,6 +11,7 @@ import {
   fetchWelfareServices
 } from './opendata/notices.js'
 import { SEED_SOURCE, loadSeedLocalSupport, loadSeedShelters } from './seed/index.js'
+import officialDirectory from './seed/official-shelter-ids.json' with { type: 'json' }
 import {
   ensureBaselineData,
   millisecondsUntilNextRun,
@@ -303,7 +304,7 @@ test('쉼터 동기화가 좌표 없는 행을 지오코딩으로 보정한다',
   assert.equal(run.imported, 2)
   assert.deepEqual(geocoded, ['광주광역시 동구 1'])
   const stored = repository.listShelters()
-  assert.equal(stored.length, 2)
+  assert.equal(stored.filter(s => s.source === 'mogef-teen-shelter').length, 2)
   assert.equal(stored.find((item) => item.name === '좌표없는쉼터').lat, 35.1595)
   repository.close()
 })
@@ -317,7 +318,7 @@ test('쉼터 동기화를 다시 돌려도 행이 늘지 않는다', async () =>
   await syncShelters(options)
   await syncShelters(options)
 
-  assert.equal(repository.countShelters(), 1)
+  assert.equal(repository.countShelters(), 3)
   repository.close()
 })
 
@@ -335,8 +336,8 @@ test('오픈API 동기화가 성공하면 동봉 파일데이터 행을 대체�
   })
 
   const stored = repository.listShelters()
-  assert.equal(stored.length, 1)
-  assert.equal(stored[0].source, 'mogef-teen-shelter')
+  assert.equal(stored.filter(s => s.source === 'mogef-teen-shelter').length, 1)
+  assert.equal(stored.filter(s => s.source === 'mogef-file').length, 0)
   repository.close()
 })
 
@@ -400,6 +401,10 @@ test('동봉 데이터를 넣으면 주변 쉼터 조회가 실제 결과를 낸
   await ensureBaselineData({ repository, logger: {} })
 
   const shelters = repository.listShelters()
+  const linked = shelters.filter(s => s.officialStatus)
+  assert.deepEqual(linked.map(s => s.officialStatus.id).sort(), officialDirectory.map(s => s.id).sort())
+  assert.equal(shelters.find(s => s.name.includes('용산일시')).officialStatus.id, 'su34')
+  assert.equal(shelters.find(s => s.name.includes('이동형, 서북')).officialStatus, null)
   assert.ok(shelters.length >= 130)
   assert.ok(repository.countNotices() >= 200)
 

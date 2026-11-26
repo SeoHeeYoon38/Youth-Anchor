@@ -1,6 +1,7 @@
 import { mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
+import { officialShelterRef } from './seed/officialShelters.js'
 
 const DEFAULT_DATABASE_PATH = resolve('server/data/haven.db')
 
@@ -38,6 +39,7 @@ function mapShelter(row) {
   if (!row) return null
   return {
     id: row.id,
+    officialStatus: officialShelterRef(row),
     name: row.name,
     type: row.type,
     gender: row.gender,
@@ -304,7 +306,8 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     countShelters: database.prepare('SELECT COUNT(*) AS total FROM shelters'),
     countNotices: database.prepare('SELECT COUNT(*) AS total FROM notices'),
     deleteSheltersBySource: database.prepare('DELETE FROM shelters WHERE source = ?'),
-    deleteSheltersExceptSource: database.prepare('DELETE FROM shelters WHERE source <> ?'),
+    deleteSheltersExceptSource: database.prepare("DELETE FROM shelters WHERE source <> ? AND source <> 'kyci-shelter'"),
+    removeShelterByExternalId: database.prepare('DELETE FROM shelters WHERE external_id = ?'),
     recordSyncRun: database.prepare(`
       INSERT INTO sync_runs (target, status, imported, skipped, total_count, message, started_at, finished_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -412,6 +415,9 @@ export function createDatabase(databasePath = process.env.HAVEN_DB_PATH || DEFAU
     },
     deleteSheltersBySource(source) {
       return statements.deleteSheltersBySource.run(source).changes
+    },
+    removeShelterByExternalId(externalId) {
+      return statements.removeShelterByExternalId.run(externalId).changes
     },
     /** 오픈API 동기화 성공 후 다른 출처(동봉 파일데이터 등)의 행을 정리한다. */
     deleteSheltersExceptSource(source) {
