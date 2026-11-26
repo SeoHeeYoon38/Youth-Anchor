@@ -16,6 +16,7 @@ function normalizeSearchText(value) {
 function searchableShelterText(shelter) {
   return [
     shelter?.name,
+    shelter?.officialStatus?.name,
     shelter?.address,
     shelter?.region,
     shelter?.entryTarget,

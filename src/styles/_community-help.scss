@@ -119,22 +119,17 @@
 .admission-note { margin: 12px 0; color: #73583f; font-size: 13px; line-height: 1.5; }
 .shelter-capacity { align-items: center; }
 .shelter-capacity dd { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; }
-.shelter-admission .shelter-status-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
+.shelter-occupancy {
   margin-inline-start: auto;
-  min-height: 36px;
-  padding: 5px 9px;
-  border: 1px solid #dec59e;
+  padding: 3px 9px;
   border-radius: 16px;
-  background: #fffaf0;
+  background: #f3eadb;
   color: #725238;
   font-size: 12px;
   font-weight: 750;
-  text-decoration: none;
 }
+.shelter-occupancy.can-enter { background: #e5efde; color: #3d6137; }
+.shelter-capacity dd small { flex-basis: 100%; color: #786a59; font-size: 11px; font-weight: 500; }
 
 .shelter-status-page h1 { margin: 12px 0; color: #50392b; font-size: 24px; }
 .shelter-status-list { display: grid; gap: 10px; padding: 0; list-style: none; }

@@ -10,6 +10,7 @@ import {
 import { SHELTER_ENDPOINT, fetchYouthShelters } from './opendata/shelters.js'
 import { syncNoticeFeeds } from './notice-sync.js'
 import { loadSeedLocalSupport, loadSeedNotices, loadSeedShelters } from './seed/index.js'
+import { ensureOfficialShelters } from './seed/officialShelters.js'
 
 export const SHELTER_SOURCE = 'mogef-teen-shelter'
 const KST_OFFSET_MINUTES = 9 * 60
@@ -117,7 +118,10 @@ export async function syncShelters({
     }
 
     // 오픈API가 더 최신이므로 동봉 파일데이터로 넣어둔 행은 정리한다.
-    if (imported > 0) repository.deleteSheltersExceptSource(SHELTER_SOURCE)
+    if (imported > 0) {
+      repository.deleteSheltersExceptSource(SHELTER_SOURCE)
+      ensureOfficialShelters(repository)
+    }
 
     const message = withoutCoordinates > 0 ? `좌표 없음 ${withoutCoordinates}건 제외` : ''
     logger.log?.(`[sync] shelters imported=${imported} total=${totalCount} ${message}`)
@@ -204,6 +208,8 @@ export async function ensureBaselineData({ repository, logger = console } = {}) 
     sheltersInserted = shelters.length
     logger.log?.(`[sync] 전국 청소년쉼터 ${shelters.length}곳을 동봉 데이터로 채웠습니다 (여성가족부 2025-03 기준)`)
   }
+
+  ensureOfficialShelters(repository)
 
   if (repository.countNotices() === 0) {
     const notices = await loadSeedNotices()
