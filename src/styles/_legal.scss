@@ -22,8 +22,7 @@
 .legal-main::-webkit-scrollbar { display: none; }
 .legal-picker { padding: 6px 12px 4px; }
 .legal-picker-heading { display: grid; grid-template-columns: 49px minmax(0, 1fr); align-items: center; gap: 16px; }
-.legal-picker-symbol { width: 49px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: #ffb246; color: #76502f; }
-.legal-picker-symbol img { width: 29px; height: 29px; display: block; }
+.legal-picker-symbol { width: 49px; height: 44px; display: block; object-fit: contain; }
 .legal-picker-intro { container-type: inline-size; }
 .legal-picker-heading h1 { margin: 0; color: #674331; font-size: clamp(20px, 5.2vw, 24px); font-weight: 900; line-height: 1.2; }
 .legal-picker-heading .legal-picker-intro h1 { font-size: min(1.5rem, 6.6cqi); }
