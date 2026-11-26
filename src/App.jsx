@@ -10,6 +10,7 @@ import HomePage from './pages/HomePage.jsx'
 import FamilyHelpPage from './pages/FamilyHelpPage.jsx'
 import SheltersPage from './pages/SheltersPage.jsx'
 import ShelterStatusPage from './pages/ShelterStatusPage.jsx'
+import CounselingCentersPage from './pages/CounselingCentersPage.jsx'
 import SupportPage from './pages/SupportPage.jsx'
 import WelcomePage from './pages/WelcomePage.jsx'
 import { RightsCatalogPage, RightsDetailPage, RightsDocumentsPage, RightsHomePage } from './pages/RightsPage.jsx'
@@ -133,6 +134,7 @@ export default function App() {
         <Route path="/legal" element={<LegalHomePage onQuickExit={quickExit} />} />
         <Route path="/family-help/:topicId?" element={<FamilyHelpPage onQuickExit={quickExit} />} />
         <Route path="/shelters/status/:region" element={<ShelterStatusPage onQuickExit={quickExit} />} />
+        <Route path="/counseling-centers" element={<CounselingCentersPage onQuickExit={quickExit} />} />
         <Route path="/legal/chat" element={<LegalChatPage onQuickExit={quickExit} />} />
         <Route element={<HavenLayout onQuickExit={quickExit} onNotice={() => setNoticeOpen(true)} />}>
           <Route path="/home" element={<HomePage shelters={sortedShelters} locationMessage={locationMessage} locateMe={locateMe} locating={locating} onSelectShelter={setSelectedShelter} onOpenGuide={() => setGuideOpen(true)} />} />
