@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { ChevronRight, House, LocateFixed, MapPin, SlidersHorizontal, X } from 'lucide-react'
 import KakaoMap from '../components/KakaoMap.jsx'
+import DragBackHeader from '../components/DragBackHeader.jsx'
 import ShelterCard from '../components/ShelterCard.jsx'
 import { ShelterVisitNote } from '../components/ShelterHelp.jsx'
 import {
@@ -34,9 +35,9 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
   return (
     <>
       <div className="view shelter-view page-enter">
-        <header className="map-header">
+        <DragBackHeader className="map-header">
           <div><span>HAVEN</span><h1>청소년쉼터 지도</h1></div>
-        </header>
+        </DragBackHeader>
 
         <div className={`map-search${searchQuery ? ' has-query' : ''}`}>
           <img src="/figma/warm/map-search.svg" alt="" aria-hidden="true" />

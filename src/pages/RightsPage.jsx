@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { fetchRightsDocuments, fetchUserData, recommendRightsCollection, saveUserData } from '../api.js'
 import FeatureHeader from '../components/FeatureHeader.jsx'
+import usePullDown from '../usePullDown.js'
 import BottomNav from '../components/BottomNav.jsx'
 import JobSearchFab from '../components/JobSearchFab.jsx'
 import { RIGHTS_DOCUMENTS, RIGHTS_DOCUMENT_DETAILS } from '../../shared/rightsCatalog.js'
@@ -198,7 +199,8 @@ function CollectionBookCard({ collection, onClick, onLongPress, selectedForDelet
 }
 
 function DialogShell({ title, onClose, children }) {
-  return <div className="rights-sheet-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><section className="rights-sheet" role="dialog" aria-modal="true" aria-label={title}><div className="rights-sheet-handle" /><header><strong>{title}</strong><button type="button" onClick={onClose} aria-label="닫기"><X size={20} /></button></header>{children}</section></div>
+  const sheet = usePullDown(onClose)
+  return <div className="rights-sheet-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}><section ref={sheet} className="rights-sheet" role="dialog" aria-modal="true" aria-label={title}><div className="rights-sheet-handle" /><header><strong>{title}</strong><button type="button" onClick={onClose} aria-label="닫기"><X size={20} /></button></header>{children}</section></div>
 }
 
 function DocumentPicker({ books = BOOKS, title = '서류 추가하기', selectedIds, onClose, onSave }) {

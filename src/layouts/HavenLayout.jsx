@@ -1,6 +1,7 @@
 import { Bell, ExternalLink } from 'lucide-react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
+import DragBackHeader from '../components/DragBackHeader.jsx'
 import JobSearchFab from '../components/JobSearchFab.jsx'
 import Mascot from '../components/Mascot.jsx'
 
@@ -13,12 +14,13 @@ export default function HavenLayout({ onQuickExit, onNotice }) {
   const isChat = pathname === '/chat'
   const isSupport = pathname === '/support'
   const usesWarmHeader = isHome || isSupport
+  const Header = isSupport ? DragBackHeader : 'header'
   const usesWarmNav = isHome || isShelters || isChat || isSupport
 
   return (
     <div className={`app-shell route-${pathname.slice(1) || 'home'}`}>
       {!hasOwnHeader && (
-        <header className="topbar">
+        <Header className="topbar">
           <button className="brand group" onClick={() => navigate('/home')} aria-label="Haven 홈">
             {usesWarmHeader ? (
               <span className="home-brand-mark" aria-hidden="true"><img src="/figma/warm/haven-house-only.png" alt="" /></span>
@@ -36,7 +38,7 @@ export default function HavenLayout({ onQuickExit, onNotice }) {
               긴급 종료
             </button>
           </div>
-        </header>
+        </Header>
       )}
 
       <main><Outlet /></main>

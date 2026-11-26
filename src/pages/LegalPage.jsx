@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
+import DragBackHeader from '../components/DragBackHeader.jsx'
 import { fetchLegalTopic, fetchLegalTopics, fetchUserData, saveUserData } from '../api.js'
 import { addChecklistItems, mergeChecklists, readChecklist, writeChecklist } from '../checklistStore.js'
 
@@ -198,11 +199,11 @@ export function LegalChatPage({ onQuickExit }) {
 
   return (
     <div className="feature-shell legal-shell legal-chat-shell">
-      <header className="chat-header legal-chat-header">
+      <DragBackHeader className="chat-header legal-chat-header" backTo="/legal">
         <span className="chat-header-call-icon" aria-hidden="true"><Phone size={25} /></span>
         <div><h1>{topic.title}</h1><span><i /> 온라인</span></div>
         <button className="exit-compact" type="button" onClick={onQuickExit} aria-label="긴급 종료"><Power size={19} /> 긴급종료</button>
-      </header>
+      </DragBackHeader>
       <div className="privacy-strip"><LockKeyhole size={17} /> 대화는 익명으로 임시 저장되며 긴급 종료 시 즉시 삭제돼요.</div>
       <main className="legal-chat-main">
         <section className="legal-chat-log" aria-live="polite">

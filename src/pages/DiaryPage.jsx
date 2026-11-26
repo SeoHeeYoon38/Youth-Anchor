@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
 import JobSearchFab from '../components/JobSearchFab.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
+import usePullDown from '../usePullDown.js'
 import { fetchUserData, saveUserData } from '../api.js'
 import { mergeChecklists, readChecklist, writeChecklist } from '../checklistStore.js'
 
@@ -141,9 +142,10 @@ function formatDiaryDate(dateKey) {
 }
 
 function DiaryEntrySheet({ entry, onClose, onEdit }) {
+  const sheet = usePullDown(onClose)
   return (
     <div className="diary-entry-backdrop" role="presentation" onMouseDown={onClose}>
-      <section className="diary-entry-sheet" role="dialog" aria-modal="true" aria-labelledby="diary-entry-title" onMouseDown={(event) => event.stopPropagation()}>
+      <section ref={sheet} className="diary-entry-sheet" role="dialog" aria-modal="true" aria-labelledby="diary-entry-title" onMouseDown={(event) => event.stopPropagation()}>
         <div className="diary-entry-handle"><img src={`${DIARY_ASSET_ROOT}/sheet/asset-1.svg`} alt="" /></div>
         <header>
           <h2 id="diary-entry-title">{formatDiaryDate(entry.date)}</h2>

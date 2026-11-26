@@ -12,19 +12,20 @@ import {
   ShieldCheck,
   X
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import usePullDown from '../usePullDown.js'
 import { buildKakaoDirectionsUrl } from '../kakaoDirections.js'
 import { fetchShelterStatus } from '../api.js'
 
 const inquiry = '쉼터에 문의'
 
 function SheetFrame({ children, onClose, labelledBy, className = '' }) {
-  const dialog = useRef(null)
+  const dialog = usePullDown(onClose)
   useEffect(() => {
     const trigger = document.activeElement
     dialog.current?.focus()
     return () => { trigger?.focus({ preventScroll: true }) }
-  }, [])
+  }, [dialog])
 
   function handleKey(event) {
     if (event.key === 'Escape') onClose()
@@ -70,7 +71,9 @@ function ShelterCapacity({ shelter }) {
   return <div className="shelter-capacity"><dt>전체 정원</dt>
     <dd aria-live="polite">
       <span>{Number.isInteger(capacity) ? `${capacity}명` : inquiry}</span>
-      {record && <span>· 현원 {Number.isInteger(record.residents) ? `${record.residents}명` : '미제공'}</span>}
+      {Number.isInteger(record?.residents)
+        ? <span>· 현원 {record.residents}명</span>
+        : !loading && Number.isInteger(capacity) && <span>· 현원은 쉼터에 문의</span>}
       {status && status !== '기관에 문의' && status !== inquiry && <span className={`shelter-occupancy${status === '입소가능' ? ' can-enter' : ''}`}>{status}</span>}
       {record?.checkedAt && <small>공식 현황 조회 {new Date(record.checkedAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</small>}
     </dd>

@@ -16,14 +16,16 @@
   align-items: center;
   gap: 14px;
   padding: 16px;
+  text-decoration: none;
+}
+.family-help-card, .family-topic, .shelter-card-warm {
   border: 1px solid #eee1d1;
   border-radius: 20px;
   background: #fffdf9;
   color: #50392b;
-  text-decoration: none;
   box-shadow: 0 3px 0 rgba(112, 74, 34, .09);
 }
-.family-help-card:hover, .family-topic:hover { border-color: #cfac84; }
+.family-help-card:hover, .family-topic:hover, .shelter-card-warm:hover { border-color: #cfac84; }
 .family-help-card strong { display: block; font-size: 16px; line-height: 1.45; }
 .family-help-card small { display: block; margin-top: 4px; color: #79634e; font-size: 12px; line-height: 1.6; }
 .family-help-card > svg, .family-topic > svg { color: #9f876f; }
