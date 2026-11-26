@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronRight, LockKeyhole, Navigation, Power } from 'lucide-react'
+import { ChevronRight, LockKeyhole, Navigation, Phone, Power } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import DragBackHeader from '../components/DragBackHeader.jsx'
 import { connectChatRoom, createChatRoom, requestChatReply } from '../api.js'
@@ -166,7 +166,7 @@ export default function ChatPage({ onRoomChange, onQuickExit }) {
   return (
     <div className="view chat-view page-enter">
       <DragBackHeader className="chat-header">
-        <img className="chat-header-call-icon general-chat-phone" src="/icons/help/phone.svg" alt="" />
+        <span className="chat-header-call-icon" aria-hidden="true"><Phone size={25} /></span>
         <div><h1>AI 안내 가온</h1><span><i /> 온라인</span></div>
         <button className="exit-compact transition active:scale-95" onClick={onQuickExit} aria-label="긴급 종료"><Power size={19} /> 긴급종료</button>
       </DragBackHeader>

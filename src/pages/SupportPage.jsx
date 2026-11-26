@@ -20,7 +20,7 @@ export default function SupportPage({ supports, onSelect }) {
         <h1>혼자 준비하지<br />않아도 돼요</h1>
         <p>주거, 생활비, 일자리, 식사 지원을 한곳에서 확인하세요.</p>
         <a className="support-callout" href="tel:1388">
-          <span className="support-callout-icon" aria-hidden="true"><img src="/figma/warm/heart.svg" alt="" /></span>
+          <img className="youth-call-icon" src="/icons/help/phone-heart.svg" alt="" />
           <span className="support-callout-copy"><strong>1388에 바로 연결</strong><small>24시간 무료 청소년 상담</small></span>
           <ChevronRight size={17} aria-hidden="true" />
         </a>

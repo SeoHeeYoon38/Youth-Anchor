@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, ExternalLink, Heart, MapPin, Phone, TriangleAlert } from 'lucide-react'
+import { ChevronDown, ChevronRight, ExternalLink, MapPin, Phone, TriangleAlert } from 'lucide-react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import BottomNav from '../components/BottomNav.jsx'
 import FeatureHeader from '../components/FeatureHeader.jsx'
@@ -66,7 +66,7 @@ const topics = [
     related: ['violence', 'care']
   },
   {
-    id: 'distress', title: '마음이 너무 힘들어요', icon: Heart, tone: 'lilac',
+    id: 'distress', title: '마음이 너무 힘들어요', artwork: '/icons/help/family-distress.png', tone: 'lilac',
     agency: counselingCenters,
     examples: [
       { home: '부모님의 재혼으로 새 가족과 살 때', story: '새 집에서는 아직 손님처럼 느껴져요. 부모님이 속상해하실까 봐 마음을 털어놓기 어려워요.' },
@@ -91,17 +91,16 @@ const topics = [
   }
 ]
 
-function TopicIcon({ topic, size = 24 }) {
-  const Icon = topic.icon
+function TopicIcon({ topic }) {
   return <span className={`help-icon ${topic.tone}`} aria-hidden="true">
-    {topic.artwork ? <img src={topic.artwork} alt="" /> : <Icon size={size} />}
+    <img src={topic.artwork} alt="" />
   </span>
 }
 
 function TopicLink({ topic, from }) {
   return (
     <Link className="family-topic" to={`/family-help/${topic.id}`} state={{ from }}>
-      <TopicIcon topic={topic} size={21} />
+      <TopicIcon topic={topic} />
       <span>{topic.title}</span><ChevronRight size={17} aria-hidden="true" />
     </Link>
   )

@@ -24,7 +24,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
           <p>HAVEN과 함께 필요한 도움을 찾아봐요.</p>
         </div>
         <a href="tel:1388" className="home-help-line group transition duration-300 hover:-translate-y-1">
-          <img className="home-help-icon" src="/icons/help/phone-heart.svg" alt="" />
+          <img className="youth-call-icon" src="/icons/help/phone-heart.svg" alt="" />
           <span className="home-help-copy"><strong>1388에 바로 연결</strong><small>24시간 무료 청소년 상담</small></span>
           <img className="home-chevron" src={`${WARM_ASSET_ROOT}/chevron-right.svg`} alt="" aria-hidden="true" />
         </a>
@@ -42,7 +42,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
               className={`feature-tile feature-tile-${item.tone} group transition duration-300 hover:-translate-y-1 active:scale-[0.98]`}
               onClick={() => item.action === 'guide' ? onOpenGuide() : navigate(item.to)}
             >
-              <span className="feature-icon" aria-hidden="true"><img src={item.icon} alt="" /></span>
+              <img className="feature-icon" src={item.icon} alt="" />
               <strong>{item.label}</strong>
               <small>{item.description}</small>
             </button>
