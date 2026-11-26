@@ -16,6 +16,8 @@ import { useEffect, useRef, useState } from 'react'
 import { buildKakaoDirectionsUrl } from '../kakaoDirections.js'
 import { fetchShelterStatus } from '../api.js'
 
+const inquiry = '쉼터에 문의'
+
 function SheetFrame({ children, onClose, labelledBy, className = '' }) {
   const dialog = useRef(null)
   useEffect(() => {
@@ -64,12 +66,12 @@ function ShelterCapacity({ shelter }) {
 
   const capacity = record?.capacity ?? shelter.capacity
   const loading = id && record === undefined
-  const status = record?.status && record.status !== '기관에 문의' ? record.status : '쉼터에 문의'
+  const status = loading ? '현황 확인 중…' : record?.status
   return <div className="shelter-capacity"><dt>전체 정원</dt>
     <dd aria-live="polite">
-      <span>{Number.isInteger(capacity) ? `${capacity}명` : '미제공'}</span>
+      <span>{Number.isInteger(capacity) ? `${capacity}명` : inquiry}</span>
       {record && <span>· 현원 {Number.isInteger(record.residents) ? `${record.residents}명` : '미제공'}</span>}
-      <span className={`shelter-occupancy${status === '입소가능' ? ' can-enter' : ''}`}>{loading ? '현황 확인 중…' : status}</span>
+      {status && status !== '기관에 문의' && status !== inquiry && <span className={`shelter-occupancy${status === '입소가능' ? ' can-enter' : ''}`}>{status}</span>}
       {record?.checkedAt && <small>공식 현황 조회 {new Date(record.checkedAt).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</small>}
     </dd>
   </div>
@@ -82,7 +84,6 @@ export function ShelterSheet({ shelter, origin = null, onClose }) {
   const dialNumber = firstPhone.replace(/[\s().-]/g, '')
   const hasPhone = /^(?:0\d{8,10}|\+82\d{8,10}|1[5-8]\d{6})$/.test(dialNumber)
   const target = shelter.entryTarget || (shelter.source === 'mogef-teen-shelter' ? '' : shelter.ages)
-  const inquiry = '쉼터에 문의'
   return (
     <SheetFrame onClose={onClose} labelledBy="shelter-sheet-title" className="shelter-sheet warm-sheet">
       <header className="shelter-detail-heading">
@@ -96,7 +97,7 @@ export function ShelterSheet({ shelter, origin = null, onClose }) {
       <dl className="shelter-admission">
         <ShelterCapacity key={shelter.id} shelter={shelter} />
         <div><dt>입소 대상</dt><dd>{target || inquiry}</dd></div>
-        <div><dt>입소 기간</dt><dd>{shelter.entryPeriod || inquiry}</dd></div>
+        <div><dt>입소 기간</dt><dd>{shelter.entryPeriod?.trim() || inquiry}</dd></div>
         <div><dt>주소</dt><dd>{shelter.address || inquiry}</dd></div>
         <div><dt>대표전화</dt><dd>{hasPhone ? <a href={`tel:${dialNumber}`}>{displayPhone}</a> : '시설 번호 미제공'}</dd></div>
       </dl>
