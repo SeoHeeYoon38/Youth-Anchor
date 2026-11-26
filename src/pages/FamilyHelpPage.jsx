@@ -5,7 +5,7 @@ import FeatureHeader from '../components/FeatureHeader.jsx'
 
 const counselingCenters = {
   label: '가까운 청소년상담복지센터 찾기',
-  url: 'https://www.1388.go.kr/sfi/YTOSP_SC_SFI_01?untwktValue=U02'
+  path: '/counseling-centers'
 }
 const childProtectionCenters = {
   label: '가까운 아동보호전문기관 찾기',
@@ -114,7 +114,9 @@ function TopicGuide({ topic, from }) {
       <section><h2>상담을 요청하면 어떻게 진행되나요?</h2><p>{topic.next}</p></section>
       <div className="family-contacts">
         <a className="help-primary" href="tel:1388"><Phone size={16} /> 1388 전화 상담</a>
-        <a className="help-secondary" href={topic.agency.url} target="_blank" rel="noreferrer">{topic.agency.label} <ExternalLink size={14} /></a>
+        {topic.agency.path
+          ? <Link className="help-secondary" to={topic.agency.path} state={{ topicId: topic.id, from }}>{topic.agency.label} <ChevronRight size={14} /></Link>
+          : <a className="help-secondary" href={topic.agency.url} target="_blank" rel="noreferrer">{topic.agency.label} <ExternalLink size={14} /></a>}
         <small>휴대전화에서는 지역번호와 1388을 함께 눌러주세요.</small>
       </div>
       <details className="family-related">

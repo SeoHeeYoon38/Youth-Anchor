@@ -144,6 +144,17 @@
 .shelter-status-list b { border-radius: 12px; padding: 4px 9px; font-size: 12px; background: #f2e9df; color: #694d38; }
 .shelter-status-list b.can-enter { background: #e5efde; color: #3d6137; }
 
+.center-finder-heading, .center-results li > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.center-finder-heading h1 { margin: 0; font-size: 21px; }
+.center-finder-heading button { flex-shrink: 0; }
+.center-finder > p, .center-results p { margin: 8px 0 14px; color: #705b49; font-size: 14px; }
+.counseling-center-map { height: clamp(165px, 28dvh, 300px); border-radius: 16px; background: #f4eadb; overflow: hidden; }
+.center-results { list-style: none; padding: 0; display: grid; gap: 10px; }
+.center-results li { padding: 16px; border: 1px solid #eadbc7; border-radius: 16px; background: #fffdf9; }
+.center-results small { white-space: nowrap; color: #705b49; }
+.center-results li .center-links { justify-content: flex-start; flex-wrap: wrap; gap: 18px; }
+.center-links a { display: inline-flex; align-items: center; gap: 6px; padding: 5px 0; color: #795631; font-weight: 700; font-size: 14px; }
+
 .rights-prep-topic { grid-column: 1 / -1; cursor: auto; }
 .rights-prep-topic p { margin: 0; font-size: 14px; line-height: 1.7; }
 .rights-prep-topic .help-primary { display: flex; width: fit-content; margin-top: 10px; }
