@@ -34,15 +34,14 @@
   box-shadow: 0 8px 20px rgba(190,122,42,.08);
 }
 
-.home-help-icon {
+.youth-call-icon {
   width: 36px;
   height: 36px;
   display: block;
   object-fit: contain;
 }
 
-.home-chevron,
-.feature-icon img { display: block; }
+.home-chevron { display: block; }
 .home-help-copy strong,
 .home-help-copy small { display: block; }
 .home-help-copy strong { color: #f37527; font-size: 17px; }
@@ -76,8 +75,7 @@
   cursor: pointer;
 }
 
-.feature-icon { width: 40px; height: 40px; margin-bottom: 8px; display: grid; place-items: center; border-radius: 12px; }
-.feature-icon img { width: 100%; height: 100%; object-fit: contain; }
+.feature-icon { display: block; width: 40px; height: 40px; flex: none; margin-bottom: 8px; object-fit: contain; }
 .feature-tile strong { width: 100%; font-size: 15px; }
 .feature-tile small { width: 100%; color: #8b7664; font-size: 12px; line-height: 1.4; }
 

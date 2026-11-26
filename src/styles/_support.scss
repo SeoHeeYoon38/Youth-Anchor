@@ -37,8 +37,6 @@
   box-shadow: 0 8px 20px rgba(190,122,42,.08);
 }
 
-.support-callout-icon { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 11px; background: #fff3de; }
-.support-callout-icon img { display: block; width: 18px; height: 18px; }
 .support-callout-copy strong, .support-callout-copy small { display: block; }
 .support-callout-copy strong { color: #f87d11; font-size: 13px; font-weight: 800; }
 .support-callout-copy small { margin-top: 1px; color: #41331a; font-size: 9px; font-weight: 700; }
@@ -111,8 +109,7 @@
   .support-view { padding-left: 14px; padding-right: 14px; }
   .support-hero { padding: 16px; border-radius: 20px; }
   .support-hero h1 { font-size: 22px; }
-  .support-callout { min-height: 58px; margin-top: 12px; grid-template-columns: 34px minmax(0, 1fr) 16px; padding: 9px 10px; }
-  .support-callout-icon { width: 34px; height: 34px; }
+  .support-callout { min-height: 58px; margin-top: 12px; grid-template-columns: 36px minmax(0, 1fr) 16px; padding: 9px 10px; }
   .support-search { height: 46px; padding-left: 12px; }
   .category-scroll { gap: 6px; }
   .category-scroll button { min-width: 48px; height: 36px; padding: 0 12px; }
