@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { createChatService, detectChatActions } from './ai-chat.js'
+import { createChatService, detectChatActions, fallbackChatReply } from './ai-chat.js'
 
 test('chat actions map urgent and shelter requests to safe next steps', () => {
   const actions = detectChatActions('지금 위험하고 오늘 잘 곳이 없어요')
   assert.ok(actions.includes('call-112'))
-  assert.ok(actions.includes('send-sos'))
+  assert.ok(!actions.includes('send-sos'))
   assert.ok(actions.includes('find-shelter'))
   assert.ok(actions.includes('call-1388'))
 })
@@ -18,8 +18,10 @@ test('chat actions understand natural free-conversation phrases', () => {
   assert.ok(foodActions.includes('view-support'))
   assert.ok(shelterActions.includes('find-shelter'))
   assert.ok(shelterActions.includes('call-1388'))
-  assert.ok(urgentActions.includes('call-112'))
-  assert.ok(urgentActions.includes('send-sos'))
+  assert.deepEqual(urgentActions, ['call-112'])
+  const fallback = fallbackChatReply('지금 위험해요')
+  assert.match(fallback.reply, /112/)
+  assert.doesNotMatch(fallback.reply, /긴급 알림|위치 공유/)
 })
 
 test('OpenAI chat uses the Responses API without storing the response', async () => {

@@ -30,7 +30,7 @@
 .legal-topic-list { margin-top: 52px; display: grid; gap: 24px; }
 .legal-topic-list > button { min-height: 99px; padding: 14px 19px 14px 24px; display: grid; grid-template-columns: 61px minmax(0, 1fr) 22px; align-items: center; gap: 24px; border: 0; border-radius: 20px; background: linear-gradient(90deg, #fff 0%, #fffdfa 100%); color: #633d2a; text-align: left; box-shadow: 2px 7px 2px rgba(84, 66, 51, .32); cursor: pointer; }
 .legal-topic-icon { width: 61px; height: 61px; display: grid; place-items: center; border-radius: 20px; }
-.legal-topic-icon img { width: 29px; height: 29px; display: block; }
+.legal-topic-icon img { width: 70%; height: 70%; display: block; object-fit: contain; }
 .legal-topic-icon.labor { background: #fce6d2; color: #bd7234; }
 .legal-topic-icon.school { background: #e8f0ff; color: #5f82c8; }
 .legal-topic-icon.digital { background: #eee8ff; color: #8066cf; }

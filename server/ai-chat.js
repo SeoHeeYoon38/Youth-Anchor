@@ -9,7 +9,7 @@ const SAFETY_INSTRUCTIONS = `당신은 위기청소년과 자립준비청년을 
 - 이름, 주민등록번호, 정확한 집 주소 등 신원을 특정하는 정보를 요구하지 마세요.
 - 사용자가 지금 다치거나 위협받을 가능성이 있으면 첫 문장에서 112에 전화하거나 주변의 믿을 수 있는 어른에게 즉시 도움을 요청하도록 안내하세요.
 - 가정 밖 청소년 상담·보호가 필요하면 청소년전화 1388을 안내하세요.
-- Haven이 실제 신고나 출동을 완료했다고 말하지 마세요. 긴급 알림 접수 여부는 별도의 화면 기능에서만 확인됩니다.
+- 이 채팅은 신고를 접수하거나 출동을 요청할 수 없습니다. 즉시 신고가 필요하면 사용자가 직접 112에 전화하도록 안내하세요.
 - 쉼터의 입소 가능 여부나 잔여석을 단정하지 말고, 방문 전에 1388 또는 해당 시설에 전화하도록 안내하세요.
 - 사용자의 감정을 인정하되 과장된 위로나 확신을 피하고, 지금 할 수 있는 가장 작은 다음 행동을 제안하세요.`
 
@@ -41,7 +41,6 @@ export function detectChatActions(message) {
   const actions = new Set()
   if (/위험|폭력|맞았|죽고|자해|살려|납치|협박|쫓아|무서|두려/.test(message)) {
     actions.add('call-112')
-    actions.add('send-sos')
   }
   if (/잘\s*곳|잘곳|잠.{0,4}곳|쉼터|가출|집에.{0,5}못|머물|노숙|숙소/.test(message)) {
     actions.add('find-shelter')
@@ -56,7 +55,7 @@ export function fallbackChatReply(message) {
   const actions = detectChatActions(message)
   if (actions.includes('call-112')) {
     return {
-      reply: '지금 다치거나 위협받을 가능성이 있다면 먼저 112에 전화하거나 가까운 믿을 수 있는 어른에게 도움을 요청해 주세요. 위치를 공유할 수 있다면 Haven의 긴급 알림도 함께 접수할 수 있어요.',
+      reply: '지금 다치거나 위협받을 가능성이 있다면 먼저 112에 전화하거나 가까운 믿을 수 있는 어른에게 도움을 요청해 주세요.',
       actions
     }
   }

@@ -19,18 +19,21 @@
   text-decoration: none;
 }
 .family-help-card, .family-topic, .shelter-card-warm {
-  border: 1px solid #eee1d1;
-  border-radius: 20px;
   background: #fffdf9;
   color: #50392b;
+}
+.family-help-card, .family-topic, .shelter-card-warm, .feature-tile {
+  border: 1px solid #eee1d1;
+  border-radius: 20px;
   box-shadow: 0 3px 0 rgba(112, 74, 34, .09);
 }
-.family-help-card:hover, .family-topic:hover, .shelter-card-warm:hover { border-color: #cfac84; }
+.family-help-card:hover, .family-topic:hover, .shelter-card-warm:hover, .feature-tile:hover { border-color: #cfac84; }
 .family-help-card strong { display: block; font-size: 16px; line-height: 1.45; }
 .family-house-icon { display: block; width: 44px; height: 44px; object-fit: contain; }
 .family-help-card small { display: block; margin-top: 4px; color: #79634e; font-size: 12px; line-height: 1.6; }
 .family-help-card > svg, .family-topic > svg { color: #9f876f; }
 .help-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 15px; }
+.help-icon img { display: block; width: 75%; height: 75%; object-fit: contain; }
 .help-icon.rose { background: #fae5df; color: #a74d48; }
 .help-icon.peach { background: #fae8d7; color: #9c602e; }
 .help-icon.sage { background: #e6efdc; color: #546e43; }
@@ -109,7 +112,7 @@
 
 .bottom-sheet.shelter-sheet { min-height: 0; }
 .shelter-detail-heading { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 11px; }
-.shelter-detail-heading > img { width: 46px; height: 46px; border-radius: 15px; background: #f8e8c9; }
+.shelter-detail-heading > img { width: 46px; height: 46px; object-fit: contain; }
 .shelter-detail-heading p { margin: 0 0 4px; color: #795a3c; font-size: 12px; font-weight: 700; }
 .shelter-detail-heading h2 { margin: 0; color: #503826; font-size: clamp(17px, 4.8vw, 22px); font-weight: 800; line-height: 1.4; }
 .help-close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid #e8d8be; border-radius: 50%; background: #fffefa; color: #664d39; cursor: pointer; }

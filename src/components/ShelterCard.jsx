@@ -7,7 +7,7 @@ export default function ShelterCard({ shelter, onClick, variant = 'default' }) {
 
     return (
       <button className="shelter-card shelter-card-warm transition duration-300" onClick={onClick}>
-        <span className="warm-shelter-icon" aria-hidden="true"><img src="/figma/warm/shelter-card.svg" alt="" /></span>
+        <img className="warm-shelter-icon" src="/icons/help/shelter-house.svg" alt="" />
         <span className="warm-shelter-copy">
           <strong>{shelter.name}</strong>
           <small>{details.map((detail) => `#${detail}`).join(' ')}</small>
