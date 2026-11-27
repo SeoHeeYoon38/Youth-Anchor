@@ -80,12 +80,11 @@
   height: 22px;
   display: grid;
   place-items: center;
-  filter: var(--nav-idle-filter);
+  pointer-events: none;
 }
-.nav-item.active .home-nav-icon {
-  filter: none;
-}
-.nav-item.active .home-nav-icon img { width: 22px; height: 22px; object-fit: contain; }
+.home-nav-icon .nav-idle-art { filter: var(--nav-idle-filter); }
+.home-nav-icon .nav-selected-art { width: 22px; height: 22px; object-fit: contain; }
+.nav-item.active .nav-idle-art, .nav-item:not(.active) .nav-selected-art { display: none; }
 .bottom-nav .nav-item:focus-visible { outline: 2px solid #98612c; outline-offset: 2px; }
 
 @media (max-width: 390px) {

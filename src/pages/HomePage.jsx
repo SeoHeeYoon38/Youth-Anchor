@@ -16,8 +16,8 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
   const navigate = useNavigate()
 
   return (
-    <div className="view home-view page-enter">
-      <section className="home-hero-card reveal-card">
+    <div className="view home-view">
+      <section className="home-hero-card">
         <div className="home-hero-copy">
           <span>오늘도 안전한 하루</span>
           <h1>반가워요, 방문자님!</h1>
@@ -35,7 +35,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
           <div><span>바로 도움받기</span><h2 id="feature-title">무엇을 도와드릴까요?</h2></div>
           <small><LockKeyhole size={13} aria-hidden="true" />개인정보 없이 이용가능</small>
         </div>
-        <div className="feature-grid stagger-grid">
+        <div className="feature-grid">
           {QUICK_ACTIONS.map((item) => (
             <button
               key={item.label}
