@@ -7,7 +7,7 @@ import Mascot from '../components/Mascot.jsx'
 
 export default function HavenLayout({ onQuickExit, onNotice }) {
   const navigate = useNavigate()
-  const { pathname } = useLocation()
+  const { pathname, state } = useLocation()
   const hasOwnHeader = pathname === '/chat' || pathname === '/shelters'
   const isHome = pathname === '/home'
   const isShelters = pathname === '/shelters'
@@ -45,7 +45,7 @@ export default function HavenLayout({ onQuickExit, onNotice }) {
 
       {pathname !== '/chat' && <JobSearchFab key={pathname} />}
 
-      <BottomNav warm={usesWarmNav} mapTheme={isShelters} />
+      <BottomNav warm={usesWarmNav} mapTheme={isShelters} supportLast={isSupport && state?.supportNav} />
     </div>
   )
 }

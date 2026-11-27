@@ -83,9 +83,10 @@
   filter: var(--nav-idle-filter);
 }
 .nav-item.active .home-nav-icon {
-  filter: brightness(0) saturate(100%) invert(61%) sepia(68%) saturate(1450%) hue-rotate(345deg) brightness(99%) contrast(86%);
+  filter: none;
   transform: translateY(-1px);
 }
+.nav-item.active .home-nav-icon img { width: 22px; height: 22px; object-fit: contain; }
 @media (prefers-reduced-motion: no-preference) {
   .home-nav-icon { transition: transform .25s ease, filter .2s ease; }
   .nav-item.active .home-nav-icon { animation: nav-select .25s ease; }
