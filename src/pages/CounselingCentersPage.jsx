@@ -26,8 +26,11 @@ function CenterMap({ origin, nearby, located }) {
     const { maps, map } = ready
     const point = new maps.LatLng(origin.lat, origin.lng)
     map.setCenter(point)
+    const sproutPin = new maps.MarkerImage('/icons/help/counseling-center-sprout.png', new maps.Size(36, 48), {
+      offset: new maps.Point(18, 48),
+    })
     const markers = nearby.map((center) => {
-      const marker = new maps.Marker({ map, title: center.name, position: new maps.LatLng(center.lat, center.lng) })
+      const marker = new maps.Marker({ map, title: center.name, position: new maps.LatLng(center.lat, center.lng), image: sproutPin })
       const select = () => document.getElementById(center.name)?.focus()
       maps.event.addListener(marker, 'click', select)
       return { marker, select }
