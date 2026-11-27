@@ -84,16 +84,9 @@
 }
 .nav-item.active .home-nav-icon {
   filter: none;
-  transform: translateY(-1px);
 }
 .nav-item.active .home-nav-icon img { width: 22px; height: 22px; object-fit: contain; }
-@media (prefers-reduced-motion: no-preference) {
-  .home-nav-icon { transition: transform .25s ease, filter .2s ease; }
-  .nav-item.active .home-nav-icon { animation: nav-select .25s ease; }
-}
-@keyframes nav-select {
-  from { transform: translateY(0); filter: var(--nav-idle-filter); }
-}
+.bottom-nav .nav-item:focus-visible { outline: 2px solid #98612c; outline-offset: 2px; }
 
 @media (max-width: 390px) {
   :is(.route-home, .route-support) .topbar { padding-left: 14px; padding-right: 14px; }
