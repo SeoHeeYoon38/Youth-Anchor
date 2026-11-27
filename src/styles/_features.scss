@@ -178,8 +178,11 @@
 .rights-featured h1 a { color: inherit; text-decoration: none; }
 .rights-featured h1 a::after { content: ''; position: absolute; inset: 0; z-index: 1; }
 @media (prefers-reduced-motion: no-preference) {
-  .rights-featured-entry { animation: featured-document-in .28s ease-out; }
-  @keyframes featured-document-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  .rights-featured-entry { animation: featured-document-in .5s cubic-bezier(.22, 1, .36, 1); }
+  @keyframes featured-document-in {
+    from { opacity: 0; transform: translateX(-24%); }
+    to { opacity: 1; transform: translateX(0); }
+  }
 }
 .rights-sparkles { width: 70px; position: absolute; right: 0; top: 4px; object-fit: contain; }
 

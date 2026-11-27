@@ -69,7 +69,9 @@ function useRightsCatalog(initialBooks = BOOKS) {
     fetchRightsDocuments().then((items) => {
       if (!active) return
       if (items.length) lastLoadedCatalog = items
-      setBooks(lastLoadedCatalog)
+      const updated = lastLoadedCatalog
+      // The banner and searchable shelf use the same catalog for this visit, even after an offline fallback.
+      setBooks((current) => initialBooks === null ? current ?? updated : updated)
     }).catch(() => { if (active) setBooks(lastLoadedCatalog) }).finally(() => window.clearTimeout(fallback))
     return () => { active = false; window.clearTimeout(fallback) }
   }, [initialBooks])
@@ -324,7 +326,14 @@ export function RightsHomePage({ onQuickExit }) {
   const requestedCategory = params.get('category')
   const category = CATEGORIES.includes(requestedCategory) ? requestedCategory : '전체'
   const [page, setPage] = useState(1)
-  const filteredBooks = useMemo(() => books.filter((book) => book.title.replace(/\s/g, '').includes(query.replace(/\s/g, '')) && (category === '전체' || book.category === category)), [books, category, query])
+  const filteredBooks = useMemo(() => {
+    const term = query.replace(/[\s·]/g, '')
+    return books.filter((book) => {
+      const names = [book.title, book.shortTitle]
+      if (book.id === 'resident') names.push('주민등록초본')
+      return (category === '전체' || book.category === category) && names.some((name) => name.replace(/[\s·]/g, '').includes(term))
+    })
+  }, [books, category, query])
   const totalPages = Math.max(1, Math.ceil(filteredBooks.length / 4))
   const visibleBooks = filteredBooks.slice((page - 1) * 4, page * 4)
   const changeCategory = (nextCategory) => {

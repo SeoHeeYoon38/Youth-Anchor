@@ -161,34 +161,46 @@
 .rights-prep-topic p { margin: 0; font-size: 14px; line-height: 1.7; }
 .rights-prep-topic .help-primary { display: flex; width: fit-content; margin-top: 10px; }
 
-.job-fab {
-  position: fixed;
+.rights-shell, .diary-shell { position: relative; }
+.route-home:has(.job-fab) .home-view { padding-bottom: 90px; }
+.job-fab-area {
+  position: absolute;
+  inset: calc(8px + env(safe-area-inset-top)) 10px calc(82px + env(safe-area-inset-bottom));
   z-index: 30;
-  right: max(16px, calc((100vw - 560px) / 2 + 18px));
-  bottom: calc(116px + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.job-fab {
+  position: absolute;
+  left: var(--fab-x);
+  top: var(--fab-y);
+  transform: translate(calc(-1 * var(--fab-x)), calc(-1 * var(--fab-y)));
+  width: max-content;
+  pointer-events: auto;
 }
 .job-fab-link {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 106px;
-  height: 106px;
-  border-radius: 50%;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
   text-decoration: none;
 }
-.job-fab-link > .mascot-breathe { width: 100%; height: 100%; pointer-events: none; }
+.job-fab-link:active { cursor: grabbing; }
+.job-fab-link > .mascot-breathe { width: 84px; height: 84px; pointer-events: none; }
 .job-fab-mascot {
   width: 100%; height: 100%; object-fit: contain;
-  transform: translateY(10px) scaleX(-1);
+  transform: scaleX(-1);
   filter: drop-shadow(0 12px 18px rgba(116,66,42,.24));
 }
 .job-fab-bubble {
   font-size: 12px;
   line-height: 1.5;
-  position: absolute;
-  right: 82px;
-  top: 23px;
+  position: relative;
+  z-index: 1;
+  margin-right: -15px;
   width: max-content;
   max-width: calc(100vw - 122px);
   padding: 7px 11px;
@@ -198,7 +210,4 @@
   color: #6f503c;
   box-shadow: 0 8px 18px rgba(112,68,36,.11);
 }
-.job-fab-close { display: grid; place-items: center; position: absolute; top: 16px; right: 8px; width: 24px; height: 24px; padding: 0; border: 1.5px solid #fff; border-radius: 50%; background: #9b5037; color: #fff; cursor: pointer; }
-@media (min-width: 700px) {
-  .job-fab { bottom: calc(146px + env(safe-area-inset-bottom)); }
-}
+.job-fab-close { display: grid; place-items: center; position: absolute; top: 2px; right: 1px; width: 24px; height: 24px; padding: 0; border: 1.5px solid #fff; border-radius: 50%; background: #9b5037; color: #fff; cursor: pointer; }

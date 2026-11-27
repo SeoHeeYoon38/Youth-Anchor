@@ -22,7 +22,15 @@ const WELCOME_SPARKLES = [
   ['47%', '55%', '5px', '-3.9s', '5s', '-7px', '-18px'],
   ['63%', '43%', '6px', '-.5s', '5.8s', '8px', '-25px'],
   ['76%', '83%', '5px', '-2.9s', '5.3s', '-6px', '-19px'],
-  ['89%', '42%', '8px', '-1.8s', '6.3s', '7px', '-27px']
+  ['89%', '42%', '8px', '-1.8s', '6.3s', '7px', '-27px'],
+  ['12%', '28%', '9px', '-4.2s', '6.5s', '5px', '-19px'],
+  ['35%', '15%', '6px', '-2.3s', '5.9s', '-6px', '-16px'],
+  ['73%', '12%', '8px', '-1.3s', '6.7s', '4px', '-18px'],
+  ['22%', '54%', '6px', '-3.6s', '5.5s', '-5px', '-20px'],
+  ['81%', '49%', '9px', '-.9s', '6.1s', '6px', '-22px'],
+  ['6%', '70%', '7px', '-2.7s', '6.4s', '4px', '-18px'],
+  ['90%', '66%', '6px', '-4.6s', '5.8s', '-4px', '-16px'],
+  ['29%', '84%', '8px', '-1.9s', '6.3s', '5px', '-21px']
 ]
 
 export default function WelcomePage({ onQuickExit }) {
@@ -60,8 +68,7 @@ export default function WelcomePage({ onQuickExit }) {
       </section>
 
       <div className="welcome-visual">
-        <div className="welcome-glow" aria-hidden="true" />
-        <div className="welcome-sparkles" aria-hidden="true">
+        <div className="welcome-glow welcome-sparkles" aria-hidden="true">
           {WELCOME_SPARKLES.map(([left, top, size, delay, duration, driftX, driftY], index) => (
             <i
               key={`${left}-${top}`}
