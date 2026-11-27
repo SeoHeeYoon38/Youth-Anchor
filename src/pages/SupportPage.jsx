@@ -17,7 +17,7 @@ export default function SupportPage({ supports, onSelect }) {
     <div className="view support-view page-enter">
       <section className="support-hero">
         <span className="support-kicker"><Sparkles size={13} /> 맞춤 자립 지원</span>
-        <h1>혼자 준비하지<br />않아도 돼요</h1>
+        <h1>혼자 준비하지 않아도 돼요</h1>
         <p>주거, 생활비, 일자리, 식사 지원을 한곳에서 확인하세요.</p>
         <a className="support-callout" href="tel:1388">
           <img className="youth-call-icon" src="/icons/help/phone-heart.svg" alt="" />

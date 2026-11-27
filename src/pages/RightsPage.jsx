@@ -1,6 +1,6 @@
-import { Check, ChevronLeft, ChevronRight, ExternalLink, FolderOpen, FolderPlus, Phone, Plus, Search, Trash2, X } from 'lucide-react'
+import { BookOpen, BriefcaseBusiness, Check, ChevronLeft, ChevronRight, ExternalLink, FolderOpen, FolderPlus, GraduationCap, House, Landmark, Phone, Plus, School, Search, ShieldCheck, Trash2, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { fetchRightsDocuments, fetchUserData, recommendRightsCollection, saveUserData } from '../api.js'
 import FeatureHeader from '../components/FeatureHeader.jsx'
 import usePullDown from '../usePullDown.js'
@@ -16,6 +16,14 @@ const CATEGORIES = ['전체', '지원', '주거', '생활', '일자리']
 
 const BOOKS = RIGHTS_DOCUMENTS
 const DOCUMENT_DETAILS = RIGHTS_DOCUMENT_DETAILS
+const FEATURED_DOCUMENT_KEY = 'haven-last-featured-document'
+const FEATURED_SYMBOLS = {
+  bank: Landmark, lease: House, enrollment: School, graduation: GraduationCap,
+  'school-record': BookOpen, ged: GraduationCap, military: ShieldCheck,
+  employment: BriefcaseBusiness, career: BriefcaseBusiness
+}
+let lastFeaturedId = 'resident'
+let lastLoadedCatalog = BOOKS
 
 const PREP_METADATA = {
   resident: { detail: '주소 · 세대 정보', meta: '2026.11.01', rule: '제출처 기준 확인' },
@@ -52,16 +60,45 @@ function prepareCollections(stored, starter = laborStarterCollection) {
   return collections.some(({ id }) => id === laborStarterCollection.id) ? collections : [starter, ...collections]
 }
 
-function useRightsCatalog() {
-  const [books, setBooks] = useState(BOOKS)
+function useRightsCatalog(initialBooks = BOOKS) {
+  const [books, setBooks] = useState(initialBooks)
   useEffect(() => {
     let active = true
+    // Keep the offline catalog available while a sleeping server starts up.
+    const fallback = initialBooks === null ? window.setTimeout(() => setBooks(lastLoadedCatalog), 1800) : null
     fetchRightsDocuments().then((items) => {
-      if (active && items.length) setBooks(items)
-    }).catch(() => {})
-    return () => { active = false }
-  }, [])
+      if (!active) return
+      if (items.length) lastLoadedCatalog = items
+      setBooks(lastLoadedCatalog)
+    }).catch(() => { if (active) setBooks(lastLoadedCatalog) }).finally(() => window.clearTimeout(fallback))
+    return () => { active = false; window.clearTimeout(fallback) }
+  }, [initialBooks])
   return books
+}
+
+function FeaturedDocument({ books }) {
+  const [book] = useState(() => {
+    let previousId = lastFeaturedId
+    try { previousId = sessionStorage.getItem(FEATURED_DOCUMENT_KEY) || previousId } catch { /* Use the in-memory history. */ }
+    const index = books.findIndex((item) => item.id === previousId)
+    return books[(index + 1) % books.length]
+  })
+  useEffect(() => {
+    lastFeaturedId = book.id
+    try { sessionStorage.setItem(FEATURED_DOCUMENT_KEY, book.id) } catch { /* Storage can be disabled. */ }
+  }, [book.id])
+  const Symbol = FEATURED_SYMBOLS[book.id]
+
+  return <section className="rights-featured rights-featured-entry">
+    <span className="rights-pill">{book.category} · 서류 소개</span>
+    <h1><Link to={`/rights/document/${book.id}`}>{book.title}</Link></h1>
+    <p>{book.detail.summary}</p>
+    <div className="rights-document-art" data-category={book.category} aria-hidden="true">
+      {Symbol ? <Symbol strokeWidth={1.6} /> : <img src={`${ASSET_ROOT}/${book.icon}`} alt="" />}
+      <span /><span />
+    </div>
+    <img className="rights-sparkles" src={`${ASSET_ROOT}/rights-sparkles.png`} alt="" />
+  </section>
 }
 
 function useRightsLibrary() {
@@ -280,7 +317,8 @@ function PreparationChecklist({ catalog = BOOKS, collection, onViewDocument, onT
 
 export function RightsHomePage({ onQuickExit }) {
   const navigate = useNavigate()
-  const books = useRightsCatalog()
+  const catalog = useRightsCatalog(null)
+  const books = catalog || BOOKS
   const [query, setQuery] = useState('')
   const [params, setParams] = useSearchParams()
   const requestedCategory = params.get('category')
@@ -295,12 +333,7 @@ export function RightsHomePage({ onQuickExit }) {
   }
   return (
     <RightsShell onQuickExit={onQuickExit} pageClass="rights-home-page">
-      <section className="rights-featured">
-        <span className="rights-pill">생활 · 필수 서류</span><h1>주민등록등본·초본</h1>
-        <p>내가 사는 곳과 누구와 살고 있는지 알려줘요. 초본은 내 주소가 바뀐 기록 등을 보여줘요.</p>
-        <div className="rights-document-art" aria-hidden="true"><strong>주민등록등본</strong><span /><span /><span /></div>
-        <img className="rights-sparkles" src={`${ASSET_ROOT}/rights-sparkles.png`} alt="" />
-      </section>
+      {catalog ? <FeaturedDocument books={catalog} /> : <div className="rights-featured" aria-hidden="true" />}
       <label className="rights-search rights-main-search"><Search size={21} /><input aria-label="서류 검색" value={query} onChange={(event) => { setQuery(event.target.value); setPage(1) }} placeholder="서류 이름을 검색해 보세요" /></label>
       <CategoryTabs value={category} onChange={changeCategory} />
       {visibleBooks.length > 0 && <>

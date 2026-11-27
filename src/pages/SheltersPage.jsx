@@ -72,7 +72,7 @@ export default function SheltersPage({ shelters, position, locationMessage, loca
             <button className={viewTouched && viewMode === 'list' ? 'active' : ''} onClick={() => { setViewMode('list'); setViewTouched(true) }}>목록</button>
           </div>
           <button className={(isFilterActive(filter) || (filterTouched && filterOpen)) ? 'filter-button condition-button active' : 'filter-button condition-button'} onClick={() => { setFilterOpen((open) => !open); setFilterTouched(true) }} aria-expanded={filterOpen}>
-            <SlidersHorizontal size={14} /> 조건{isFilterActive(filter) ? ` · ${describeFilter(filter)}` : ''}
+            <SlidersHorizontal size={14} /><span>조건{isFilterActive(filter) ? ` · ${describeFilter(filter)}` : ''}</span>
           </button>
           <button className={locating || position ? 'filter-button active' : 'filter-button'} onClick={locateMe} disabled={locating} aria-pressed={Boolean(position)}>
             <LocateFixed size={14} className={locating ? 'spin' : ''} /> 내 위치

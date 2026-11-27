@@ -169,8 +169,18 @@
 .rights-featured h1 { margin: 14px 0 8px; font-size: 24px; line-height: 1.25; }
 .rights-featured p { margin: 0; color: #6f5b4c; font-size: 13px; line-height: 1.45; }
 .rights-document-art { width: 90px; height: 116px; padding: 18px 12px; position: absolute; right: 15px; top: 23px; transform: rotate(9deg); border-radius: 6px; background: #f2f3ff; box-shadow: 0 8px 14px rgba(78,65,111,.12); color: #526bc1; }
-.rights-document-art strong { display: block; margin-bottom: 15px; font-size: 11px; }
-.rights-document-art span { height: 5px; margin-top: 7px; display: block; border-radius: 4px; background: #aeb8e8; }
+.rights-document-art :is(img, svg) { display: block; width: 100%; height: 48%; object-fit: contain; margin-bottom: 5px; }
+.rights-document-art span { height: 4px; margin-top: 6px; display: block; border-radius: 4px; background: currentColor; opacity: .35; }
+.rights-document-art span:last-child { width: 70%; }
+.rights-document-art[data-category="주거"] { background: #fff0dc; color: #aa7143; }
+.rights-document-art[data-category="지원"] { background: #eff4e4; color: #77885a; }
+.rights-document-art[data-category="일자리"] { background: #f9e9de; color: #a86c4d; }
+.rights-featured h1 a { color: inherit; text-decoration: none; }
+.rights-featured h1 a::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .rights-featured-entry { animation: featured-document-in .28s ease-out; }
+  @keyframes featured-document-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+}
 .rights-sparkles { width: 70px; position: absolute; right: 0; top: 4px; object-fit: contain; }
 
 .rights-catalog-grid { margin: 12px 20px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 22px; }
@@ -302,7 +312,6 @@
 .rights-grid-button { width: 42px; height: 40px; }
 
 .rights-featured {
-  height: 196px;
   min-height: 196px;
   padding: 9px 145px 8px 2px;
 }
