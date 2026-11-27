@@ -18,13 +18,15 @@
 .diary-calendar-head button { width: 28px; height: 28px; display: grid; place-items: center; border: 0; background: transparent; color: #826d60; cursor: pointer; }
 .diary-calendar-head h2 { margin: 0; font-size: 17px; }
 .diary-calendar-head > span { justify-self: end; padding: 6px 9px; border-radius: 15px; background: #fff2e2; color: #c77b45; font-size: 9px; }
-.diary-weekdays, .diary-days { display: grid; grid-template-columns: repeat(7, 1fr); }
+.diary-weekdays, .diary-days { --diary-grid-line: #e8ddcf; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--diary-grid-line); }
 .diary-weekdays { margin-top: 15px; }
-.diary-weekdays span { color: #b59d90; font-size: 9px; text-align: center; }
-.diary-days { margin-top: 5px; row-gap: 3px; }
+.diary-weekdays span { padding-block: 4px; background: #fffdfa; color: #b59d90; font-size: 9px; text-align: center; }
+.diary-days { border-top: 1px solid var(--diary-grid-line); }
+.diary-days > span { background: #fffdfa; }
 .diary-days > span, .diary-days button { height: clamp(52px, 13.8vw, 68px); }
-.diary-days button { padding: 3px; display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; border-radius: 12px; background: transparent; color: #9d8678; font-size: 9px; cursor: pointer; }
-.diary-days button.today { border: 1px solid #f48745; color: #d8682b; font-weight: 900; }
+.diary-days button { position: relative; padding: 3px; display: flex; flex-direction: column; align-items: center; gap: 3px; border: 0; border-radius: 0; background: #fffdfa; color: #9d8678; font-size: 9px; cursor: pointer; }
+.diary-days button.today { color: #d8682b; font-weight: 900; }
+.diary-days button.today::after { content: ''; position: absolute; inset: 2px; border: 1px solid #f48745; border-radius: 10px; pointer-events: none; }
 .diary-days button img { width: clamp(32px, 8.8vw, 42px); height: clamp(32px, 8.8vw, 42px); object-fit: contain; }
 .diary-days button img.diary-calendar-photo { border: 0; border-radius: 50%; object-fit: cover; box-shadow: none; }
 

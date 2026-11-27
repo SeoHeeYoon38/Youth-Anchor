@@ -20,7 +20,7 @@ export default function HomePage({ shelters, locationMessage, locateMe, locating
       <section className="home-hero-card reveal-card">
         <div className="home-hero-copy">
           <span>오늘도 안전한 하루</span>
-          <h1>반가워요, 게스트님!</h1>
+          <h1>반가워요, 방문자님!</h1>
           <p>HAVEN과 함께 필요한 도움을 찾아봐요.</p>
         </div>
         <a href="tel:1388" className="home-help-line group transition duration-300 hover:-translate-y-1">

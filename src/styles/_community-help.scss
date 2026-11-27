@@ -10,6 +10,7 @@
   line-height: 1.6;
 }
 .shelter-visit-note svg { flex-shrink: 0; margin-top: 2px; }
+.family-help-card, .family-topic, .section-link { background: #fffdf9; }
 .family-help-card, .family-topic {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -19,15 +20,14 @@
   text-decoration: none;
 }
 .family-help-card, .family-topic {
-  background: #fffdf9;
   color: #50392b;
 }
-.family-help-card, .family-topic, .shelter-card-warm, .feature-tile {
+.family-help-card, .family-topic, .shelter-card-warm, .feature-tile, .section-link {
   border: 1px solid #eee1d1;
   border-radius: 20px;
   box-shadow: 0 3px 0 rgba(112, 74, 34, .09);
 }
-.family-help-card:hover, .family-topic:hover, .shelter-card-warm:hover, .feature-tile:hover { border-color: #cfac84; }
+.family-help-card:hover, .family-topic:hover, .shelter-card-warm:hover, .feature-tile:hover, .section-link:hover { border-color: #cfac84; }
 .family-help-card strong { display: block; font-size: 16px; line-height: 1.45; }
 .family-house-icon { display: block; width: 44px; height: 44px; object-fit: contain; }
 .family-help-card small { display: block; margin-top: 4px; color: #79634e; font-size: 12px; line-height: 1.6; }
@@ -150,6 +150,7 @@
 .center-finder-heading button { flex-shrink: 0; }
 .center-finder > p, .center-results p { margin: 8px 0 14px; color: #705b49; font-size: 14px; }
 .counseling-center-map { height: clamp(165px, 28dvh, 300px); border-radius: 16px; background: #f4eadb; overflow: hidden; }
+.counseling-center-map:not([hidden]) + .center-results { margin-top: clamp(16px, 4vw, 22px); }
 .center-results { list-style: none; padding: 0; display: grid; gap: 10px; }
 .center-results li { padding: 16px; border: 1px solid #eadbc7; border-radius: 16px; background: #fffdf9; }
 .center-results small { white-space: nowrap; color: #705b49; }

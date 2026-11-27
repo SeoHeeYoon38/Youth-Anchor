@@ -149,10 +149,10 @@
   margin: 0 auto 17px;
   padding: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: clamp(6px, 2.2vw, 11px);
+  gap: clamp(4px, 1.4vw, 9px);
   overflow: visible;
   scrollbar-width: none;
 }
@@ -162,7 +162,7 @@
   padding: 0;
   display: flex;
   flex: 0 0 auto;
-  gap: clamp(6px, 2.2vw, 11px);
+  gap: clamp(4px, 1.4vw, 9px);
   border-radius: 0;
   background: transparent;
 }
@@ -184,14 +184,15 @@
   white-space: nowrap;
   backdrop-filter: none;
 }
-.route-shelters .segmented-control button { padding: 0 6px; }
+.route-shelters .segmented-control button { min-width: clamp(40px, 12vw, 63px); padding: 0 6px; }
+.route-shelters .filter-button:not(.condition-button), .route-shelters .filter-button svg { flex-shrink: 0; }
 .route-shelters .condition-button {
-  min-width: clamp(58px, 15vw, 69px);
+  min-width: 0;
   max-width: 100%;
-  padding-right: 12px;
-  padding-left: 12px;
-  flex: 0 0 auto;
+  padding-inline: clamp(6px, 2vw, 12px);
+  flex: 0 1 auto;
 }
+.route-shelters .condition-button span { overflow: hidden; text-overflow: ellipsis; }
 .route-shelters .segmented-control button.active,
 .route-shelters .filter-button.active { border-color: #ffeac4; background: #f87d11; color: #fff; box-shadow: none; }
 .route-shelters .filter-button:disabled { opacity: .72; }
@@ -334,7 +335,7 @@
 @media (max-width: 390px) {
   .route-shelters .map-search { width: calc(100% - 44px); }
   .route-shelters .filter-panel, .route-shelters .map-wrap, .route-shelters .map-results { margin-left: 14px; margin-right: 14px; }
-  .route-shelters .map-controls { max-width: calc(100% - 44px); }
+  .route-shelters .map-controls { max-width: calc(100% - 28px); }
   .route-shelters .shelter-list { padding-left: 14px; padding-right: 14px; }
   .route-shelters .data-note { width: calc(100% - 28px); }
 }
@@ -342,7 +343,7 @@
 @media (max-width: 350px) {
   .route-shelters .map-controls { max-width: calc(100% - 28px); gap: 5px; }
   .route-shelters .segmented-control { gap: 5px; }
-  .route-shelters .segmented-control button, .route-shelters .filter-button { padding-left: 2px; padding-right: 2px; gap: 2px; font-size: 9px; }
+  .route-shelters .segmented-control button, .route-shelters .filter-button { padding-inline: 5px; gap: 3px; font-size: 10px; }
   .route-shelters .filter-button svg { width: 11px; height: 11px; }
   .route-shelters .filter-row { gap: 6px; }
   .route-shelters .filter-row button { padding: 0 1px; font-size: 9px; }

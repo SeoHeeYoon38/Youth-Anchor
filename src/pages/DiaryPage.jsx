@@ -169,6 +169,7 @@ export function DiaryHomePage({ onQuickExit }) {
   const month = cursor.getMonth()
   const daysInMonth = new Date(year, month + 1, 0).getDate()
   const firstDay = new Date(year, month, 1).getDay()
+  const trailingDays = (7 - (firstDay + daysInMonth) % 7) % 7
   const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
   const monthEntries = entries.filter((entry) => entry.date?.startsWith(monthPrefix))
   const entryByDate = new Map(monthEntries.map((entry) => [entry.date, entry]))
@@ -194,7 +195,7 @@ export function DiaryHomePage({ onQuickExit }) {
         <div className="diary-calendar-head"><button type="button" onClick={() => changeMonth(-1)} aria-label="이전 달"><ChevronLeft size={18} /></button><h2>{year}년 {month + 1}월</h2><button type="button" onClick={() => changeMonth(1)} aria-label="다음 달"><ChevronRight size={18} /></button><span>이번 달 기록 {monthEntries.length}일</span></div>
         <div className="diary-weekdays">{['일', '월', '화', '수', '목', '금', '토'].map((day) => <span key={day}>{day}</span>)}</div>
         <div className="diary-days">
-          {Array.from({ length: firstDay }, (_, index) => <span key={`blank-${index}`} />)}
+          {Array.from({ length: firstDay }, (_, index) => <span key={`blank-${index}`} aria-hidden="true" />)}
           {Array.from({ length: daysInMonth }, (_, index) => {
             const day = index + 1
             const key = `${monthPrefix}-${String(day).padStart(2, '0')}`
@@ -202,6 +203,7 @@ export function DiaryHomePage({ onQuickExit }) {
             const isToday = key === toDateKey(new Date())
             return <button type="button" key={key} className={isToday ? 'today' : ''} onClick={() => entry ? setSelectedEntry(entry) : navigate(`/diary/new?date=${key}`)}><span>{day}</span>{entry && (entry.photo ? <img className="diary-calendar-photo" src={entry.photo} alt="첨부 사진" /> : <DiaryVisual entry={entry} />)}</button>
           })}
+          {Array.from({ length: trailingDays }, (_, index) => <span key={`end-${index}`} aria-hidden="true" />)}
         </div>
       </section>
       <button type="button" className="diary-primary" onClick={() => navigate('/diary/new')}><Pencil size={19} /> 오늘 마음 남기기</button>

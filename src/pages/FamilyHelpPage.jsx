@@ -13,7 +13,7 @@ const childProtectionCenters = {
 }
 const youthShelters = {
   label: '가까운 청소년쉼터 찾기',
-  url: 'https://www.1388.go.kr/sfi/YTOSP_SC_SFI_01?untwktValue=U04'
+  path: '/shelters'
 }
 
 const topics = [
