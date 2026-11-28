@@ -180,15 +180,15 @@
 @media (prefers-reduced-motion: no-preference) {
   @supports (mask-image: linear-gradient(to right, transparent, black)) {
     .rights-featured-entry {
-      mask-image: linear-gradient(to right, transparent 42%, black 58%);
+      mask-image: linear-gradient(to left, transparent 42%, black 58%);
       mask-size: 250% 100%;
       mask-repeat: no-repeat;
-      mask-position: 100% 0;
-      animation: featured-document-in 1.5s ease-in-out;
+      mask-position: 0% 0;
+      animation: featured-document-in 1.2s ease-in-out;
     }
     @keyframes featured-document-in {
-      from { mask-position: 0% 0; }
-      to { mask-position: 100% 0; }
+      from { mask-position: 100% 0; }
+      to { mask-position: 0% 0; }
     }
   }
 }
