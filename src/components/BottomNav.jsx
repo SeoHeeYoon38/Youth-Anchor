@@ -20,13 +20,13 @@ export default function BottomNav({ warm = false, mapTheme = false, supportLast 
     <nav className={`bottom-nav ${warm ? 'warm-bottom-nav' : ''}`} aria-label="주요 메뉴">
       {items.map(({ to, label, icon: Icon, warmIcon, mapIcon, activeIcon }) => (
         <NavLink key={to} to={to} state={to === '/support' ? { supportNav: true } : undefined} className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-          {({ isActive }) => {
-            const src = isActive ? activeIcon : warm && (mapTheme ? mapIcon : warmIcon)
-            return <>
-              <span className="home-nav-icon" aria-hidden="true">{src ? <img src={src} alt="" /> : <Icon size={22} />}</span>
-              <span>{label}</span>
-            </>
-          }}
+          <span className="home-nav-icon" aria-hidden="true">
+            {warm && warmIcon
+              ? <img className="nav-idle-art" src={mapTheme ? mapIcon : warmIcon} alt="" />
+              : <Icon className="nav-idle-art" size={22} />}
+            <img className="nav-selected-art" src={activeIcon} alt="" />
+          </span>
+          <span>{label}</span>
         </NavLink>
       ))}
     </nav>
